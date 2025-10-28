@@ -1,0 +1,34 @@
+services:
+  postgis:
+    image: postgis/postgis:17-master
+    container_name: postgis
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"           
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+
+  geoserver:
+    image: docker.osgeo.org/geoserver:2.24.x
+    container_name: geoserver
+    restart: always
+    depends_on:
+      - postgis
+    environment:
+      TZ: America/Argentina/Cordoba
+      INSTALL_EXTENSIONS: "true"
+      STABLE_EXTENSIONS: "postgresql,ogr,monitor,importer,ysld"
+      COMMUNITY_EXTENSIONS: "cog,mbtiles"
+    ports:
+      - "8080:8080"          
+    volumes:
+      - ./geoserver_data:/opt/geoserver_data      
+      - ./geoserver_logs:/var/log/geoserver        
+
+volumes:
+  postgis_data:
+
