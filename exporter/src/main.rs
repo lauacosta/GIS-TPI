@@ -3,11 +3,24 @@ use std::{ffi::OsStr, path::Path, process::Command};
 fn main() {
     let force_reload = match std::env::args().nth(1).as_deref() {
         Some("reload" | "--reload" | "-r") => {
-            println!("Force reloading...");
+            println!("🔄 Force reloading...");
             true
         }
+        Some("help" | "--help" | "-h") => {
+            println!(
+                "Usage: exporter [OPTIONS]\n\n\
+             Options:\n  \
+               reload, --reload, -r    Force reload data\n  \
+               help,   --help,   -h    Show this help message\n\n\
+             If no option is provided, the program runs normally."
+            );
+            std::process::exit(0);
+        }
         Some(other) => {
-            eprintln!("❌ Unknown argument: {other}\nUsage: program [reload|--reload|-r]");
+            eprintln!(
+                "❌ Unknown argument: {other}\n\n\
+             Usage: program [reload|--reload|-r|help|--help|-h]"
+            );
             std::process::exit(1);
         }
         None => false,
@@ -40,6 +53,7 @@ fn main() {
         let shp_files: Vec<_> = std::fs::read_dir("./shp_files")
             .unwrap_or_else(|e| {
                 eprintln!("❌ Failed to read directory './shp_files': {e}");
+                eprintln!("❌ Please, create the directory and put all .shp files there");
                 std::process::exit(1);
             })
             .filter_map(|entry| entry.ok().map(|e| e.path()))
@@ -158,7 +172,6 @@ fn main() {
     }
 }
 
-/// Helper struct to clean up temporary directory on panic or error.
 struct CleanupGuard<'a> {
     path: &'a std::path::Path,
 }
