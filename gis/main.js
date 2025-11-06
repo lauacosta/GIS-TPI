@@ -21,8 +21,13 @@ const aside = document.querySelector("aside");
 
 menuBtn.addEventListener("click", () => {
   aside.classList.toggle("menu-open");
-  // aside.style.left = "-10%";
 });
+
+document.getElementById("center-arg").onclick = function () {
+  const view = map.getView();
+  view.setCenter(fromLonLat([-63.6, -38.4]));
+  view.setZoom(5);
+};
 
 document.getElementById("zoom-out").onclick = function () {
   const view = map.getView();
