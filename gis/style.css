@@ -94,6 +94,20 @@ body {
   height: 100%;
 }
 
+body {
+  opacity: 0;
+  animation: fadeIn 1s forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 #map {
   position: absolute;
   top: 0;
@@ -103,13 +117,15 @@ body {
 }
 
 aside {
+  --width: 250px;
+  --padd: 8px;
   height: 100dvh;
-  padding: 0.5rem;
+  padding: var(--padd);
   position: relative;
-  left: -10%;
+  left: calc((-1 * var(--width)) + var(--padd));
   top: 0;
   z-index: 10;
-  width: 200px;
+  width: var(--width);
   transition: all 0.3s ease;
 }
 
