@@ -1,5 +1,11 @@
 @import "node_modules/ol/ol.css";
 
+:root {
+  --font: "Noto Sans JP", sans-serif;
+  --bg-400: #f9f6ee;
+  --box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
 /* 1. Use a more-intuitive box-sizing model */
 *,
 *::before,
@@ -10,7 +16,7 @@
 /* 2. Remove default margin */
 * {
   margin: 0;
-  font-family: "Noto Sans JP", sans-serif;
+  font-family: var(--font);
 }
 
 /* 3. Enable keyword animations */
@@ -69,9 +75,14 @@ h6 {
   text-wrap: balance;
 }
 
+button {
+  all: unset;
+  cursor: pointer;
+}
+
 /*
-  10. Create a root stacking context
-*/
+    10. Create a root stacking context
+  */
 #root,
 #__next {
   isolation: isolate;
@@ -83,19 +94,66 @@ body {
   height: 100%;
 }
 
-body {
-  display: grid;
-  grid-template-columns: auto 1fr;
-}
-
 #map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
   width: 100%;
 }
 
 aside {
-  width: fit-content;
   height: 100dvh;
-  background-color: #f9f6ee;
-  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  padding: 0.5rem;
+  position: relative;
+  left: -10%;
+  top: 0;
+  z-index: 10;
+  width: 200px;
+  transition: all 0.3s ease;
+}
+
+.menu-open {
+  left: 0;
+}
+
+.aside-container {
+  height: 100%;
   padding: 0.5rem 1rem;
+  background-color: var(--bg-400);
+  box-shadow: var(--box-shadow);
+  border-radius: 4px;
+  width: 100%;
+}
+
+.ol-zoom {
+  display: none;
+}
+
+.controls-container {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  z-index: 10;
+}
+
+.controls-group {
+  display: grid;
+  place-content: center;
+
+  background-color: var(--bg-400);
+  border-radius: 4px;
+
+  box-shadow: var(--box-shadow);
+}
+
+.controls-group button {
+  display: grid;
+  place-content: center;
+  padding: 0.3rem;
 }
