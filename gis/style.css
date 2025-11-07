@@ -1,7 +1,7 @@
-@import "node_modules/ol/ol.css";
+@import 'node_modules/ol/ol.css';
 
 :root {
-  --font: "Noto Sans JP", sans-serif;
+  --font: 'Noto Sans JP', sans-serif;
   --bg-200: rgb(255, 254, 251);
   --bg-300: rgb(250, 247, 242);
   --border-400: #d8d6cf;
@@ -169,9 +169,23 @@ header {
   transition: all 0.3s ease;
   cursor: pointer;
   border-radius: var(--border-radius);
+  display: flex;
+  gap: 1rem;
 }
 
 .layers li:hover {
+  background-color: var(--bg-300);
+}
+
+.clean-selection {
+  width: calc(100% - 34px);
+  padding: 0.5rem;
+  text-align: center;
+  margin: 0.5rem;
+  padding: 0.5rem;
+  font-weight: 600;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-400);
   background-color: var(--bg-300);
 }
 
