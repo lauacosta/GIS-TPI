@@ -84,7 +84,7 @@ function createWFSLayer(layerName) {
   });
 }
 
-const layersWMS = layers.map((layerInfo) => createWMSLayer(layerInfo[0]));
+// const layersWMS = layers.map((layerInfo) => createWMSLayer(layerInfo[0]));
 const layersWFS = layers.map((layerInfo) => createWFSLayer(layerInfo[0]));
 
 const capaBaseOSM = new TileLayer({
@@ -114,9 +114,15 @@ const map = new Map({
 
 const menuBtn = document.getElementById("menu");
 const aside = document.querySelector("aside");
+const escala = document.querySelector(".ol-scale-bar");
 
 menuBtn.addEventListener("click", () => {
   aside.classList.toggle("menu-open");
+  if (escala.style.left == "0.5rem") {
+    escala.style.left = "350px";
+  } else {
+    escala.style.left = "0.5rem";
+  }
 });
 
 document.getElementById("center-arg").onclick = function () {
@@ -151,6 +157,7 @@ document.getElementById("zoom-in").onclick = function () {
 const ulLayers = document.querySelector(".layers");
 
 layers.map((layer) => {
+  console.log(layer);
   ulLayers.insertAdjacentHTML(
     "afterbegin",
     `
