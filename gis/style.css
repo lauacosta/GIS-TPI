@@ -4,8 +4,9 @@
   --font: "Noto Sans JP", sans-serif;
   --bg-200: rgb(255, 254, 251);
   --bg-300: rgb(250, 247, 242);
+
   --border-400: #d8d6cf;
-  --box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  --box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   --border-radius: 4px;
 }
 
@@ -100,21 +101,22 @@ html,
 body {
   margin: 0;
   height: 100%;
+  background-color: #aad3df;
 }
 
-body {
+/* body {
   opacity: 0;
   animation: fadeIn 1s forwards;
-}
+} */
 
-@keyframes fadeIn {
+/* @keyframes fadeIn {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
   }
-}
+} */
 
 #map {
   position: absolute;
@@ -126,8 +128,7 @@ body {
 
 aside {
   --width: 350px;
-  --padd: 8px;
-  height: 100dvh;
+  --padd: 0.5rem;
   padding: var(--padd);
   position: relative;
   left: calc((-1 * var(--width)) + var(--padd));
@@ -138,9 +139,52 @@ aside {
 }
 
 header {
+  padding: 0.5rem 0.5rem 0 0.5rem;
+}
+
+.header-container {
+  display: flex;
+  position: relative;
+  z-index: 2;
+  background-color: var(--bg-200);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  height: 36px;
+}
+
+.tabs {
+  & ul {
+    display: flex;
+    font-size: 0.875rem;
+    height: 100%;
+  }
+
+  & li {
+    display: grid;
+    align-items: center;
+    padding-inline: 1rem;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  & li:hover {
+    background-color: var(--bg-300);
+  }
+}
+
+.selected-tab {
+  background-color: var(--bg-300);
+}
+
+.title-container {
   padding-inline: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border-400);
+  height: 100%;
+  display: flex;
+  align-items: center;
+
+  & h1 {
+    font-size: 1rem;
+  }
 }
 
 .menu-open {
@@ -148,12 +192,14 @@ header {
 }
 
 .aside-container {
-  height: 100%;
+  position: relative;
+  z-index: 2;
+  height: calc(100dvh - 1.5rem - 36px);
   padding: 0.5rem 0;
   background-color: var(--bg-200);
   box-shadow: var(--box-shadow);
   border-radius: var(--border-radius);
-  width: 100%;
+  width: 334px;
   overflow: hidden;
 }
 
@@ -177,12 +223,26 @@ header {
   background-color: var(--bg-300);
 }
 
+.aside-actions {
+  padding: 0.5rem;
+  width: 100%;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.search {
+  all: unset;
+  width: calc(100% - 1rem);
+  padding: 0.5rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-400);
+}
+
 .clean-selection {
-  width: calc(100% - 34px);
-  padding: 0.5rem;
+  width: 100%;
+  padding-block: 0.5rem;
   text-align: center;
-  margin: 0.5rem;
-  padding: 0.5rem;
+
   font-weight: 600;
   border-radius: var(--border-radius);
   border: 1px solid var(--border-400);
@@ -223,4 +283,5 @@ header {
 
 .ol-scale-bar {
   left: 350px;
+  transition: all 0.3s ease;
 }
