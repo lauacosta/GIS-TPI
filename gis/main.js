@@ -214,14 +214,15 @@ async function fetchLayersFromGeoServer(workspace) {
     const all = result.Capability.Layer.Layer;
 
     return all
-        .map((/** @type {{ Name: string; }} */ l) => {
+        .map((/** @type {{ Name: string; Style: { Name: string; }[]; }} */ l) => {
+            const type = l.Style[0].Name
             const raw = l.Name.replace(`${workspace}:`, "");
             const format = raw
                 .replace(/_/g, " ")
                 .toLowerCase()
                 .replace(/\b\w/g, c => c.toUpperCase());
 
-            return [raw, format];
+            return [raw, format, type];
         });
 }
 
@@ -288,10 +289,16 @@ async function init_map(map) {
     function renderList(list) {
         ulLayers.innerHTML = "";
 
-        list.forEach(([layerName, label], /** @type {string | number} */ i) => {
+        list.forEach(([layerName, label, type], /** @type {string | number} */ i) => {
+            const emoji = {
+                point: "📍",
+                polygon: "⬟",
+                line: "➖"
+            }[type] ?? "❓";
+
             ulLayers.insertAdjacentHTML(
                 "beforeend",
-                `<li><input type="checkbox" id="${layerName}"><label for="${layerName}">${label}</label></li>`
+                `<li><input type="checkbox" id="${layerName}"><label for="${layerName}">${emoji} ${label}</label></li>`
             );
 
             /** @type {HTMLInputElement | null} */
