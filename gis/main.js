@@ -9,13 +9,13 @@ import DragBox from 'ol/interaction/DragBox.js';
 import { getWidth } from 'ol/extent.js';
 import { defaults as defaultControls } from "ol/control/defaults.js";
 import { fromLonLat } from "ol/proj";
-import Fill from 'ol/style/Fill.js';
-import Stroke from 'ol/style/Stroke.js';
-import Style from 'ol/style/Style.js';
-import VectorSource from 'ol/source/Vector.js';
+import Fill from "ol/style/Fill.js";
+import Stroke from "ol/style/Stroke.js";
+import Style from "ol/style/Style.js";
+import VectorSource from "ol/source/Vector.js";
 import VectorLayer from "ol/layer/Vector";
-import { platformModifierKeyOnly } from 'ol/events/condition.js';
-import Select from 'ol/interaction/Select.js';
+import { platformModifierKeyOnly } from "ol/events/condition.js";
+import Select from "ol/interaction/Select.js";
 import ScaleLine from "ol/control/ScaleLine.js";
 import WMSCapabilities from "ol/format/WMSCapabilities.js";
 
@@ -31,14 +31,10 @@ const layerColors = [
     "#cc99ff",
     "#ff99cc",
     "#99ffcc",
-    "#cccc66"
+    "#cccc66",
 ];
-
 let layerIndex = 0;
 
-/**
- * @returns {ScaleLine}
- */
 function scaleControl() {
     const control = new ScaleLine({
         bar: true,
@@ -57,12 +53,19 @@ function scaleControl() {
 function installMapControls(map) {
     const menuBtn = document.getElementById("menu");
     const aside = document.querySelector("aside");
+    const escala = document.querySelector(".ol-scale-bar");
 
     if (!menuBtn) { console.error("menu id not found"); return };
     if (!aside) { console.error("aside not found"); return };
+    if (!escala) { console.error("ol-scale-bar not found"); return };
 
     menuBtn.addEventListener("click", () => {
         aside.classList.toggle("menu-open");
+        if (escala.style.left == "0.5rem") {
+            escala.style.left = "350px";
+        } else {
+            escala.style.left = "0.5rem";
+        }
     });
 
     document.getElementById("center-arg").onclick = function() {
@@ -104,11 +107,9 @@ function installInteractions(map, layersWFS) {
             width: 2,
         }),
     });
-
     const select = new Select({
         style: selectedStyle,
     });
-
     map.addInteraction(select);
 
     select.on('select', function() {
@@ -193,6 +194,7 @@ function installInteractions(map, layersWFS) {
             console.info("No features selected.");
         }
     });
+
 
     dragBox.on('boxstart', function() {
         select.clearSelection();
@@ -305,7 +307,6 @@ async function init_map(map) {
             });
         });
     }
-
     renderList(layers);
 
     searchInput.addEventListener("input", () => {
@@ -328,7 +329,6 @@ async function init_map(map) {
 }
 
 
-// async function main() {
 const map = new Map({
     controls: defaultControls().extend([scaleControl()]),
     target: "map",
@@ -341,8 +341,3 @@ const map = new Map({
 const layersWFS = await init_map(map)
 installMapControls(map)
 installInteractions(map, layersWFS)
-// }
-
-// await main()
-
-
