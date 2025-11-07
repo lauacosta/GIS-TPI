@@ -1,7 +1,9 @@
 // @ts-check
 import OSM from "ol/source/OSM";
+import { transformExtent } from 'ol/proj';
 import TileLayer from "ol/layer/Tile";
 import { Map, View } from "ol";
+import { bbox as bboxStrategy } from 'ol/loadingstrategy.js';
 import GeoJSON from 'ol/format/GeoJSON.js';
 import DragBox from 'ol/interaction/DragBox.js';
 import { getWidth } from 'ol/extent.js';
@@ -18,6 +20,7 @@ import ScaleLine from "ol/control/ScaleLine.js";
 import WMSCapabilities from "ol/format/WMSCapabilities.js";
 
 const workspace = "TPI_GIS";
+const EPSG_ID = 4326;
 const CORRIENTES_TIENE_PAYE = fromLonLat([-58.82, -27.493]);
 
 const layerColors = [
@@ -232,11 +235,18 @@ function createWFSLayer(layerName) {
         stroke: new Stroke({ color: "#222", width: 1 }),
     });
 
-
     const layer = new VectorLayer({
         source: new VectorSource({
-            url: `http://localhost:8080/geoserver/${workspace}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${workspace}:${layerName}&outputFormat=application/json&srsname=EPSG:4326`,
+            // url: `http://localhost:8080/geoserver/${workspace}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${workspace}:${layerName}&outputFormat=application/json&srsname=EPSG:4326`,
             format: new GeoJSON(),
+            url: (extent) => {
+                const fixed_extent = transformExtent(extent, 'EPSG:3857', `EPSG:${EPSG_ID}`);
+                return `http://localhost:8080/geoserver/${workspace}/ows?service=WFS&` +
+                    `version=1.1.0&request=GetFeature&typeName=${workspace}:${layerName}&` +
+                    `outputFormat=application/json&` +
+                    `srsname=EPSG:${EPSG_ID}&bbox=${fixed_extent.join(',')},EPSG:${EPSG_ID}`;
+            },
+            strategy: bboxStrategy,
         }),
         visible: false,
         style: layerStyle,
@@ -318,21 +328,21 @@ async function init_map(map) {
 }
 
 
-async function main() {
-    const map = new Map({
-        controls: defaultControls().extend([scaleControl()]),
-        target: "map",
-        view: new View({
-            center: CORRIENTES_TIENE_PAYE,
-            zoom: 12,
-        }),
-    });
+// async function main() {
+const map = new Map({
+    controls: defaultControls().extend([scaleControl()]),
+    target: "map",
+    view: new View({
+        center: CORRIENTES_TIENE_PAYE,
+        zoom: 12,
+    }),
+});
 
-    const layersWFS = await init_map(map)
-    installMapControls(map)
-    installInteractions(map, layersWFS)
-}
+const layersWFS = await init_map(map)
+installMapControls(map)
+installInteractions(map, layersWFS)
+// }
 
-await main()
+// await main()
 
 
