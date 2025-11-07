@@ -14,7 +14,7 @@ import Style from 'ol/style/Style.js';
 import { platformModifierKeyOnly } from 'ol/events/condition.js';
 import Select from 'ol/interaction/Select.js';
 
-const workspace = "TPI_GIS";
+const workspace = 'TPI_GIS';
 
 const style = new Style({
     fill: new Fill({
@@ -118,7 +118,7 @@ const map = new Map({
     layers: [capaBaseOSM, ...layersWMS],
     view: new View({
         center: fromLonLat([-63.6, -38.4]),
-        zoom: 2,
+        zoom: 5,
     }),
 });
 
@@ -173,6 +173,8 @@ document.getElementById("zoom-in").onclick = function() {
 
 const ulLayers = document.querySelector(".layers");
 
+// Source - https://stackoverflow.com/questions/814564/inserting-html-elements-with-javascript
+
 layers.map((layer) => {
     ulLayers.insertAdjacentHTML("afterbegin",
         `
@@ -192,6 +194,7 @@ layers.map((layer) => {
         });
     });
 });
+
 
 const select = new Select({
     filter: function(feature) {
