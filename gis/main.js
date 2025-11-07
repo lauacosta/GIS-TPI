@@ -254,8 +254,8 @@ function createWFSLayer(layerName) {
         visible: false,
         style: layerStyle,
     });
-
     layer.set('layerName', layerName);
+
     return layer
 }
 
@@ -277,6 +277,16 @@ async function init_map(map) {
 
     /** @type {HTMLInputElement | null} */
     const searchInput = document.getElementById("layer-search");
+    const cleanBtn = document.querySelector(".clean-selection");
+
+    cleanBtn.addEventListener("click", () => {
+        ulLayers.querySelectorAll("input[type='checkbox']").forEach((checkbox, i) => {
+            checkbox.checked = false;
+            layersWFS[i].setVisible(false);
+        });
+
+        cleanBtn.style.display = "none";
+    });
 
     if (!ulLayers || !searchInput) {
         console.warn("Missing .layers UL or #layer-search input");
@@ -311,6 +321,10 @@ async function init_map(map) {
             checkbox.checked = layersWFS[layerIndex].getVisible();
             checkbox.addEventListener("change", () => {
                 layersWFS[layerIndex].setVisible(checkbox.checked);
+
+                const anyChecked = [...ulLayers.querySelectorAll("input[type='checkbox']")]
+                    .some(input => input.checked);
+                cleanBtn.style.display = anyChecked ? "inline-block" : "none";
             });
         });
     }
@@ -340,6 +354,7 @@ const map = new Map({
     controls: defaultControls().extend([scaleControl()]),
     target: "map",
     view: new View({
+        // projection: `EPSG:${EPSG_ID}`,
         center: CORRIENTES_TIENE_PAYE,
         zoom: 12,
     }),
