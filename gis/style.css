@@ -1,7 +1,7 @@
-@import 'node_modules/ol/ol.css';
+@import "node_modules/ol/ol.css";
 
 :root {
-  --font: 'Noto Sans JP', sans-serif;
+  --font: "Noto Sans JP", sans-serif;
   --bg-200: rgb(255, 254, 251);
   --bg-300: rgb(250, 247, 242);
   --border-400: #d8d6cf;
@@ -9,45 +9,125 @@
   --border-radius: 4px;
 }
 
+/* 1. Use a more-intuitive box-sizing model */
 *,
 *::before,
-*::after { box-sizing: border-box; }
-* { margin: 0; font-family: var(--font); }
-@media (prefers-reduced-motion: no-preference) { html { interpolate-size: allow-keywords; } }
-body { line-height: 1.5; -webkit-font-smoothing: antialiased; }
-img, picture, video, canvas, svg { display: block; max-width: 100%; }
-input, button, textarea, select { font: inherit; }
-p, h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }
-p { text-wrap: pretty; }
-h1, h2, h3, h4, h5, h6 { text-wrap: balance; }
-ul { list-style-type: none; padding: 0; }
-button { all: unset; cursor: pointer; }
-#root, #__next { isolation: isolate; }
-html, body { margin: 0; height: 100%; }
-
-body { opacity: 0; animation: fadeIn 1s forwards; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-.page-title { padding: 1rem; border-bottom: 1px solid var(--border-400); background: var(--bg-200); }
-
-#map {
-  position: relative;
-  width: 100%;
-  height: 50vh;
-  border-bottom: 1px solid var(--border-400);
+*::after {
+  box-sizing: border-box;
 }
 
-.bottom-panel {
-  display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 0;
-  min-height: 50vh;
+/* 2. Remove default margin */
+* {
+  margin: 0;
+  font-family: var(--font);
+}
+
+/* 3. Enable keyword animations */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    interpolate-size: allow-keywords;
+  }
+}
+
+body {
+  /* 4. Add accessible line-height */
+  line-height: 1.5;
+  /* 5. Improve text rendering */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 6. Improve media defaults */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* 7. Inherit fonts for form controls */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* 8. Avoid text overflows */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+/* 9. Improve line wrapping */
+p {
+  text-wrap: pretty;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+button {
+  all: unset;
+  cursor: pointer;
+}
+
+/*
+    10. Create a root stacking context
+  */
+#root,
+#__next {
+  isolation: isolate;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  opacity: 0;
+  animation: fadeIn 1s forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+#map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
 }
 
 aside {
   --width: 350px;
   --padd: 8px;
-  height: 100%;
+  height: 100dvh;
   padding: var(--padd);
   position: relative;
   left: calc((-1 * var(--width)) + var(--padd));
@@ -56,7 +136,16 @@ aside {
   width: var(--width);
   transition: all 0.3s ease;
 }
-.menu-open { left: 0; }
+
+header {
+  padding-inline: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-400);
+}
+
+.menu-open {
+  left: 0;
+}
 
 .aside-container {
   height: 100%;
@@ -67,18 +156,14 @@ aside {
   width: 100%;
   overflow: hidden;
 }
-.aside-container > header {
-  padding-inline: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border-400);
-}
 
 .layers {
-  overflow-y: auto;
-  height: calc(100% - 2.5rem);
+  overflow-y: scroll;
+  height: 100%;
   padding: 0.5rem;
   gap: 0.5rem;
 }
+
 .layers li {
   padding: 0.5rem;
   transition: all 0.3s ease;
@@ -87,19 +172,7 @@ aside {
   display: flex;
   gap: 1rem;
 }
-.layers li:hover { background-color: var(--bg-300); }
 
-<<<<<<< HEAD
-.ol-zoom { display: none; }
-||||||| f1e146c
-.layers li:hover {
-  background-color: var(--bg-300);
-}
-
-.ol-zoom {
-  display: none;
-}
-=======
 .layers li:hover {
   background-color: var(--bg-300);
 }
@@ -119,7 +192,6 @@ aside {
 .ol-zoom {
   display: none;
 }
->>>>>>> main
 
 .controls-container {
   position: absolute;
@@ -132,60 +204,23 @@ aside {
   padding: 0.5rem 0;
   z-index: 10;
 }
+
 .controls-group {
   display: grid;
   place-content: center;
+
   background-color: var(--bg-200);
   border-radius: var(--border-radius);
+
   box-shadow: var(--box-shadow);
 }
+
 .controls-group button {
   display: grid;
   place-content: center;
   padding: 0.3rem;
 }
 
-.info-panel { padding: 1rem; overflow-y: auto; }
-
-.tabs {
-  display: flex;
-  gap: 0.5rem;
-  border-bottom: 1px solid var(--border-400);
-  margin-bottom: 1rem;
-  min-height: 2.2rem;
-}
-.tabs button {
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px 6px 0 0;
-  background: var(--bg-300);
-  border: 1px solid var(--border-400);
-  border-bottom: none;
-}
-.tabs button.active {
-  background: white;
-  font-weight: 600;
-  box-shadow: var(--box-shadow);
-}
-
-.tab-content { padding: 0.5rem; }
-
-.tab-content table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border: 1px solid var(--border-400);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: var(--box-shadow);
-}
-.tab-content th, .tab-content td {
-  padding: 0.55rem 0.7rem;
-  border-bottom: 1px solid var(--border-400);
-  text-align: left;
-  vertical-align: top;
-}
-.tab-content tr:nth-child(even) td { background: var(--bg-300); }
-.tab-content th {
-  background: var(--bg-200);
-  font-weight: 700;
+.ol-scale-bar {
+  left: 350px;
 }
