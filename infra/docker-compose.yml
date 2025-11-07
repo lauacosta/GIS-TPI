@@ -23,6 +23,10 @@ services:
       INSTALL_EXTENSIONS: "true"
       STABLE_EXTENSIONS: "postgresql,ogr,monitor,importer,wps,ysld"
       COMMUNITY_EXTENSIONS: "cog,mbtiles"
+      CORS_ENABLED: "true"
+      CORS_ALLOWED_ORIGINS: "*"
+      CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,HEAD,OPTIONS"
+      CORS_ALLOWED_HEADERS: "*"
     ports:
       - "8080:8080"          
     volumes:
