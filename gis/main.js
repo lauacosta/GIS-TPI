@@ -5,6 +5,9 @@ import { fromLonLat } from "ol/proj";
 import { TileWMS } from "ol/source";
 import ScaleLine from "ol/control/ScaleLine.js";
 import { defaults as defaultControls } from "ol/control/defaults.js";
+import VectorSource from "ol/source/Vector";
+import VectorLayer from "ol/layer/Vector";
+import GeoJSON from "ol/format/GeoJSON";
 
 const workspace = "TPI_GIS";
 
@@ -71,7 +74,18 @@ function createWMSLayer(layerName) {
   });
 }
 
+function createWFSLayer(layerName) {
+  return new VectorLayer({
+    source: new VectorSource({
+      url: `http://localhost:8080/geoserver/${workspace}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${workspace}:${layerName}&outputFormat=application/json&srsname=EPSG:4326`,
+      format: new GeoJSON(),
+    }),
+    visible: false,
+  });
+}
+
 const layersWMS = layers.map((layerInfo) => createWMSLayer(layerInfo[0]));
+const layersWFS = layers.map((layerInfo) => createWFSLayer(layerInfo[0]));
 
 const capaBaseOSM = new TileLayer({
   source: new OSM(),
@@ -91,7 +105,7 @@ function scaleControl() {
 const map = new Map({
   controls: defaultControls().extend([scaleControl()]),
   target: "map",
-  layers: [capaBaseOSM, ...layersWMS],
+  layers: [capaBaseOSM, ...layersWFS],
   view: new View({
     center: fromLonLat([-63.6, -38.4]),
     zoom: 5,
@@ -150,9 +164,9 @@ layers.forEach((layer, i) => {
   const input = document.getElementById(id);
   if (!input) return;
 
-  input.checked = layersWMS[i].getVisible();
+  input.checked = layersWFS[i].getVisible();
 
   input.addEventListener("change", (e) => {
-    layersWMS[i].setVisible(e.target.checked);
+    layersWFS[i].setVisible(e.target.checked);
   });
 });
