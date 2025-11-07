@@ -1,7 +1,7 @@
-@import 'node_modules/ol/ol.css';
+@import "node_modules/ol/ol.css";
 
 :root {
-  --font: 'Noto Sans JP', sans-serif;
+  --font: "Noto Sans JP", sans-serif;
   --bg-200: rgb(255, 254, 251);
   --bg-300: rgb(250, 247, 242);
   --border-400: #d8d6cf;
@@ -219,4 +219,8 @@ header {
   display: grid;
   place-content: center;
   padding: 0.3rem;
+}
+
+.ol-scale-bar {
+  left: 350px;
 }

@@ -3,7 +3,8 @@ import TileLayer from "ol/layer/Tile";
 import { Map, View } from "ol";
 import { fromLonLat } from "ol/proj";
 import { TileWMS } from "ol/source";
-import { easeIn, easeOut, inAndOut } from "ol/easing";
+import ScaleLine from "ol/control/ScaleLine.js";
+import { defaults as defaultControls } from "ol/control/defaults.js";
 
 const workspace = "TPI_GIS";
 
@@ -76,7 +77,19 @@ const capaBaseOSM = new TileLayer({
   source: new OSM(),
 });
 
+function scaleControl() {
+  const control = new ScaleLine({
+    bar: true,
+    steps: 4,
+    text: true,
+    minWidth: 140,
+  });
+
+  return control;
+}
+
 const map = new Map({
+  controls: defaultControls().extend([scaleControl()]),
   target: "map",
   layers: [capaBaseOSM, ...layersWMS],
   view: new View({
