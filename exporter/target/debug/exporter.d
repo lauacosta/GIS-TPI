@@ -1,1 +1,1 @@
-/home/lautaro/Documents/GIS-TPI/target/debug/exporter: /home/lautaro/Documents/GIS-TPI/src/main.rs
+/home/lautaro/Documents/GIS-TPI/exporter/target/debug/exporter: /home/lautaro/Documents/GIS-TPI/exporter/src/main.rs

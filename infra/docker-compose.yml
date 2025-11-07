@@ -31,4 +31,3 @@ services:
 
 volumes:
   postgis_data:
-

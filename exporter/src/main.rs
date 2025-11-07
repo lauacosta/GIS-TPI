@@ -152,7 +152,17 @@ fn main() {
         println!("📥 Inserting {entry_path} into PostGIS...");
 
         let output = Command::new("psql")
-            .args(["-U", "lautaro", "-d", "gisdb", "-f", &entry_path])
+            .env("PGPASSWORD", "postgres")
+            .args([
+                "-h",
+                "localhost",
+                "-U",
+                "postgres",
+                "-d",
+                "postgres",
+                "-f",
+                &entry_path,
+            ])
             .output()
             .unwrap_or_else(|e| {
                 eprintln!("❌ Failed to execute psql for {entry_path}: {e}");
