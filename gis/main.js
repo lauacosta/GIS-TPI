@@ -14,7 +14,7 @@ import Style from 'ol/style/Style.js';
 import { platformModifierKeyOnly } from 'ol/events/condition.js';
 import Select from 'ol/interaction/Select.js';
 
-const workspace = 'TPI_GIS';
+const workspace = "TPI_GIS";
 
 const style = new Style({
     fill: new Fill({
@@ -74,22 +74,20 @@ const layers = [
 ];
 
 // ---------- LIB ---------
-function createWMSLayer(layerName) {
-    return new TileLayer({
-        source: new TileWMS({
-            url: "http://localhost:8080/geoserver/wms",
-            params: {
-                LAYERS: `${workspace}:${layerName}`,
-                TILED: true,
-            },
-            serverType: "geoserver",
+
+
+function createWFSLayer(layerName) {
+    return new VectorLayer({
+        source: new VectorSource({
+            url: `http://localhost:8080/geoserver/${workspace}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${workspace}:${layerName}&outputFormat=application/json&srsname=EPSG:4326`,
+            format: new GeoJSON(),
         }),
         visible: false,
     });
 }
 
 // ---------- CAPAS ---------
-const layersWMS = layers.map((layerInfo) => createWMSLayer(layerInfo[0]));
+const layersWFS = layers.map((layerInfo) => createWFSLayer(layerInfo[0]));
 
 const capaBaseOSM = new TileLayer({
     source: new OSM(),
@@ -112,10 +110,21 @@ const capaBaseOSM = new TileLayer({
 
 
 // ---------- MAPA ---------
+function scaleControl() {
+    const control = new ScaleLine({
+        bar: true,
+        steps: 4,
+        text: true,
+        minWidth: 140,
+    });
+
+    return control;
+}
+
 const map = new Map({
+    controls: defaultControls().extend([scaleControl()]),
     target: "map",
-    // layers: [capaBaseOSM, ...layersWMS, vectorLayer1],
-    layers: [capaBaseOSM, ...layersWMS],
+    layers: [capaBaseOSM, ...layersWFS],
     view: new View({
         center: fromLonLat([-63.6, -38.4]),
         zoom: 5,
@@ -130,8 +139,7 @@ const selectedStyle = new Style({
         color: 'rgba(255, 255, 255, 0.7)',
         width: 2,
     }),
-});
-
+})
 
 // ---------- INTERACCIONES ---------
 const menuBtn = document.getElementById("menu");
@@ -171,14 +179,15 @@ document.getElementById("zoom-in").onclick = function() {
 };
 
 
-const ulLayers = document.querySelector(".layers");
-
 // Source - https://stackoverflow.com/questions/814564/inserting-html-elements-with-javascript
+const ulLayers = document.querySelector('.layers');
 
 layers.map((layer) => {
-    ulLayers.insertAdjacentHTML("afterbegin",
+
+    ulLayers.insertAdjacentHTML(
+        'afterbegin',
         `
-    <li><input type="checkbox" id="${layer[0]}"><label for="${layer[0]}">${layer[1]}</label></li>
+        < li > <input type="checkbox" id="${layer[0]}"><label for="${layer[0]}">${layer[1]}</label></li>
     `
     );
 
@@ -187,10 +196,10 @@ layers.map((layer) => {
         const input = document.getElementById(id);
         if (!input) return;
 
-        input.checked = layersWMS[i].getVisible();
+        input.checked = layersWFS[i].getVisible();
 
         input.addEventListener("change", (e) => {
-            layersWMS[i].setVisible(e.target.checked);
+            layersWFS[i].setVisible(e.target.checked);
         });
     });
 });
@@ -308,13 +317,14 @@ function renderTabs(features) {
 
 function showFeature(feature) {
     tabContent.innerHTML = `
-    <table>
-      <tr><th>Campo</th><th>Valor</th></tr>
+        < table >
+        <tr><th>Campo</th><th>Valor</th></tr>
       ${Object.entries(feature.getProperties())
             .filter(([key]) => key !== 'geometry')
             .map(([key, value]) => `<tr><td>${key}</td><td>${value}</td></tr>`)
-            .join("")}
-    </table>
-  `;
+            .join("")
+        }
+    </table >
+        `;
 }
 

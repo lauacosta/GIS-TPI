@@ -8,9 +8,9 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     ports:
-      - "5432:5432"           
+      - "5433:5432"          
     volumes:
-      - postgis_data:/var/lib/postgresql/data
+      - postgis_data:/var/lib/postgresql/data   
 
   geoserver:
     image: docker.osgeo.org/geoserver:2.24.x
@@ -28,10 +28,11 @@ services:
       CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,HEAD,OPTIONS"
       CORS_ALLOWED_HEADERS: "*"
     ports:
-      - "8080:8080"          
+      - "8080:8080"           
     volumes:
       - ./geoserver_data:/opt/geoserver_data      
-      - ./geoserver_logs:/var/log/geoserver        
+      - ./geoserver_logs:/var/log/geoserver       
+
 
 volumes:
   postgis_data:
