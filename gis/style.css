@@ -217,10 +217,24 @@ header {
   border-radius: var(--border-radius);
   display: flex;
   gap: 1rem;
+  font-size: 0.875rem;
+
+  & label {
+    display: inline-flex;
+    gap: 0.5rem;
+    text-transform: lowercase;
+    text-transform: capitalize;
+  }
 }
 
 .layers li:hover {
   background-color: var(--bg-300);
+}
+
+.layer-symbol {
+  display: grid;
+  place-items: center;
+  width: 18px;
 }
 
 .aside-actions {
