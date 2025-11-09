@@ -2,6 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -15,8 +18,6 @@
       type="image/x-icon"
       href="https://openlayers.org/favicon.ico" />
     <link rel="stylesheet" href="./style.css" />
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GIS - Grupo 2</title>
   </head>
 
@@ -39,7 +40,11 @@
         <header><h1>GIS Grupo 2</h1></header>
 
         <div class="aside-actions">
-          <input id="layer-search" type="text" placeholder="Buscar capa..." class="search" />
+          <input
+            id="layer-search"
+            type="text"
+            placeholder="Buscar capa..."
+            class="search" />
           <button class="clean-selection">Limpiar selección</button>
         </div>
 
@@ -68,6 +73,11 @@
             </span>
           </button>
         </div>
+        <div class="controls-group">
+          <button id="query" title="Habilitar consulta">
+            <span class="material-symbols-rounded">frame_inspect</span>
+          </button>
+        </div>
       </div>
     </aside>
 
@@ -76,4 +86,3 @@
     <script type="module" src="./main.js"></script>
   </body>
 </html>
-

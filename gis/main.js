@@ -118,7 +118,41 @@ function installInteractions(map, layersWFS) {
   const select = new Select({
     style: selectedStyle,
   });
-  map.addInteraction(select);
+
+  const dragBox = new DragBox({
+    condition: platformModifierKeyOnly,
+  });
+
+  let queryMode = false;
+  const queryBtn = document.getElementById("query");
+
+  queryBtn.addEventListener("click", () => {
+    queryMode = !queryMode;
+    queryBtn.classList.toggle("active");
+
+    // Remover interacciones existentes
+    map.removeInteraction(select);
+    map.removeInteraction(dragBox);
+
+    if (queryMode) {
+      // Modo consulta
+      map.addInteraction(select);
+      map.addInteraction(dragBox);
+    } else {
+      // Modo zoom por defecto
+      const dragZoom = new DragBox({
+        condition: platformModifierKeyOnly,
+        className: "ol-dragzoom",
+      });
+
+      dragZoom.on("boxend", function () {
+        const extent = dragZoom.getGeometry().getExtent();
+        map.getView().fit(extent, { duration: 500 });
+      });
+
+      map.addInteraction(dragZoom);
+    }
+  });
 
   select.on("select", function () {
     const features = select.getFeatures().getArray();
@@ -128,13 +162,9 @@ function installInteractions(map, layersWFS) {
     }
   });
 
-  const dragBox = new DragBox({
-    condition: platformModifierKeyOnly,
-  });
-
-  map.addInteraction(dragBox);
-
   dragBox.on("boxend", function () {
+    if (!queryMode) return;
+
     const boxExtent = dragBox.getGeometry().getExtent();
 
     const worldExtent = map.getView().getProjection().getExtent();
