@@ -18,6 +18,7 @@ import { platformModifierKeyOnly } from "ol/events/condition.js";
 import Select from "ol/interaction/Select.js";
 import ScaleLine from "ol/control/ScaleLine.js";
 import WMSCapabilities from "ol/format/WMSCapabilities.js";
+import Circle from "ol/style/Circle.js";
 
 const workspace = "TPI_GIS";
 const EPSG_ID = 4326;
@@ -115,8 +116,22 @@ function installInteractions(map, layersWFS) {
       width: 2,
     }),
   });
+
+  const selectedPointStyle = new Style({
+    image: new Circle({
+      radius: 8,
+      fill: new Fill({ color: "rgba(255,165,0,0.9)" }),
+      stroke: new Stroke({ color: "rgba(255,115,0,1)", width: 2 }),
+    }),
+  });
+
   const select = new Select({
-    style: selectedStyle,
+    style: function (feature) {
+      const geom = feature && feature.getGeometry && feature.getGeometry();
+      const type = geom && geom.getType && geom.getType();
+      if (type === "Point" || type === "MultiPoint") return selectedPointStyle;
+      return selectedStyle;
+    },
   });
 
   const dragBox = new DragBox({
@@ -139,18 +154,20 @@ function installInteractions(map, layersWFS) {
       map.addInteraction(select);
       map.addInteraction(dragBox);
     } else {
+      map.removeInteraction(select);
+      map.removeInteraction(dragBox);
       // Modo zoom por defecto
-      const dragZoom = new DragBox({
-        condition: platformModifierKeyOnly,
-        className: "ol-dragzoom",
-      });
+      // const dragZoom = new DragBox({
+      //   condition: platformModifierKeyOnly,
+      //   className: "ol-dragzoom",
+      // });
 
-      dragZoom.on("boxend", function () {
-        const extent = dragZoom.getGeometry().getExtent();
-        map.getView().fit(extent, { duration: 500 });
-      });
+      // dragZoom.on("boxend", function () {
+      //   const extent = dragZoom.getGeometry().getExtent();
+      //   map.getView().fit(extent, { duration: 500 });
+      // });
 
-      map.addInteraction(dragZoom);
+      // map.addInteraction(dragZoom);
     }
   });
 
@@ -269,7 +286,15 @@ function createWFSLayer(layerName) {
   const color = layerColors[layerIndex % layerColors.length];
   layerIndex++;
 
-  const layerStyle = new Style({
+  const pointStyle = new Style({
+    image: new Circle({
+      radius: 6,
+      fill: new Fill({ color }),
+      stroke: new Stroke({ color: "#222", width: 1 }),
+    }),
+  });
+
+  const polygonLineStyle = new Style({
     fill: new Fill({ color }),
     stroke: new Stroke({ color: "#222", width: 1 }),
   });
@@ -296,7 +321,12 @@ function createWFSLayer(layerName) {
       strategy: bboxStrategy,
     }),
     visible: false,
-    style: layerStyle,
+    style: function (feature) {
+      const geom = feature.getGeometry && feature.getGeometry();
+      const type = geom && geom.getType && geom.getType();
+      if (type === "Point" || type === "MultiPoint") return pointStyle;
+      return polygonLineStyle;
+    },
   });
   layer.set("layerName", layerName);
 
