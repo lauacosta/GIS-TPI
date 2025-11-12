@@ -1,4 +1,3 @@
-// @ts-check
 import OSM from "ol/source/OSM";
 import { transformExtent } from "ol/proj";
 import TileLayer from "ol/layer/Tile";
@@ -47,9 +46,6 @@ function scaleControl() {
   return control;
 }
 
-/**
- * @param {Map} map
- */
 function installMapControls(map) {
   const menuBtn = document.getElementById("menu");
   const aside = document.querySelector("aside");
@@ -156,28 +152,16 @@ function installInteractions(map, layersWFS) {
     } else {
       map.removeInteraction(select);
       map.removeInteraction(dragBox);
-      // Modo zoom por defecto
-      // const dragZoom = new DragBox({
-      //   condition: platformModifierKeyOnly,
-      //   className: "ol-dragzoom",
-      // });
-
-      // dragZoom.on("boxend", function () {
-      //   const extent = dragZoom.getGeometry().getExtent();
-      //   map.getView().fit(extent, { duration: 500 });
-      // });
-
-      // map.addInteraction(dragZoom);
     }
   });
 
-  select.on("select", function () {
-    const features = select.getFeatures().getArray();
-    for (const feature of features) {
-      const props = feature.getProperties();
-      console.log(props);
-    }
-  });
+  // select.on("select", function () {
+  //   const features = select.getFeatures().getArray();
+  //   for (const feature of features) {
+  //     const props = feature.getProperties();
+  //     console.log(props);
+  //   }
+  // });
 
   dragBox.on("boxend", function () {
     if (!queryMode) return;
@@ -241,11 +225,25 @@ function installInteractions(map, layersWFS) {
         });
     }
 
+    const layersList = document.getElementById("selected-layers");
+    const selectedLayers = new Set();
+
     if (selected.length > 0) {
       console.group(`Selected ${selected.length} features`);
       selected.forEach((f, i) => {
-        console.log(`Feature #${i + 1} [${f.layer}]`, f.props);
+        selectedLayers.add(f.props.fclass);
+        console.log(`Feature #${i + 1} [${f.layer}]`, f.props.fclass);
       });
+
+      layersList
+        .querySelectorAll("li:not(#map-tab)")
+        .forEach((li) => li.remove());
+      selectedLayers.forEach((layerName) => {
+        const li = document.createElement("li");
+        li.textContent = layerName;
+        layersList.appendChild(li);
+      });
+
       console.groupEnd();
     } else {
       console.info("No features selected.");
@@ -257,9 +255,6 @@ function installInteractions(map, layersWFS) {
   });
 }
 
-/**
- * @param {string} workspace
- */
 async function fetchLayersFromGeoServer(workspace) {
   const url = `http://localhost:8080/geoserver/${workspace}/wms?service=WMS&request=GetCapabilities`;
   const text = await fetch(url).then((r) => r.text());
@@ -268,20 +263,16 @@ async function fetchLayersFromGeoServer(workspace) {
 
   const all = result.Capability.Layer.Layer;
 
-  return all.map(
-    (/** @type {{ Name: string; Style: { Name: string; }[]; }} */ l) => {
-      const type = l.Style[0].Name;
-      const raw = l.Name.replace(`${workspace}:`, "");
-      const format = raw.replace(/_/g, " ").toLowerCase();
+  return all.map((l) => {
+    const type = l.Style[0].Name;
+    const raw = l.Name.replace(`${workspace}:`, "");
+    const format = raw.replace(/_/g, " ").toLowerCase();
+    console.log(l);
 
-      return [raw, format, type];
-    }
-  );
+    return [raw, format, type];
+  });
 }
 
-/**
- * @param {string} layerName
- */
 function createWFSLayer(layerName) {
   const color = layerColors[layerIndex % layerColors.length];
   layerIndex++;
@@ -333,23 +324,13 @@ function createWFSLayer(layerName) {
   return layer;
 }
 
-/**
- * @typedef {[string, string]} LayerEntry  // [layerName, label]
- */
-
-/**
- * @param {import("ol/Map").default} map
- */
 async function init_map(map) {
   const layers = await fetchLayersFromGeoServer(workspace);
   const layersWFS = layers.map(([layerName]) => createWFSLayer(layerName));
 
   // console.log(layers)
 
-  /** @type {HTMLUListElement | null} */
   const ulLayers = document.querySelector(".layers");
-
-  /** @type {HTMLInputElement | null} */
   const searchInput = document.getElementById("layer-search");
   const cleanBtn = document.querySelector(".clean-selection");
 
@@ -369,43 +350,37 @@ async function init_map(map) {
     return;
   }
 
-  /**
-   * @param {LayerEntry[]} list
-   */
   function renderList(list) {
     ulLayers.innerHTML = "";
 
-    list.forEach(
-      ([layerName, label, type], /** @type {string | number} */ i) => {
-        const emoji =
-          {
-            point: "📍",
-            polygon: "⬟",
-            line: "➖",
-          }[type] ?? "❓";
+    list.forEach(([layerName, label, type]) => {
+      const emoji =
+        {
+          point: "📍",
+          polygon: "⬟",
+          line: "➖",
+        }[type] ?? "❓";
 
-        ulLayers.insertAdjacentHTML(
-          "beforeend",
-          `<li><input type="checkbox" id="${layerName}"><label for="${layerName}"><span class="layer-symbol">${emoji}</span> ${label}</label></li>`
-        );
+      ulLayers.insertAdjacentHTML(
+        "beforeend",
+        `<li><input type="checkbox" id="${layerName}"><label for="${layerName}"><span class="layer-symbol">${emoji}</span> ${label}</label></li>`
+      );
 
-        /** @type {HTMLInputElement | null} */
-        const checkbox = document.getElementById(layerName);
-        const layerIndex = layers.findIndex(([n]) => n === layerName);
+      const checkbox = document.getElementById(layerName);
+      const layerIndex = layers.findIndex(([n]) => n === layerName);
 
-        if (!checkbox) return;
+      if (!checkbox) return;
 
-        checkbox.checked = layersWFS[layerIndex].getVisible();
-        checkbox.addEventListener("change", () => {
-          layersWFS[layerIndex].setVisible(checkbox.checked);
+      checkbox.checked = layersWFS[layerIndex].getVisible();
+      checkbox.addEventListener("change", () => {
+        layersWFS[layerIndex].setVisible(checkbox.checked);
 
-          const anyChecked = [
-            ...ulLayers.querySelectorAll("input[type='checkbox']"),
-          ].some((input) => input.checked);
-          cleanBtn.style.display = anyChecked ? "inline-block" : "none";
-        });
-      }
-    );
+        const anyChecked = [
+          ...ulLayers.querySelectorAll("input[type='checkbox']"),
+        ].some((input) => input.checked);
+        cleanBtn.style.display = anyChecked ? "inline-block" : "none";
+      });
+    });
   }
   renderList(layers);
 
