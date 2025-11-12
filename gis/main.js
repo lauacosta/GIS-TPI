@@ -226,21 +226,33 @@ function installInteractions(map, layersWFS) {
     }
 
     const layersList = document.getElementById("selected-layers");
-    const selectedLayers = new Set();
+    const selectedLayers = {};
 
     if (selected.length > 0) {
       console.group(`Selected ${selected.length} features`);
+
       selected.forEach((f, i) => {
-        selectedLayers.add(f.props.fclass);
+        const fclass = f.props.fclass;
+
+        if (!(fclass in selectedLayers)) {
+          selectedLayers[fclass] = [];
+        }
+
+        selectedLayers[fclass].push(f.props);
         console.log(`Feature #${i + 1} [${f.layer}]`, f.props.fclass);
       });
 
       layersList
         .querySelectorAll("li:not(#map-tab)")
         .forEach((li) => li.remove());
-      selectedLayers.forEach((layerName) => {
+
+      const resultado = Object.entries(selectedLayers);
+
+      console.log("Resultados seleccionados:", resultado);
+
+      resultado.forEach(([fclass, props]) => {
         const li = document.createElement("li");
-        li.textContent = layerName;
+        li.textContent = fclass;
         layersList.appendChild(li);
       });
 
@@ -267,7 +279,6 @@ async function fetchLayersFromGeoServer(workspace) {
     const type = l.Style[0].Name;
     const raw = l.Name.replace(`${workspace}:`, "");
     const format = raw.replace(/_/g, " ").toLowerCase();
-    console.log(l);
 
     return [raw, format, type];
   });
