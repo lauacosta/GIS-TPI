@@ -14,7 +14,8 @@ import VectorLayer from "ol/layer/Vector";
 import { platformModifierKeyOnly } from "ol/events/condition.js";
 import Select from "ol/interaction/Select.js";
 import ScaleLine from "ol/control/ScaleLine.js";
-import WMSCapabilities from "ol/format/WMSCapabilities.js";
+
+import { getWFSUrl, fetchLayersFromGeoServer } from "./api/geoserver";
 
 import {
   createLayerStyle,
@@ -252,23 +253,6 @@ function installInteractions(map, layersWFS) {
   });
 }
 
-async function fetchLayersFromGeoServer(workspace) {
-  const url = `http://localhost:8080/geoserver/${workspace}/wms?service=WMS&request=GetCapabilities`;
-  const text = await fetch(url).then((r) => r.text());
-  const parser = new WMSCapabilities();
-  const result = parser.read(text);
-
-  const all = result.Capability.Layer.Layer;
-
-  return all.map((l) => {
-    const type = l.Style[0].Name;
-    const raw = l.Name.replace(`${workspace}:`, "");
-    const format = raw.replace(/_/g, " ").toLowerCase();
-
-    return [raw, format, type];
-  });
-}
-
 function createWFSLayer(layerName) {
   const color = layerColors[layerIndex % layerColors.length];
   layerIndex++;
@@ -277,7 +261,6 @@ function createWFSLayer(layerName) {
 
   const layer = new VectorLayer({
     source: new VectorSource({
-      // url: `http://localhost:8080/geoserver/${workspace}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${workspace}:${layerName}&outputFormat=application/json&srsname=EPSG:4326`,
       format: new GeoJSON(),
       url: (extent) => {
         const fixed_extent = transformExtent(
@@ -285,14 +268,7 @@ function createWFSLayer(layerName) {
           "EPSG:3857",
           `EPSG:${EPSG_ID}`
         );
-        return (
-          `http://localhost:8080/geoserver/${workspace}/ows?service=WFS&` +
-          `version=1.1.0&request=GetFeature&typeName=${workspace}:${layerName}&` +
-          `outputFormat=application/json&` +
-          `srsname=EPSG:${EPSG_ID}&bbox=${fixed_extent.join(
-            ","
-          )},EPSG:${EPSG_ID}`
-        );
+        return getWFSUrl(workspace, layerName, fixed_extent, EPSG_ID);
       },
       strategy: bboxStrategy,
     }),
