@@ -8,16 +8,19 @@ import DragBox from "ol/interaction/DragBox.js";
 import { getWidth } from "ol/extent.js";
 import { defaults as defaultControls } from "ol/control/defaults.js";
 import { fromLonLat } from "ol/proj";
-import Fill from "ol/style/Fill.js";
-import Stroke from "ol/style/Stroke.js";
-import Style from "ol/style/Style.js";
+
 import VectorSource from "ol/source/Vector.js";
 import VectorLayer from "ol/layer/Vector";
 import { platformModifierKeyOnly } from "ol/events/condition.js";
 import Select from "ol/interaction/Select.js";
 import ScaleLine from "ol/control/ScaleLine.js";
 import WMSCapabilities from "ol/format/WMSCapabilities.js";
-import Circle from "ol/style/Circle.js";
+
+import {
+  createLayerStyle,
+  selectedStyle,
+  selectedPointStyle,
+} from "./map/styles";
 
 const workspace = "TPI_GIS";
 const EPSG_ID = 4326;
@@ -103,24 +106,6 @@ function installMapControls(map) {
 }
 
 function installInteractions(map, layersWFS) {
-  const selectedStyle = new Style({
-    fill: new Fill({
-      color: "rgba(255, 165, 0, 0.25)",
-    }),
-    stroke: new Stroke({
-      color: "rgba(255, 115, 0, 1)",
-      width: 2,
-    }),
-  });
-
-  const selectedPointStyle = new Style({
-    image: new Circle({
-      radius: 8,
-      fill: new Fill({ color: "rgba(255,165,0,0.9)" }),
-      stroke: new Stroke({ color: "rgba(255,115,0,1)", width: 2 }),
-    }),
-  });
-
   const select = new Select({
     style: function (feature) {
       const geom = feature && feature.getGeometry && feature.getGeometry();
@@ -288,18 +273,7 @@ function createWFSLayer(layerName) {
   const color = layerColors[layerIndex % layerColors.length];
   layerIndex++;
 
-  const pointStyle = new Style({
-    image: new Circle({
-      radius: 6,
-      fill: new Fill({ color }),
-      stroke: new Stroke({ color: "#222", width: 1 }),
-    }),
-  });
-
-  const polygonLineStyle = new Style({
-    fill: new Fill({ color }),
-    stroke: new Stroke({ color: "#222", width: 1 }),
-  });
+  const styles = createLayerStyle(color);
 
   const layer = new VectorLayer({
     source: new VectorSource({
@@ -324,10 +298,12 @@ function createWFSLayer(layerName) {
     }),
     visible: false,
     style: function (feature) {
-      const geom = feature.getGeometry && feature.getGeometry();
-      const type = geom && geom.getType && geom.getType();
-      if (type === "Point" || type === "MultiPoint") return pointStyle;
-      return polygonLineStyle;
+      const type = feature.getGeometry().getType();
+
+      if (type === "Point" || type === "MultiPoint") {
+        return styles.point;
+      }
+      return styles.polygon;
     },
   });
   layer.set("layerName", layerName);
