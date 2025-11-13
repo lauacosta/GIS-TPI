@@ -13,7 +13,6 @@ import VectorSource from "ol/source/Vector.js";
 import VectorLayer from "ol/layer/Vector";
 import { platformModifierKeyOnly } from "ol/events/condition.js";
 import Select from "ol/interaction/Select.js";
-import ScaleLine from "ol/control/ScaleLine.js";
 
 import { getWFSUrl, fetchLayersFromGeoServer } from "./api/geoserver";
 
@@ -22,6 +21,13 @@ import {
   selectedStyle,
   selectedPointStyle,
 } from "./map/styles";
+import {
+  centerInitialPos,
+  scaleControl,
+  zoomIn,
+  zoomOut,
+} from "./map/controls";
+import { initSidebar } from "./ui/siderbar";
 
 const workspace = "TPI_GIS";
 const EPSG_ID = 4326;
@@ -39,71 +45,19 @@ const layerColors = [
 ];
 let layerIndex = 0;
 
-function scaleControl() {
-  const control = new ScaleLine({
-    bar: true,
-    steps: 4,
-    text: true,
-    minWidth: 140,
-  });
-
-  return control;
-}
-
 function installMapControls(map) {
-  const menuBtn = document.getElementById("menu");
-  const aside = document.querySelector("aside");
-  const escala = document.querySelector(".ol-scale-bar");
-
-  if (!menuBtn) {
-    console.error("menu id not found");
-    return;
-  }
-  if (!aside) {
-    console.error("aside not found");
-    return;
-  }
-  if (!escala) {
-    console.error("ol-scale-bar not found");
-    return;
-  }
-
-  menuBtn.addEventListener("click", () => {
-    aside.classList.toggle("menu-open");
-    if (escala.style.left == "0.5rem") {
-      escala.style.left = "350px";
-    } else {
-      escala.style.left = "0.5rem";
-    }
-  });
-
-  document.getElementById("center-arg").onclick = function () {
-    const view = map.getView();
-    view.animate({
-      center: CORRIENTES_TIENE_PAYE,
-      zoom: 12,
-      duration: 1000,
-    });
+  const dom = {
+    center: document.getElementById("centerInitialPos"),
+    zoomout: document.getElementById("zoom-out"),
+    zoomin: document.getElementById("zoom-in"),
   };
 
-  document.getElementById("zoom-out").onclick = function () {
-    const view = map.getView();
-    const zoom = view.getZoom();
+  dom.center.onclick = () =>
+    centerInitialPos(map.getView(), CORRIENTES_TIENE_PAYE);
 
-    view.animate({
-      zoom: zoom - 1,
-      duration: 500,
-    });
-  };
+  dom.zoomout.onclick = () => zoomOut(map.getView());
 
-  document.getElementById("zoom-in").onclick = function () {
-    const view = map.getView();
-    const zoom = view.getZoom();
-    view.animate({
-      zoom: zoom + 1,
-      duration: 500,
-    });
-  };
+  dom.zoomin.onclick = () => zoomIn(map.getView());
 }
 
 function installInteractions(map, layersWFS) {
@@ -127,12 +81,10 @@ function installInteractions(map, layersWFS) {
     queryMode = !queryMode;
     queryBtn.classList.toggle("active");
 
-    // Remover interacciones existentes
     map.removeInteraction(select);
     map.removeInteraction(dragBox);
 
     if (queryMode) {
-      // Modo consulta
       map.addInteraction(select);
       map.addInteraction(dragBox);
     } else {
@@ -140,14 +92,6 @@ function installInteractions(map, layersWFS) {
       map.removeInteraction(dragBox);
     }
   });
-
-  // select.on("select", function () {
-  //   const features = select.getFeatures().getArray();
-  //   for (const feature of features) {
-  //     const props = feature.getProperties();
-  //     console.log(props);
-  //   }
-  // });
 
   dragBox.on("boxend", function () {
     if (!queryMode) return;
@@ -376,6 +320,7 @@ const map = new Map({
   }),
 });
 
+initSidebar();
 const layersWFS = await init_map(map);
 installMapControls(map);
 installInteractions(map, layersWFS);
