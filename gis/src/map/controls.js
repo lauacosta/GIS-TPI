@@ -1,4 +1,5 @@
 import ScaleLine from "ol/control/ScaleLine.js";
+import { CORRIENTES_TIENE_PAYE } from "../config/mapConst";
 
 export const scaleControl = () => {
   return new ScaleLine({
@@ -9,9 +10,9 @@ export const scaleControl = () => {
   });
 };
 
-export const centerInitialPos = (view, position) => {
+export const centerInitialPos = (view) => {
   return view.animate({
-    center: position,
+    center: CORRIENTES_TIENE_PAYE,
     zoom: 12,
     duration: 1000,
   });
