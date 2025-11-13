@@ -2,9 +2,9 @@ import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 import GeoJSON from "ol/format/GeoJSON";
 import { bbox as bboxStrategy } from "ol/loadingstrategy";
-import { createLayerStyle } from "../map/styles";
+import { createLayerStyle } from "./styles";
 import { transformExtent } from "ol/proj";
-import { EPSG_ID } from "../config/mapConst";
+import { EPSG_ID, workspace } from "../config/mapConst";
 import { getWFSUrl } from "../api/geoserver";
 
 const layerColors = [
@@ -19,7 +19,7 @@ const layerColors = [
 ];
 let layerIndex = 0;
 
-export function createWFSLayer(layerName, workspace, epsg) {
+export function createWFSLayer(layerName) {
   const color = layerColors[layerIndex % layerColors.length];
   layerIndex++;
 

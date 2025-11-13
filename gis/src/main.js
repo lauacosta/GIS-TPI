@@ -8,7 +8,7 @@ import { scaleControl } from "./map/controls";
 import { initSidebar } from "./ui/siderbar";
 import { initLayerList } from "./ui/layerList";
 import { CORRIENTES_TIENE_PAYE, workspace, EPSG_ID } from "./config/mapConst";
-import { createWFSLayer } from "./ui/layerFactory";
+import { createWFSLayer } from "./map/layerFactory";
 import { initToolbar } from "./ui/toolbar";
 
 const capaBaseOSM = new TileLayer({
@@ -28,9 +28,7 @@ const map = new Map({
 async function init_map() {
   try {
     const layers = await fetchLayersFromGeoServer(workspace);
-    const WFSlayers = layers.map(([layerName]) =>
-      createWFSLayer(layerName, workspace, EPSG_ID)
-    );
+    const WFSlayers = layers.map(([layerName]) => createWFSLayer(layerName));
 
     map.setLayers([capaBaseOSM, ...WFSlayers]);
     const mapControls = setupInteractions(map, WFSlayers);
