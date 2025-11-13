@@ -6,6 +6,7 @@
   --bg-300: rgb(250, 247, 242);
 
   --border-400: #d8d6cf;
+  --border-500: #a3a3a3;
   --box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   --border-radius: 4px;
 }
@@ -294,9 +295,16 @@ header {
   display: grid;
   place-content: center;
   padding: 0.3rem;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
 }
 
 .ol-scale-bar {
   left: 350px;
   transition: all 0.3s ease;
+}
+
+.active {
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-500) !important;
 }

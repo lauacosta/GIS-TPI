@@ -2,6 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -15,8 +18,6 @@
       type="image/x-icon"
       href="https://openlayers.org/favicon.ico" />
     <link rel="stylesheet" href="./style.css" />
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GIS - Grupo 2</title>
   </head>
 
@@ -25,10 +26,8 @@
       <div class="header-container">
         <div class="title-container"><h1>GIS Grupo 2</h1></div>
         <div class="tabs">
-          <ul>
+          <ul id="selected-layers">
             <li id="map-tab" class="selected-tab">Mapa</li>
-            <li>Tabla localidades</li>
-            <li>Tabla vegetación de cultivos</li>
           </ul>
         </div>
       </div>
@@ -36,10 +35,12 @@
 
     <aside class="menu-open">
       <div class="aside-container">
-        <header><h1>GIS Grupo 2</h1></header>
-
         <div class="aside-actions">
-          <input id="layer-search" type="text" placeholder="Buscar capa..." class="search" />
+          <input
+            id="layer-search"
+            type="text"
+            placeholder="Buscar capa..."
+            class="search" />
           <button class="clean-selection">Limpiar selección</button>
         </div>
 
@@ -63,9 +64,14 @@
             </span>
           </button>
           <button>
-            <span class="material-symbols-rounded" id="center-arg">
+            <span class="material-symbols-rounded" id="centerInitialPos">
               south_america
             </span>
+          </button>
+        </div>
+        <div class="controls-group">
+          <button id="query" title="Habilitar consulta">
+            <span class="material-symbols-rounded">frame_inspect</span>
           </button>
         </div>
       </div>
@@ -73,7 +79,6 @@
 
     <div id="map"></div>
 
-    <script type="module" src="./main.js"></script>
+    <script type="module" src="../src/main.js"></script>
   </body>
 </html>
-
