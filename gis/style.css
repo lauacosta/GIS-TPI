@@ -6,7 +6,9 @@
   --bg-300: rgb(250, 247, 242);
 
   --border-400: #d8d6cf;
-  --border-500: #a3a3a3;
+  /* (Lautaro) Todavia hay que decidir como se va a ver, pero el gris no se apreciaba mucho */
+  --border-500: #b521e3;
+  /* --border-500: #a3a3a3; */
   --box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   --border-radius: 4px;
 }
