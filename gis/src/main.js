@@ -4,23 +4,17 @@ import TileLayer from "ol/layer/Tile";
 import { Map, View } from "ol";
 import { bbox as bboxStrategy } from "ol/loadingstrategy.js";
 import GeoJSON from "ol/format/GeoJSON.js";
-import DragBox from "ol/interaction/DragBox.js";
-import { getWidth } from "ol/extent.js";
 import { defaults as defaultControls } from "ol/control/defaults.js";
 import { fromLonLat } from "ol/proj";
 
 import VectorSource from "ol/source/Vector.js";
 import VectorLayer from "ol/layer/Vector";
-import { platformModifierKeyOnly } from "ol/events/condition.js";
-import Select from "ol/interaction/Select.js";
+
+import { setupInteractions } from "./map/interactions";
 
 import { getWFSUrl, fetchLayersFromGeoServer } from "./api/geoserver";
 
-import {
-  createLayerStyle,
-  selectedStyle,
-  selectedPointStyle,
-} from "./map/styles";
+import { createLayerStyle } from "./map/styles";
 import {
   centerInitialPos,
   scaleControl,
@@ -60,143 +54,6 @@ function installMapControls(map) {
   dom.zoomin.onclick = () => zoomIn(map.getView());
 }
 
-function installInteractions(map, layersWFS) {
-  const select = new Select({
-    style: function (feature) {
-      const geom = feature && feature.getGeometry && feature.getGeometry();
-      const type = geom && geom.getType && geom.getType();
-      if (type === "Point" || type === "MultiPoint") return selectedPointStyle;
-      return selectedStyle;
-    },
-  });
-
-  const dragBox = new DragBox({
-    condition: platformModifierKeyOnly,
-  });
-
-  let queryMode = false;
-  const queryBtn = document.getElementById("query");
-
-  queryBtn.addEventListener("click", () => {
-    queryMode = !queryMode;
-    queryBtn.classList.toggle("active");
-
-    map.removeInteraction(select);
-    map.removeInteraction(dragBox);
-
-    if (queryMode) {
-      map.addInteraction(select);
-      map.addInteraction(dragBox);
-    } else {
-      map.removeInteraction(select);
-      map.removeInteraction(dragBox);
-    }
-  });
-
-  dragBox.on("boxend", function () {
-    if (!queryMode) return;
-
-    const boxExtent = dragBox.getGeometry().getExtent();
-
-    const worldExtent = map.getView().getProjection().getExtent();
-    const worldWidth = getWidth(worldExtent);
-    const startWorld = Math.floor((boxExtent[0] - worldExtent[0]) / worldWidth);
-    const endWorld = Math.floor((boxExtent[2] - worldExtent[0]) / worldWidth);
-
-    const rotation = map.getView().getRotation();
-    const oblique = rotation % (Math.PI / 2) !== 0;
-
-    select.clearSelection();
-
-    const selected = [];
-
-    for (let world = startWorld; world <= endWorld; ++world) {
-      const left = Math.max(boxExtent[0] - world * worldWidth, worldExtent[0]);
-      const right = Math.min(boxExtent[2] - world * worldWidth, worldExtent[2]);
-      const extent = [left, boxExtent[1], right, boxExtent[3]];
-
-      layersWFS
-        .filter((l) => l.getVisible())
-        .forEach((layer) => {
-          const source = layer.getSource();
-          const layerFeatures = source
-            .getFeaturesInExtent(extent)
-            .filter((f) => f.getGeometry().intersectsExtent(extent));
-
-          if (oblique) {
-            const anchor = [0, 0];
-            const geometry = dragBox.getGeometry().clone();
-            geometry.translate(-world * worldWidth, 0);
-            geometry.rotate(-rotation, anchor);
-            const boxGeomExtent = geometry.getExtent();
-
-            layerFeatures.forEach((feature) => {
-              const geom = feature.getGeometry().clone();
-              geom.rotate(-rotation, anchor);
-              if (geom.intersectsExtent(boxGeomExtent)) {
-                select.selectFeature(feature);
-                selected.push({
-                  layer: layer.get("layerName"),
-                  id: feature.getId(),
-                  props: feature.getProperties(),
-                });
-              }
-            });
-          } else {
-            layerFeatures.forEach((feature) => {
-              select.selectFeature(feature);
-              selected.push({
-                layer: layer.get("title") || layer.get("name"),
-                id: feature.getId(),
-                props: feature.getProperties(),
-              });
-            });
-          }
-        });
-    }
-
-    const layersList = document.getElementById("selected-layers");
-    const selectedLayers = {};
-
-    if (selected.length > 0) {
-      console.group(`Selected ${selected.length} features`);
-
-      selected.forEach((f, i) => {
-        const fclass = f.props.fclass;
-
-        if (!(fclass in selectedLayers)) {
-          selectedLayers[fclass] = [];
-        }
-
-        selectedLayers[fclass].push(f.props);
-        console.log(`Feature #${i + 1} [${f.layer}]`, f.props.fclass);
-      });
-
-      layersList
-        .querySelectorAll("li:not(#map-tab)")
-        .forEach((li) => li.remove());
-
-      const resultado = Object.entries(selectedLayers);
-
-      console.log("Resultados seleccionados:", resultado);
-
-      resultado.forEach(([fclass, props]) => {
-        const li = document.createElement("li");
-        li.textContent = fclass;
-        layersList.appendChild(li);
-      });
-
-      console.groupEnd();
-    } else {
-      console.info("No features selected.");
-    }
-  });
-
-  dragBox.on("boxstart", function () {
-    select.clearSelection();
-  });
-}
-
 function createWFSLayer(layerName) {
   const color = layerColors[layerIndex % layerColors.length];
   layerIndex++;
@@ -234,8 +91,6 @@ function createWFSLayer(layerName) {
 async function init_map(map) {
   const layers = await fetchLayersFromGeoServer(workspace);
   const layersWFS = layers.map(([layerName]) => createWFSLayer(layerName));
-
-  // console.log(layers)
 
   const ulLayers = document.querySelector(".layers");
   const searchInput = document.getElementById("layer-search");
@@ -323,4 +178,19 @@ const map = new Map({
 initSidebar();
 const layersWFS = await init_map(map);
 installMapControls(map);
-installInteractions(map, layersWFS);
+
+const mapControls = setupInteractions(map, layersWFS);
+
+const queryBtn = document.getElementById("query");
+let queryMode = false;
+
+queryBtn.addEventListener("click", () => {
+  queryMode = !queryMode;
+  queryBtn.classList.toggle("active");
+
+  if (queryMode) {
+    mapControls.enableQueryMode();
+  } else {
+    mapControls.disableQueryMode();
+  }
+});
