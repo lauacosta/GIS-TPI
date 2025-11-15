@@ -44,6 +44,8 @@ export function createWFSLayer(layerName) {
 
       if (type === "Point" || type === "MultiPoint") {
         return styles.point;
+      } else if (type === "LineString" || type === "MultiLineString") {
+        return styles.line;
       }
       return styles.polygon;
     },

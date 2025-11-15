@@ -18,6 +18,13 @@ export const selectedPointStyle = new Style({
   }),
 });
 
+export const selectedLineStyle = new Style({
+  stroke: new Stroke({
+    color: "rgba(255, 115, 0, 1)",
+    width: 3,
+  }),
+});
+
 export const createLayerStyle = (color) => {
   return {
     point: new Style({
@@ -25,6 +32,14 @@ export const createLayerStyle = (color) => {
         radius: 6,
         fill: new Fill({ color }),
         stroke: new Stroke({ color: "#222", width: 1 }),
+      }),
+    }),
+    line: new Style({
+      stroke: new Stroke({
+        color,
+        width: 3,
+        lineCap: "round",
+        lineJoin: "round",
       }),
     }),
     polygon: new Style({
