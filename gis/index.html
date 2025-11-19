@@ -11,9 +11,6 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap"
       rel="stylesheet" />
     <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link
       rel="icon"
       type="image/x-icon"
       href="https://openlayers.org/favicon.ico" />
@@ -24,58 +21,90 @@
   <body>
     <header>
       <div class="header-container">
-        <div class="title-container"><h1>GIS Grupo 2</h1></div>
-        <div class="tabs">
-          <ul id="selected-layers">
-            <li id="map-tab" class="selected-tab">Mapa</li>
-          </ul>
-        </div>
+        <h1>GIS Grupo 2</h1>
+        <div class="epsg"><p>EPSG:3857</p></div>
       </div>
     </header>
 
-    <aside class="menu-open">
-      <div class="aside-container">
-        <div class="aside-actions">
-          <input
-            id="layer-search"
-            type="text"
-            placeholder="Buscar capa..."
-            class="search" />
-          <button class="clean-selection">Limpiar selección</button>
+    <div class="nav-and-aside">
+      <nav>
+        <button class="icon-container" title="Capas" id="layers">
+          <img
+            src="./assets/layers-01-stroke-rounded.svg"
+            alt="Capas"
+            class="svg-icon" />
+        </button>
+        <button class="icon-container" title="Tablas" id="tables">
+          <img
+            src="./assets/table-stroke-rounded.svg"
+            alt="Tablas"
+            class="svg-icon" />
+        </button>
+
+        <button class="icon-container" title="Leyendas" id="legends">
+          <img
+            src="./assets/right-to-left-list-dash-stroke-rounded.svg"
+            alt="Leyendas"
+            class="svg-icon" />
+        </button>
+      </nav>
+
+      <aside class="menu-open">
+        <div class="aside-container">
+          <div class="aside-actions">
+            <input
+              id="layer-search"
+              type="text"
+              placeholder="Buscar capa..."
+              class="search" />
+            <button class="clean-selection">Limpiar selección</button>
+          </div>
+
+          <ul class="layers"></ul>
         </div>
-
-        <ul class="layers"></ul>
-      </div>
-
+      </aside>
       <div class="controls-container">
         <div class="controls-group">
-          <button>
-            <span class="material-symbols-rounded" id="menu"> menu </span>
+          <button title="Menú">
+            <img
+              src="./assets/menu-01-stroke-rounded.svg"
+              id="menu"
+              alt="Menú" />
           </button>
         </div>
 
         <div class="controls-group">
-          <button>
-            <span class="material-symbols-rounded" id="zoom-in"> add </span>
+          <button title="Acercar" id="zoom-in">
+            <img src="./assets/add-01-stroke-rounded.svg" alt="Acercar" />
           </button>
-          <button>
-            <span class="material-symbols-rounded" id="zoom-out">
-              check_indeterminate_small
-            </span>
+          <button title="Alejar" id="zoom-out">
+            <img src="./assets/remove-01-stroke-rounded.svg" alt="Alejar" />
           </button>
-          <button>
-            <span class="material-symbols-rounded" id="centerInitialPos">
-              south_america
-            </span>
+          <button id="centerInitialPos" title="Centrar Corrientes">
+            <img
+              src="./assets/location-04-stroke-rounded.svg"
+              alt="Centrar Corrientes" />
           </button>
         </div>
         <div class="controls-group">
-          <button id="query" title="Habilitar consulta">
-            <span class="material-symbols-rounded">frame_inspect</span>
+          <button id="query" title="Consultar información">
+            <img
+              src="./assets/select-02-stroke-rounded.svg"
+              alt="Consultar información" />
+          </button>
+          <button id="measure" title="Medir distancia">
+            <img
+              src="./assets/tape-measure-stroke-rounded.svg"
+              alt="Medir distancia" />
+          </button>
+          <button id="draw" title="Dibujar vector">
+            <img
+              src="./assets/pencil-edit-02-stroke-rounded.svg"
+              alt="Dibujar vector" />
           </button>
         </div>
       </div>
-    </aside>
+    </div>
 
     <div id="map"></div>
 
