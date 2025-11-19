@@ -20,7 +20,7 @@ export function initLayerList(layersData, wfsLayers) {
 
       ulLayers.insertAdjacentHTML(
         "beforeend",
-        `<li><input type="checkbox" id="${layerName}"><label for="${layerName}"><span class="layer-symbol">${emoji}</span> ${label}</label></li>`
+        `<li><input type="checkbox" id="${layerName}"><label for="${layerName}"><span class="layer-symbol">${emoji}</span><span class="layer-name">${label}</span></label></li>`
       );
 
       const checkbox = document.getElementById(layerName);
