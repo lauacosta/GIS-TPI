@@ -4,6 +4,7 @@
   --font: "Noto Sans JP", sans-serif;
   --bg-200: rgb(255, 254, 251);
   --bg-300: rgb(250, 247, 242);
+  --bg-400: rgb(236, 232, 224);
 
   --border-400: #d8d6cf;
   /* (Lautaro) Todavia hay que decidir como se va a ver, pero el gris no se apreciaba mucho */
@@ -364,8 +365,14 @@ nav {
   border-radius: var(--border-radius-sm);
   transition: var(--transition);
   cursor: pointer;
+  border: 1px solid var(--bg-200);
 }
 
 .icon-container:hover {
   background-color: var(--bg-300);
+}
+
+.active-menu,
+.active-menu:hover {
+  background-color: var(--bg-400);
 }
