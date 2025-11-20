@@ -1,0 +1,130 @@
+---
+// src/components/SideMenu.astro
+---
+
+<>
+  <nav>
+    <button
+      class="icon-container activeMenu"
+      data-target="layers"
+      title="Capas">
+      <img
+        src="/assets/layers-01-stroke-rounded.svg"
+        alt="Capas"
+        class="svg-icon"
+      />
+    </button>
+
+    <button class="icon-container" data-target="tables" title="Tablas">
+      <img
+        src="/assets/table-stroke-rounded.svg"
+        alt="Tablas"
+        class="svg-icon"
+      />
+    </button>
+
+    <button class="icon-container" data-target="legends" title="Leyendas">
+      <img
+        src="/assets/right-to-left-list-dash-stroke-rounded.svg"
+        alt="Leyendas"
+        class="svg-icon"
+      />
+    </button>
+  </nav>
+
+  <aside id="main-aside" class="menu-open">
+    <div class="aside-container">
+      <div id="panel-layers" class="panel-content activeMenu">
+        <div class="aside-header">
+          <h2>Capas</h2>
+        </div>
+        <div class="aside-actions">
+          <input
+            id="layer-search"
+            type="text"
+            placeholder="Buscar capa..."
+            class="search"
+          />
+          <button class="clean-selection" style="display: none;"
+            >Limpiar selección</button
+          >
+        </div>
+        <ul class="layers"></ul>
+      </div>
+
+      <div id="panel-tables" class="panel-content">
+        <div class="aside-header">
+          <h2>Tablas de Atributos</h2>
+        </div>
+        <div class="layers">
+          <p>
+            Use la herramienta "Consultar informacion" sobre una capa para
+            visualizar las tablas del área seleccionada.
+          </p>
+        </div>
+      </div>
+
+      <div id="panel-legends" class="panel-content">
+        <div class="aside-header">
+          <h2>Leyendas</h2>
+        </div>
+        <div class="layers"><p>Contenido de leyendas...</p></div>
+      </div>
+    </div>
+  </aside>
+</>
+
+<style>
+  .panel-content {
+    display: none;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .aside-header {
+    padding: 0.5rem;
+
+    & h2 {
+      text-wrap: nowrap;
+      font-size: 1rem;
+    }
+  }
+
+  .panel-content.activeMenu {
+    display: block;
+    animation: fadeIn 0.3s;
+  }
+
+  .icon-container.activeMenu {
+    background-color: var(--bg-400);
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  const buttons = document.querySelectorAll(".icon-container[data-target]");
+  const panels = document.querySelectorAll(".panel-content");
+
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      buttons.forEach((b) => b.classList.remove("activeMenu"));
+      panels.forEach((p) => p.classList.remove("activeMenu"));
+
+      btn.classList.add("activeMenu");
+      const targetId = btn.getAttribute("data-target");
+      const targetPanel = document.getElementById(`panel-${targetId}`);
+
+      if (targetPanel) {
+        targetPanel.classList.add("activeMenu");
+      }
+    });
+  });
+</script>

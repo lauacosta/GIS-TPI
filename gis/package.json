@@ -2,14 +2,17 @@
   "name": "gis",
   "version": "1.0.0",
   "scripts": {
-    "start": "vite",
-    "build": "vite build",
-    "serve": "vite preview"
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
   },
   "devDependencies": {
     "vite": "^7.1.11"
   },
   "dependencies": {
+    "astro": "^5.16.0",
     "ol": "latest"
   }
 }
