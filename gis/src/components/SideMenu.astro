@@ -2,7 +2,7 @@
 // src/components/SideMenu.astro
 ---
 
-<>
+<div class="nav-and-aside">
   <nav>
     <button
       class="icon-container activeMenu"
@@ -30,6 +30,45 @@
         class="svg-icon"
       />
     </button>
+
+    <div class="divider-y"></div>
+
+    <button class="icon-container" title="Acercar" id="zoom-in">
+      <img src="./assets/add-01-stroke-rounded.svg" alt="Acercar" />
+    </button>
+    <button class="icon-container" title="Alejar" id="zoom-out">
+      <img src="./assets/remove-01-stroke-rounded.svg" alt="Alejar" />
+    </button>
+    <button
+      class="icon-container"
+      id="centerInitialPos"
+      title="Centrar Corrientes">
+      <img
+        src="./assets/location-04-stroke-rounded.svg"
+        alt="Centrar Corrientes"
+      />
+    </button>
+
+    <div class="divider-y"></div>
+
+    <button class="icon-container" id="query" title="Consultar información">
+      <img
+        src="./assets/select-02-stroke-rounded.svg"
+        alt="Consultar información"
+      />
+    </button>
+    <button class="icon-container" id="measure" title="Medir distancia">
+      <img
+        src="./assets/tape-measure-stroke-rounded.svg"
+        alt="Medir distancia"
+      />
+    </button>
+    <button class="icon-container" id="draw" title="Dibujar vector">
+      <img
+        src="./assets/pencil-edit-02-stroke-rounded.svg"
+        alt="Dibujar vector"
+      />
+    </button>
   </nav>
 
   <aside id="main-aside" class="menu-open">
@@ -37,6 +76,9 @@
       <div id="panel-layers" class="panel-content activeMenu">
         <div class="aside-header">
           <h2>Capas</h2>
+          <button title="Cerrar menú" id="close-menu">
+            <img src="/assets/cancel-01-stroke-rounded.svg" alt="Cerrar" />
+          </button>
         </div>
         <div class="aside-actions">
           <input
@@ -72,7 +114,7 @@
       </div>
     </div>
   </aside>
-</>
+</div>
 
 <style>
   .panel-content {
@@ -83,6 +125,10 @@
 
   .aside-header {
     padding: 0.5rem;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
 
     & h2 {
       text-wrap: nowrap;
@@ -113,8 +159,21 @@
   const buttons = document.querySelectorAll(".icon-container[data-target]");
   const panels = document.querySelectorAll(".panel-content");
 
+  const closeBtn = document.getElementById("close-menu");
+  const aside = document.getElementById("main-aside");
+
+  if (closeBtn && aside) {
+    closeBtn.addEventListener("click", () => {
+      aside.classList.remove("menu-open");
+      buttons.forEach((btn) => btn.classList.remove("activeMenu"));
+    });
+  }
+
   buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
+      if (aside) {
+        aside.classList.add("menu-open");
+      }
       buttons.forEach((b) => b.classList.remove("activeMenu"));
       panels.forEach((p) => p.classList.remove("activeMenu"));
 

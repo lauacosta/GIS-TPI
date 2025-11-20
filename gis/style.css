@@ -156,7 +156,7 @@ header {
   justify-content: space-between;
   gap: 2rem;
   padding: 0.5rem 0.5rem 0.5rem 1rem;
-  width: 425px;
+  width: 350px;
   z-index: 2;
   background-color: var(--bg-200);
   border-radius: var(--border-radius);

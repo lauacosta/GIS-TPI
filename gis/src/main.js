@@ -5,7 +5,7 @@ import { defaults as defaultControls } from "ol/control/defaults.js";
 import { setupInteractions } from "./map/interactions";
 import { fetchLayersFromGeoServer } from "./api/geoserver";
 import { scaleControl } from "./map/controls";
-import { initSidebar } from "./ui/siderbar";
+
 import { initLayerList } from "./ui/layerList";
 import { CORRIENTES_TIENE_PAYE, workspace } from "./config/mapConst";
 import { createWFSLayer } from "./map/layerFactory";
@@ -33,7 +33,6 @@ async function init_map() {
     map.setLayers([capaBaseOSM, ...WFSlayers]);
     const mapControls = setupInteractions(map, WFSlayers);
 
-    initSidebar();
     initLayerList(layers, WFSlayers);
     initToolbar(map, mapControls);
   } catch (error) {

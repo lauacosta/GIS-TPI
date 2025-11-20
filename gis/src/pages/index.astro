@@ -5,58 +5,13 @@ import "../style.css";
 ---
 
 <Layout>
-  <header>
-    <div class="header-container">
+  <SideMenu />
+  <footer>
+    <div class="footer-container">
       <h1>GIS Grupo 2</h1>
       <div class="epsg"><p>EPSG:3857</p></div>
     </div>
-  </header>
-
-  <div class="nav-and-aside">
-    <SideMenu />
-    <div class="controls-container">
-      <div class="controls-group">
-        <button title="Menú" id="menu">
-          <img src="./assets/menu-01-stroke-rounded.svg" alt="Menú" />
-        </button>
-      </div>
-
-      <div class="controls-group">
-        <button title="Acercar" id="zoom-in">
-          <img src="./assets/add-01-stroke-rounded.svg" alt="Acercar" />
-        </button>
-        <button title="Alejar" id="zoom-out">
-          <img src="./assets/remove-01-stroke-rounded.svg" alt="Alejar" />
-        </button>
-        <button id="centerInitialPos" title="Centrar Corrientes">
-          <img
-            src="./assets/location-04-stroke-rounded.svg"
-            alt="Centrar Corrientes"
-          />
-        </button>
-      </div>
-      <div class="controls-group">
-        <button id="query" title="Consultar información">
-          <img
-            src="./assets/select-02-stroke-rounded.svg"
-            alt="Consultar información"
-          />
-        </button>
-        <button id="measure" title="Medir distancia">
-          <img
-            src="./assets/tape-measure-stroke-rounded.svg"
-            alt="Medir distancia"
-          />
-        </button>
-        <button id="draw" title="Dibujar vector">
-          <img
-            src="./assets/pencil-edit-02-stroke-rounded.svg"
-            alt="Dibujar vector"
-          />
-        </button>
-      </div>
-    </div>
-  </div>
+  </footer>
 
   <div id="map"></div>
 </Layout>

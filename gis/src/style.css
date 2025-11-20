@@ -132,29 +132,26 @@ body {
 }
 
 aside {
-  /* --width: 350px;
-  --padd: 0.5rem; */
-
   position: relative;
-  /* left: calc((-1 * var(--width)) + var(--padd)); */
   top: 0;
   z-index: 10;
   width: 0;
   transition: var(--transition);
+  overflow: hidden;
 }
 
-header {
-  padding: 0.5rem 0.5rem 0 0.5rem;
+footer {
+  padding: 0 0.5rem 0.5rem 0.5rem;
 }
 
-.header-container {
+.footer-container {
   display: flex;
   position: relative;
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
-  padding: 0.5rem 0.5rem 0.5rem 1rem;
-  width: 425px;
+  padding: 0.5rem;
+  width: 383px;
   z-index: 2;
   background-color: var(--bg-200);
   border-radius: var(--border-radius);
@@ -323,8 +320,7 @@ header {
 }
 
 .ol-scale-bar {
-  left: 400px;
-  transition: var(--transition);
+  left: 400px !important;
 }
 
 .active {
@@ -337,14 +333,14 @@ header {
   flex-direction: row;
   padding: 0.5rem;
   gap: 0.25rem;
-  transition: all 0.3s ease 0.1s;
+  transition: var(--transition);
   box-shadow: var(--box-shadow);
   height: calc(100dvh - 1.5rem - 36px);
 }
 
 .nav-and-aside:has(.menu-open) {
   gap: 0.5rem;
-  transition: all 0.3s ease;
+  transition: var(--transition);
 }
 
 nav {
@@ -373,4 +369,10 @@ nav {
 .active-menu,
 .active-menu:hover {
   background-color: var(--bg-400);
+}
+
+.divider-y {
+  height: 1px;
+  background-color: var(--border-400);
+  border-radius: var(--border-radius-sm);
 }
