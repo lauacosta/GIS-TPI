@@ -226,6 +226,7 @@ export function setupInteractions(map, layersWFS) {
     dragBoxInteraction.on("boxstart", () => {
         selectInteraction.getFeatures().clear();
     });
+
     const measureLayer = new VectorLayer({
         source: source,
         style: measureLineStyle,
@@ -242,13 +243,6 @@ export function setupInteractions(map, layersWFS) {
             map.removeInteraction(selectInteraction);
             map.removeInteraction(dragBoxInteraction);
             selectInteraction.getFeatures().clear();
-        },
-
-        enableMeasureMode: (measureController) => {
-            measureController.activate()
-        },
-        disableMeasureMode: (measureController) => {
-            measureController.deactivate()
         },
     };
 }
