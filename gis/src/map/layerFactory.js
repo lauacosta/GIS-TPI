@@ -19,7 +19,17 @@ const layerColors = [
 ];
 let layerIndex = 0;
 
-export function createWFSLayer(layerName) {
+const LAYER_Z_INDEX = {
+  point: 100,
+  multipoint: 100,
+  line: 50,
+  linestring: 50,
+  multilinestring: 50,
+  polygon: 10,
+  multipolygon: 10,
+};
+
+export function createWFSLayer(layerName, type) {
   const color = layerColors[layerIndex % layerColors.length];
   layerIndex++;
 
@@ -51,6 +61,12 @@ export function createWFSLayer(layerName) {
     },
   });
   layer.set("layerName", layerName);
+
+  const normalizedType = type ? type.toLowerCase() : "polygon";
+
+  const zIndex = LAYER_Z_INDEX[normalizedType] || 1;
+
+  layer.setZIndex(zIndex);
 
   return layer;
 }

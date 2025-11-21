@@ -3,11 +3,15 @@ import { CORRIENTES_TIENE_PAYE } from "../config/mapConst";
 
 export const scaleControl = () => {
   return new ScaleLine({
-    bar: true,
-    steps: 4,
-    text: true,
-    minWidth: 140,
+    units: "metric",
   });
+  // return new ScaleLine({
+  //   bar: true,
+  //   steps: 4,
+  //   text: true,
+  //   minWidth: 140,
+
+  // });
 };
 
 export const centerInitialPos = (view) => {

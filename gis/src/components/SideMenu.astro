@@ -1,5 +1,5 @@
 ---
-// src/components/SideMenu.astro
+import AsideHeader from "./asideHeader.astro";
 ---
 
 <div class="nav-and-aside">
@@ -52,23 +52,19 @@
     <div class="divider-y"></div>
 
     <button class="icon-container" id="query" title="Consultar información">
-        <div class="icon-wrapper">
-            <img
-                src="./assets/select-02-stroke-rounded.svg"
-                alt="Consultar información"
-            />
-            <span class="badge">f</span>
-        </div>
+      <img
+        src="./assets/select-02-stroke-rounded.svg"
+        alt="Consultar información"
+      />
+      <span class="badge">F</span>
     </button>
 
     <button class="icon-container" id="measure" title="Medir distancia">
-        <div class="icon-wrapper">
-            <img
-                src="./assets/tape-measure-stroke-rounded.svg"
-                alt="Medir distancia"
-            />
-            <span class="badge">m</span>
-        </div>
+      <img
+        src="./assets/tape-measure-stroke-rounded.svg"
+        alt="Medir distancia"
+      />
+      <span class="badge">M</span>
     </button>
 
     <button class="icon-container" id="draw" title="Dibujar vector">
@@ -82,12 +78,8 @@
   <aside id="main-aside" class="menu-open">
     <div class="aside-container">
       <div id="panel-layers" class="panel-content activeMenu">
-        <div class="aside-header">
-          <h2>Capas</h2>
-          <button title="Cerrar menú" id="close-menu">
-            <img src="/assets/cancel-01-stroke-rounded.svg" alt="Cerrar" />
-          </button>
-        </div>
+        <AsideHeader titulo="Capas" />
+
         <div class="aside-actions">
           <input
             id="layer-search"
@@ -103,21 +95,18 @@
       </div>
 
       <div id="panel-tables" class="panel-content">
-        <div class="aside-header">
-          <h2>Tablas de Atributos</h2>
-        </div>
+        <AsideHeader titulo="Tablas de atributos" />
         <div class="layers">
-          <p>
+          <p id="table-info">
             Use la herramienta "Consultar informacion" sobre una capa para
             visualizar las tablas del área seleccionada.
           </p>
+          <ul id="selected-layers"></ul>
         </div>
       </div>
 
       <div id="panel-legends" class="panel-content">
-        <div class="aside-header">
-          <h2>Leyendas</h2>
-        </div>
+        <AsideHeader titulo="Leyendas" />
         <div class="layers"><p>Contenido de leyendas...</p></div>
       </div>
     </div>
@@ -131,22 +120,41 @@
     overflow-y: auto;
   }
 
-  .aside-header {
-    padding: 0.5rem;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    align-items: center;
-
-    & h2 {
-      text-wrap: nowrap;
-      font-size: 1rem;
-    }
-  }
-
   .panel-content.activeMenu {
     display: block;
     animation: fadeIn 0.3s;
+  }
+
+  .icon-container {
+    padding: 8px;
+    border-radius: var(--border-radius-sm);
+    transition: var(--transition);
+    cursor: pointer;
+    border: 1px solid transparent;
+    position: relative;
+  }
+
+  .icon-container:hover {
+    background-color: var(--bg-400);
+  }
+
+  .badge {
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+
+    color: var(--gricesito);
+    border-radius: 25%;
+    /* border: 0.5px solid var(--gricesito); */
+    width: 12px;
+
+    /* height: 20px;  */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    pointer-events: none;
   }
 
   .icon-container.activeMenu {
@@ -167,15 +175,16 @@
   const buttons = document.querySelectorAll(".icon-container[data-target]");
   const panels = document.querySelectorAll(".panel-content");
 
-  const closeBtn = document.querySelector("#close-menu");
-  const aside = document.querySelector("#main-aside");
+  const closeBtns = document.querySelectorAll(".close-menu-btn");
+  const aside = document.getElementById("main-aside");
 
-  if (closeBtn && aside) {
-    closeBtn.addEventListener("click", () => {
-      aside.classList.remove("menu-open");
-        for (const btn of buttons) {
-            btn.classList.remove("activeMenu")
-        }
+  if (aside) {
+    closeBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        aside.classList.remove("menu-open");
+
+        buttons.forEach((b) => b.classList.remove("activeMenu"));
+      });
     });
   }
 
@@ -185,12 +194,12 @@
         aside.classList.add("menu-open");
       }
 
-        for (const b of buttons) {
-            b.classList.remove("activeMenu")
-        }
-        for (const p of panels) {
-            p.classList.remove("activeMenu")
-        }
+      for (const b of buttons) {
+        b.classList.remove("activeMenu");
+      }
+      for (const p of panels) {
+        p.classList.remove("activeMenu");
+      }
 
       btn.classList.add("activeMenu");
       const targetId = btn.getAttribute("data-target");
@@ -200,5 +209,5 @@
         targetPanel.classList.add("activeMenu");
       }
     });
-  };
+  }
 </script>
