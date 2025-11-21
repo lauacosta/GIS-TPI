@@ -1,4 +1,6 @@
 ---
+import AsideHeader from "./asideHeader.astro";
+
 // src/components/SideMenu.astro
 ---
 
@@ -74,12 +76,8 @@
   <aside id="main-aside" class="menu-open">
     <div class="aside-container">
       <div id="panel-layers" class="panel-content activeMenu">
-        <div class="aside-header">
-          <h2>Capas</h2>
-          <button title="Cerrar menú" id="close-menu">
-            <img src="/assets/cancel-01-stroke-rounded.svg" alt="Cerrar" />
-          </button>
-        </div>
+        <AsideHeader titulo="Capas" />
+
         <div class="aside-actions">
           <input
             id="layer-search"
@@ -95,9 +93,7 @@
       </div>
 
       <div id="panel-tables" class="panel-content">
-        <div class="aside-header">
-          <h2>Tablas de Atributos</h2>
-        </div>
+        <AsideHeader titulo="Tablas de atributos" />
         <div class="layers">
           <p>
             Use la herramienta "Consultar informacion" sobre una capa para
@@ -107,9 +103,7 @@
       </div>
 
       <div id="panel-legends" class="panel-content">
-        <div class="aside-header">
-          <h2>Leyendas</h2>
-        </div>
+        <AsideHeader titulo="Leyendas" />
         <div class="layers"><p>Contenido de leyendas...</p></div>
       </div>
     </div>
@@ -121,19 +115,6 @@
     display: none;
     height: 100%;
     overflow-y: auto;
-  }
-
-  .aside-header {
-    padding: 0.5rem;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    align-items: center;
-
-    & h2 {
-      text-wrap: nowrap;
-      font-size: 1rem;
-    }
   }
 
   .panel-content.activeMenu {
@@ -159,13 +140,16 @@
   const buttons = document.querySelectorAll(".icon-container[data-target]");
   const panels = document.querySelectorAll(".panel-content");
 
-  const closeBtn = document.getElementById("close-menu");
+  const closeBtns = document.querySelectorAll(".close-menu-btn");
   const aside = document.getElementById("main-aside");
 
-  if (closeBtn && aside) {
-    closeBtn.addEventListener("click", () => {
-      aside.classList.remove("menu-open");
-      buttons.forEach((btn) => btn.classList.remove("activeMenu"));
+  if (aside) {
+    closeBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        aside.classList.remove("menu-open");
+
+        buttons.forEach((b) => b.classList.remove("activeMenu"));
+      });
     });
   }
 

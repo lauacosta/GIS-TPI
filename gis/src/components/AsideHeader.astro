@@ -1,0 +1,25 @@
+---
+const { titulo } = Astro.props;
+---
+
+<div class="aside-header">
+  <h2>{titulo}</h2>
+  <button title="Cerrar menú" class="close-menu-btn">
+    <img src="/assets/cancel-01-stroke-rounded.svg" alt="Cerrar" />
+  </button>
+</div>
+
+<style>
+  .aside-header {
+    padding: 0.5rem;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+
+    & h2 {
+      text-wrap: nowrap;
+      font-size: 1rem;
+    }
+  }
+</style>

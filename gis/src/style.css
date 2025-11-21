@@ -2,11 +2,11 @@
   --font: "Noto Sans JP", sans-serif;
   --bg-200: rgb(255, 254, 251);
   --bg-300: rgb(250, 247, 242);
-  --bg-400: rgb(236, 232, 224);
+  --bg-400: rgba(228, 244, 245, 0.712);
 
   --border-400: #d8d6cf;
   /* (Lautaro) Todavia hay que decidir como se va a ver, pero el gris no se apreciaba mucho */
-  --border-500: #b521e3;
+  --border-500: #16bcee;
   /* --border-500: #a3a3a3; */
   --box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   --border-radius: 8px;
@@ -189,7 +189,7 @@ footer {
   }
 
   & li:hover {
-    background-color: var(--bg-300);
+    background-color: var(--bg-400);
   }
 }
 
@@ -219,9 +219,9 @@ footer {
   overflow-y: scroll;
   overflow-x: hidden;
   height: calc(100dvh - 1.5rem - 36px);
-
+  display: grid;
   padding: 0.5rem;
-  padding-bottom: 8.25rem;
+  padding-bottom: 11rem;
   gap: 0.5rem;
 }
 
@@ -241,7 +241,12 @@ footer {
 }
 
 .layers li:hover {
-  background-color: var(--bg-300);
+  background-color: var(--bg-400);
+}
+
+.layers li:has(input:checked) {
+  background-color: var(--bg-400);
+  border: 1px solid var(--border-500);
 }
 
 .layer-name {
@@ -268,7 +273,7 @@ footer {
 
 .search {
   all: unset;
-  width: calc(100% - 1rem);
+  width: calc(100% - 18px);
   padding: 0.5rem;
   border-radius: var(--border-radius-sm);
   border: 1px solid var(--border-400);
@@ -325,6 +330,7 @@ footer {
 
 .active {
   border-radius: var(--border-radius);
+  background-color: var(--bg-400);
   border: 1px solid var(--border-500) !important;
 }
 
@@ -359,16 +365,17 @@ nav {
   border-radius: var(--border-radius-sm);
   transition: var(--transition);
   cursor: pointer;
-  border: 1px solid var(--bg-200);
+  border: 1px solid transparent;
 }
 
 .icon-container:hover {
-  background-color: var(--bg-300);
+  background-color: var(--bg-400);
 }
 
 .active-menu,
 .active-menu:hover {
   background-color: var(--bg-400);
+  border: 1px solid var(--border-500);
 }
 
 .divider-y {
