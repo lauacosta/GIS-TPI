@@ -1,57 +1,116 @@
 import { centerInitialPos, zoomIn, zoomOut } from "../map/controls";
+import { createMeasureController } from "../map/interactions";
 
 export function initToolbar(map, interactionControls) {
-  const dom = {
-    center: document.getElementById("centerInitialPos"),
-    zoomout: document.getElementById("zoom-out"),
-    zoomin: document.getElementById("zoom-in"),
-    query: document.getElementById("query"),
-    draw: document.getElementById("draw"),
-    measure: document.getElementById("measure"),
-  };
-
-  dom.center.addEventListener("click", () => {
-    centerInitialPos(map.getView());
-  });
-
-  dom.zoomout.addEventListener("click", () => {
-    zoomOut(map.getView());
-  });
-
-  dom.zoomin.addEventListener("click", () => {
-    zoomIn(map.getView());
-  });
-
-  dom.draw.addEventListener("click", () => {
-    alert("CHAQUE. Aún no esta implementado. Anda a UI/toolbar");
-  });
-
-  dom.measure.addEventListener("click", () => {
-    alert("CHAQUE. Aún no esta implementado. Anda a UI/toolbar");
-  });
-
-  if (dom.query) {
-    let queryMode = false;
-
-    const toggle_query = () => {
-      queryMode = !queryMode;
-
-      dom.query.classList.toggle("active");
-
-      if (queryMode) {
-        interactionControls.enableQueryMode();
-      } else {
-        interactionControls.disableQueryMode();
-      }
+    const dom = {
+        center: document.querySelector("#centerInitialPos"),
+        zoomout: document.querySelector("#zoom-out"),
+        zoomin: document.querySelector("#zoom-in"),
+        query: document.querySelector("#query"),
+        draw: document.querySelector("#draw"),
+        measure: document.querySelector("#measure"),
     };
 
-    dom.query.addEventListener("click", toggle_query);
+    let measureMode = false;
+    let queryMode = false;
+    const measure_controller = createMeasureController(map);
 
-    // (Lautaro) Como hasta ahora no tenemos otros shortcuts, lo dejo aca;
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "F" || (e.key === "Escape" && queryMode)) {
-        toggle_query();
-      }
-    });
-  }
+    function handleMeasureTypeKeydown(event) {
+        if (!measureMode) return;
+
+        if (event.key === "L") {
+            measure_controller.activate("LineString");
+        }
+
+        if (event.key === "P") {
+            measure_controller.activate("Polygon");
+        }
+    }
+    globalThis.addEventListener("keydown", handleMeasureTypeKeydown);
+
+    function handleCenterClick() {
+        centerInitialPos(map.getView())
+    }
+
+    function handleZoomOutClick() {
+        zoomOut(map.getView());
+    }
+
+    function handleZoomInClick() {
+        zoomIn(map.getView());
+    }
+
+    function handleDrawClick() {
+        alert("CHAQUE. Aún no esta implementado. Anda a UI/toolbar");
+    }
+
+    function toggleMeasure() {
+        if (measureMode) {
+            measureMode = false;
+            dom.measure.classList.remove("active");
+            measure_controller.disable()
+        } else {
+            if (queryMode) {
+                queryMode = false;
+                dom.query.classList.remove("active");
+                interactionControls.disableQueryMode();
+            }
+            measureMode = true;
+            dom.measure.classList.add("active");
+            measure_controller.activate("LineString")
+        }
+    }
+
+    function toggleQuery() {
+        if (queryMode) {
+            queryMode = false;
+            dom.query.classList.remove("active");
+            interactionControls.disableQueryMode();
+        } else {
+            if (measureMode) {
+                measureMode = false;
+                dom.measure.classList.remove("active");
+                measure_controller.disable()
+            }
+            queryMode = true;
+            dom.query.classList.add("active");
+            interactionControls.enableQueryMode();
+        }
+    }
+
+    dom.center.addEventListener("click", handleCenterClick);
+    dom.zoomout.addEventListener("click", handleZoomOutClick);
+    dom.zoomin.addEventListener("click", handleZoomInClick);
+    dom.draw.addEventListener("click", handleDrawClick);
+
+    if (dom.measure) {
+        function handleMeasureClick() {
+            toggleMeasure();
+        }
+
+        function handleMeasureKeydown(event) {
+            if (event.key === "M" || (event.key === "Escape" && measureMode)) {
+                toggleMeasure();
+            }
+        }
+
+        dom.measure.addEventListener("click", handleMeasureClick);
+        globalThis.addEventListener("keydown", handleMeasureKeydown);
+    }
+
+    if (dom.query) {
+        function handleQueryClick() {
+            toggleQuery();
+        }
+
+        function handleQueryKeydown(event) {
+            if (event.key === "F" || (event.key === "Escape" && queryMode)) {
+                toggleQuery();
+            }
+        }
+
+        dom.query.addEventListener("click", handleQueryClick);
+        globalThis.addEventListener("keydown", handleQueryKeydown);
+    }
 }
+
