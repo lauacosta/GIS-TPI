@@ -3,7 +3,6 @@
     --bg-200: rgb(255, 254, 251);
     --bg-300: rgb(250, 247, 242);
     --bg-400: rgb(236, 232, 224);
-
     --border-400: #d8d6cf;
     /* (Lautaro) Todavia hay que decidir como se va a ver, pero el gris no se apreciaba mucho */
     --border-500: #181818;
@@ -13,6 +12,7 @@
     --border-radius-sm: 4px;
     --transition: all 0.3s ease;
     --orange-filler: #ff7300;
+    --gricesito: #808080;
     --orange-border: #ff7300;
 }
 
@@ -417,4 +417,29 @@ nav {
 
 .ol-tooltip-static:before {
     border-top-color: var(--orange-filler);
+}
+
+.icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge {
+  position: absolute;
+  top: 14px;
+  right: -12px;
+  background: white; 
+  color: var(--gricesito);
+  border-radius: 25%;
+  border: 0.5px solid var(--gricesito);
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  pointer-events: none;
 }

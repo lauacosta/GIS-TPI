@@ -15,19 +15,6 @@ export function initToolbar(map, interactionControls) {
     let queryMode = false;
     const measure_controller = createMeasureController(map);
 
-    function handleMeasureTypeKeydown(event) {
-        if (!measureMode) return;
-
-        if (event.key === "L") {
-            measure_controller.activate("LineString");
-        }
-
-        if (event.key === "P") {
-            measure_controller.activate("Polygon");
-        }
-    }
-    globalThis.addEventListener("keydown", handleMeasureTypeKeydown);
-
     function handleCenterClick() {
         centerInitialPos(map.getView())
     }
@@ -89,13 +76,27 @@ export function initToolbar(map, interactionControls) {
         }
 
         function handleMeasureKeydown(event) {
-            if (event.key === "M" || (event.key === "Escape" && measureMode)) {
+            if (event.key === "m" || (event.key === "Escape" && measureMode)) {
                 toggleMeasure();
+            }
+        }
+
+        function handleMeasureTypeKeydown(event) {
+            if (!measureMode) return;
+
+            if (event.key === "l") {
+                measure_controller.activate("LineString");
+            }
+
+            if (event.key === "p") {
+                measure_controller.activate("Polygon");
             }
         }
 
         dom.measure.addEventListener("click", handleMeasureClick);
         globalThis.addEventListener("keydown", handleMeasureKeydown);
+        globalThis.addEventListener("keydown", handleMeasureTypeKeydown);
+
     }
 
     if (dom.query) {
@@ -104,13 +105,14 @@ export function initToolbar(map, interactionControls) {
         }
 
         function handleQueryKeydown(event) {
-            if (event.key === "F" || (event.key === "Escape" && queryMode)) {
+            if (event.key === "f" || (event.key === "Escape" && queryMode)) {
                 toggleQuery();
             }
         }
 
         dom.query.addEventListener("click", handleQueryClick);
         globalThis.addEventListener("keydown", handleQueryKeydown);
+
     }
 }
 

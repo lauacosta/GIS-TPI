@@ -52,17 +52,25 @@
     <div class="divider-y"></div>
 
     <button class="icon-container" id="query" title="Consultar información">
-      <img
-        src="./assets/select-02-stroke-rounded.svg"
-        alt="Consultar información"
-      />
+        <div class="icon-wrapper">
+            <img
+                src="./assets/select-02-stroke-rounded.svg"
+                alt="Consultar información"
+            />
+            <span class="badge">f</span>
+        </div>
     </button>
+
     <button class="icon-container" id="measure" title="Medir distancia">
-      <img
-        src="./assets/tape-measure-stroke-rounded.svg"
-        alt="Medir distancia"
-      />
+        <div class="icon-wrapper">
+            <img
+                src="./assets/tape-measure-stroke-rounded.svg"
+                alt="Medir distancia"
+            />
+            <span class="badge">m</span>
+        </div>
     </button>
+
     <button class="icon-container" id="draw" title="Dibujar vector">
       <img
         src="./assets/pencil-edit-02-stroke-rounded.svg"
@@ -159,31 +167,38 @@
   const buttons = document.querySelectorAll(".icon-container[data-target]");
   const panels = document.querySelectorAll(".panel-content");
 
-  const closeBtn = document.getElementById("close-menu");
-  const aside = document.getElementById("main-aside");
+  const closeBtn = document.querySelector("#close-menu");
+  const aside = document.querySelector("#main-aside");
 
   if (closeBtn && aside) {
     closeBtn.addEventListener("click", () => {
       aside.classList.remove("menu-open");
-      buttons.forEach((btn) => btn.classList.remove("activeMenu"));
+        for (const btn of buttons) {
+            btn.classList.remove("activeMenu")
+        }
     });
   }
 
-  buttons.forEach((btn) => {
+  for (const btn of buttons) {
     btn.addEventListener("click", () => {
       if (aside) {
         aside.classList.add("menu-open");
       }
-      buttons.forEach((b) => b.classList.remove("activeMenu"));
-      panels.forEach((p) => p.classList.remove("activeMenu"));
+
+        for (const b of buttons) {
+            b.classList.remove("activeMenu")
+        }
+        for (const p of panels) {
+            p.classList.remove("activeMenu")
+        }
 
       btn.classList.add("activeMenu");
       const targetId = btn.getAttribute("data-target");
-      const targetPanel = document.getElementById(`panel-${targetId}`);
+      const targetPanel = document.querySelector(`#panel-${targetId}`);
 
       if (targetPanel) {
         targetPanel.classList.add("activeMenu");
       }
     });
-  });
+  };
 </script>
