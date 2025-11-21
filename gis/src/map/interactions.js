@@ -16,6 +16,7 @@ import Fill from 'ol/style/Fill.js';
 import Stroke from 'ol/style/Stroke.js';
 import Style from 'ol/style/Style.js';
 
+// Esta asi por cosas sobre referencias estables en JS, lean el MDN.
 const hideTooltip = () => helpTooltipElement.classList.add('hidden');
 
 const selectInteraction = new Select({
@@ -52,9 +53,6 @@ export function setupInteractions(map, layersWFS) {
         selectInteraction.getFeatures().clear();
     });
 
-    // pointerMoveKey = map.on('pointermove', pointerMoveHandler);
-
-
     return {
         enableQueryMode: () => {
             map.addInteraction(selectInteraction);
@@ -71,16 +69,40 @@ export function setupInteractions(map, layersWFS) {
         },
         disableMeasureMode: () => {
             map.removeInteraction(draw);
+
             if (pointerMoveKey) {
                 unByKey(pointerMoveKey);
-                pointerMoveKey = null;
+                pointerMoveKey = undefined;
             }
-            map.getViewport().removeEventListener('mouseout', hideTooltip);
+
+            if (helpTooltip) {
+                map.removeOverlay(helpTooltip);
+                helpTooltip = undefined;
+                helpTooltipElement = undefined;
+            }
+
+            if (measureTooltip) {
+                map.removeOverlay(measureTooltip);
+                measureTooltip = undefined;
+                measureTooltipElement = undefined;
+            }
+
+            map.getViewport()
+                .removeEventListener('mouseout', hideTooltip);
+
+            for (const ov of measureOverlays) {
+                const el = ov.getElement();
+                if (el && el.parentNode) {
+                    el.parentNode.removeChild(el);
+                }
+                map.removeOverlay(ov);
+            }
         },
     };
 }
 
-// --- WARN: EMPIEZA EL CODIGO PARA MEDICON
+// WARN:GLOBAL
+let measureOverlays = [];
 // WARN:GLOBAL
 const source = new VectorSource();
 // WARN:GLOBAL
@@ -94,36 +116,34 @@ let measureTooltipElement;
 // WARN:GLOBAL
 let measureTooltip;
 
-const continueLineMsg = 'Click para seguir trazando la linea';
-const continuePolygonMsg = 'Click para seguir trazando el poligono';
+const continueLineMessage = 'Click para seguir trazando la linea';
+const continuePolygonMessage = 'Click para seguir trazando el poligono';
+let helpMessage = 'Click para empezar a dibujar';
 
-const pointerMoveHandler = function(evt) {
-    if (evt.dragging) {
+const pointerMoveHandler = function(event) {
+    if (event.dragging) {
         return;
     }
-
-    let helpMsg = 'Click para empezar a dibujar';
 
     if (sketch) {
         const geom = sketch.getGeometry();
         if (geom instanceof Polygon) {
-            helpMsg = continuePolygonMsg;
+            helpMessage = continuePolygonMessage;
         } else if (geom instanceof LineString) {
-            helpMsg = continueLineMsg;
+            helpMessage = continueLineMessage;
         }
     }
 
-    helpTooltipElement.innerHTML = helpMsg;
-    helpTooltip.setPosition(evt.coordinate);
+    helpTooltipElement.innerHTML = helpMessage;
+    helpTooltip.setPosition(event.coordinate);
 
-    console.log("Te la saco");
     helpTooltipElement.classList.remove('hidden');
 };
 
 
 // const typeSelect = document.getElementById('type');
 // TODO: Para probar estoy usando para medir distancias nomas, no areas todavia.
-const typeSelect = document.getElementById('measure');
+const typeSelect = document.querySelector('#measure');
 
 // WARN:GLOBAL
 let draw;
@@ -132,22 +152,14 @@ let pointerMoveKey;
 const formatLength = function(line) {
     const length = getLength(line);
     let output;
-    if (length > 100) {
-        output = Math.round((length / 1000) * 100) / 100 + ' ' + 'km';
-    } else {
-        output = Math.round(length * 100) / 100 + ' ' + 'm';
-    }
+    output = length > 100 ? Math.round((length / 1000) * 100) / 100 + ' ' + 'km' : Math.round(length * 100) / 100 + ' ' + 'm';
     return output;
 };
 
 const formatArea = function(polygon) {
     const area = getArea(polygon);
     let output;
-    if (area > 10000) {
-        output = Math.round((area / 1000000) * 100) / 100 + ' ' + 'km<sup>2</sup>';
-    } else {
-        output = Math.round(area * 100) / 100 + ' ' + 'm<sup>2</sup>';
-    }
+    output = area > 10_000 ? Math.round((area / 1_000_000) * 100) / 100 + ' ' + 'km<sup>2</sup>' : Math.round(area * 100) / 100 + ' ' + 'm<sup>2</sup>';
     return output;
 };
 
@@ -196,13 +208,13 @@ function addDrawInteraction(map) {
     }
 
     let listener;
-    draw.on('drawstart', function(evt) {
-        sketch = evt.feature;
+    draw.on('drawstart', function(event) {
+        sketch = event.feature;
 
         let tooltipCoord;
 
-        listener = sketch.getGeometry().on('change', function(evt) {
-            const geom = evt.target;
+        listener = sketch.getGeometry().on('change', function(event_) {
+            const geom = event_.target;
             let output;
             if (geom instanceof Polygon) {
                 output = formatArea(geom);
@@ -220,7 +232,7 @@ function addDrawInteraction(map) {
         measureTooltipElement.className = 'ol-tooltip ol-tooltip-static';
         measureTooltip.setOffset([0, -7]);
         // unset sketch
-        sketch = null;
+        sketch = undefined;
         // unset tooltip so that a new one can be created
         measureTooltipElement = null;
         createMeasureTooltip(map);
@@ -229,7 +241,9 @@ function addDrawInteraction(map) {
 
     map.addInteraction(draw);
     pointerMoveKey = map.on('pointermove', pointerMoveHandler);
-    map.getViewport().addEventListener('mouseout', hideTooltip)
+    map.getViewport()
+
+        .addEventListener('mouseout', hideTooltip)
 }
 
 
@@ -261,4 +275,5 @@ function createMeasureTooltip(map) {
         insertFirst: false,
     });
     map.addOverlay(measureTooltip);
+    measureOverlays.push(measureTooltip);
 }

@@ -1,60 +1,73 @@
 export function initLayerList(layersData, wfsLayers) {
-  const ulLayers = document.querySelector(".layers");
-  const searchInput = document.getElementById("layer-search");
-  const cleanBtn = document.querySelector(".clean-selection");
+    const ulLayers = document.querySelector(".layers");
+    const searchInput = document.querySelector("#layer-search");
+    const cleanButton = document.querySelector(".clean-selection");
 
-  function renderList(list) {
-    ulLayers.innerHTML = "";
-
-    list.forEach(([layerName, label, type]) => {
-      const targetLayer = wfsLayers.find(
-        (l) => l.get("layerName") === layerName
-      );
-
-      const emoji =
-        {
-          point: "📍",
-          polygon: "⬟",
-          line: "➖",
-        }[type] ?? "❓";
-
-      ulLayers.insertAdjacentHTML(
-        "beforeend",
-        `<li><input type="checkbox" id="${layerName}"><label for="${layerName}"><span class="layer-symbol">${emoji}</span><span class="layer-name">${label}</span></label></li>`
-      );
-
-      const checkbox = document.getElementById(layerName);
-
-      checkbox.checked = targetLayer.getVisible();
-
-      checkbox.addEventListener("change", () => {
-        targetLayer.setVisible(checkbox.checked);
-        updateCleanButton();
-      });
-    });
-  }
-
-  function updateCleanButton() {
-    const anyChecked = wfsLayers.some((l) => l.getVisible());
-    if (cleanBtn) {
-      cleanBtn.style.display = anyChecked ? "inline-block" : "none";
+    function makeCheckboxHandler(targetLayer, checkbox) {
+        return function handleCheckboxChangeEvent() {
+            targetLayer.setVisible(checkbox.checked);
+            updateCleanButton();
+        };
     }
-  }
 
-  searchInput.addEventListener("input", (e) => {
-    const q = e.target.value.toLowerCase();
-    const filtered = layersData.filter(
-      ([name, label]) =>
-        name.toLowerCase().includes(q) || label.toLowerCase().includes(q)
-    );
-    renderList(filtered);
-  });
+    function handleSearchInput(event) {
+        const query = event.target.value.toLowerCase();
+        const filtered = layersData.filter(
+            ([name, label]) =>
+                name.toLowerCase().includes(query) ||
+                label.toLowerCase().includes(query)
+        );
+        renderList(filtered);
+    }
 
-  cleanBtn?.addEventListener("click", () => {
-    wfsLayers.forEach((l) => l.setVisible(false));
-    searchInput.dispatchEvent(new Event("input"));
-    updateCleanButton();
-  });
+    function handleCleanClick() {
+        for (const layer of wfsLayers) {
+            layer.setVisible(false);
+        }
+        searchInput.dispatchEvent(new Event("input"));
+        updateCleanButton();
+    }
 
-  renderList(layersData);
+    function renderList(list) {
+        ulLayers.innerHTML = "";
+
+        for (const [layerName, label, type] of list) {
+            const targetLayer = wfsLayers.find(
+                (l) => l.get("layerName") === layerName
+            );
+
+            const emoji =
+                {
+                    point: "📍",
+                    polygon: "⬟",
+                    line: "➖",
+                }[type] ?? "❓";
+
+            ulLayers.insertAdjacentHTML(
+                "beforeend",
+                `<li><input type="checkbox" id="${layerName}"><label for="${layerName}"><span class="layer-symbol">${emoji}</span><span class="layer-name">${label}</span></label></li>`
+            );
+
+            const checkbox = document.querySelector(`#${layerName}`);
+            checkbox.checked = targetLayer.getVisible();
+
+            const handler = makeCheckboxHandler(targetLayer, checkbox);
+            checkbox.addEventListener("change", handler);
+        };
+    }
+
+    function updateCleanButton() {
+        const anyChecked = wfsLayers.some((layer) => layer.getVisible());
+        if (cleanButton) {
+            cleanButton.style.display = anyChecked ? "inline-block" : "none";
+        }
+    }
+
+    searchInput.addEventListener("input", handleSearchInput);
+
+    if (cleanButton) {
+        cleanButton.addEventListener("click", handleCleanClick);
+    }
+
+    renderList(layersData);
 }

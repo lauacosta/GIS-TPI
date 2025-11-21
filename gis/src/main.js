@@ -26,19 +26,19 @@ const map = new Map({
 });
 
 
-async function init_map() {
-    try {
-        const layers = await fetchLayersFromGeoServer(workspace);
-        const WFSlayers = layers.map(([layerName]) => createWFSLayer(layerName));
+// async function init_map() {
+try {
+    const layers = await fetchLayersFromGeoServer(workspace);
+    const WFSlayers = layers.map(([layerName]) => createWFSLayer(layerName));
 
-        map.setLayers([capaBaseOSM, ...WFSlayers]);
-        const mapControls = setupInteractions(map, WFSlayers);
+    map.setLayers([capaBaseOSM, ...WFSlayers]);
+    const mapControls = setupInteractions(map, WFSlayers);
 
-        initLayerList(layers, WFSlayers);
-        initToolbar(map, mapControls);
-    } catch (error) {
-        console.error("Error iniciando la aplicación:", error);
-    }
+    initLayerList(layers, WFSlayers);
+    initToolbar(map, mapControls);
+} catch (error) {
+    console.error("Error iniciando la aplicación:", error);
 }
+// }
 
-init_map();
+// init_map();

@@ -1,76 +1,106 @@
 import { centerInitialPos, zoomIn, zoomOut } from "../map/controls";
 
+// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener
 export function initToolbar(map, interactionControls) {
     const dom = {
-        center: document.getElementById("centerInitialPos"),
-        zoomout: document.getElementById("zoom-out"),
-        zoomin: document.getElementById("zoom-in"),
-        query: document.getElementById("query"),
-        draw: document.getElementById("draw"),
-        measure: document.getElementById("measure"),
+        center: document.querySelector("#centerInitialPos"),
+        zoomout: document.querySelector("#zoom-out"),
+        zoomin: document.querySelector("#zoom-in"),
+        query: document.querySelector("#query"),
+        draw: document.querySelector("#draw"),
+        measure: document.querySelector("#measure"),
     };
 
-    dom.center.addEventListener("click", () => {
-        centerInitialPos(map.getView());
-    });
+    let measureMode = false;
+    let queryMode = false;
 
-    dom.zoomout.addEventListener("click", () => {
+    function handleCenterClick() {
+        centerInitialPos(map.getView())
+    }
+
+    function handleZoomOutClick() {
         zoomOut(map.getView());
-    });
+    }
 
-    dom.zoomin.addEventListener("click", () => {
+    function handleZoomInClick() {
         zoomIn(map.getView());
-    });
+    }
 
-    dom.draw.addEventListener("click", () => {
+    function handleDrawClick() {
         alert("CHAQUE. Aún no esta implementado. Anda a UI/toolbar");
-    });
+    }
+
+    function toggleMeasure() {
+        if (measureMode) {
+            // Disable measure mode
+            measureMode = false;
+            dom.measure.classList.remove("active");
+            interactionControls.disableMeasureMode();
+        } else {
+            // Disable query mode if active, then enable measure
+            if (queryMode) {
+                queryMode = false;
+                dom.query.classList.remove("active");
+                interactionControls.disableQueryMode();
+            }
+            measureMode = true;
+            dom.measure.classList.add("active");
+            interactionControls.enableMeasureMode();
+        }
+    }
+
+    function toggleQuery() {
+        if (queryMode) {
+            // Disable query mode
+            queryMode = false;
+            dom.query.classList.remove("active");
+            interactionControls.disableQueryMode();
+        } else {
+            // Disable measure mode if active, then enable query
+            if (measureMode) {
+                measureMode = false;
+                dom.measure.classList.remove("active");
+                interactionControls.disableMeasureMode();
+            }
+            queryMode = true;
+            dom.query.classList.add("active");
+            interactionControls.enableQueryMode();
+        }
+    }
+
+    dom.center.addEventListener("click", handleCenterClick);
+    dom.zoomout.addEventListener("click", handleZoomOutClick);
+    dom.zoomin.addEventListener("click", handleZoomInClick);
+    dom.draw.addEventListener("click", handleDrawClick);
 
     if (dom.measure) {
-        let measureMode = false;
+        function handleMeasureClick() {
+            toggleMeasure();
+        }
 
-        const toggle_measure = () => {
-            measureMode = !measureMode
-            dom.measure.classList.toggle("active");
-
-            if (measureMode) {
-                interactionControls.enableMeasureMode();
-            } else {
-                interactionControls.enableMeasureMode();
+        function handleMeasureKeydown(event) {
+            if (event.key === "M" || (event.key === "Escape" && measureMode)) {
+                toggleMeasure();
             }
         }
 
-        dom.measure.addEventListener("click", toggle_measure);
-        window.addEventListener("keydown", (e) => {
-            if (e.key === "M" || (e.key === "Escape" && measureMode)) {
-                toggle_measure();
-            }
-        });
-
+        dom.measure.addEventListener("click", handleMeasureClick);
+        globalThis.addEventListener("keydown", handleMeasureKeydown);
     }
 
     if (dom.query) {
-        let queryMode = false;
+        function handleQueryClick() {
+            toggleQuery();
+        }
 
-        const toggle_query = () => {
-            queryMode = !queryMode;
-
-            dom.query.classList.toggle("active");
-
-            if (queryMode) {
-                interactionControls.enableQueryMode();
-            } else {
-                interactionControls.disableQueryMode();
+        function handleQueryKeydown(event) {
+            if (event.key === "F" || (event.key === "Escape" && queryMode)) {
+                toggleQuery();
             }
-        };
+        }
 
-        dom.query.addEventListener("click", toggle_query);
-        // (Lautaro) Como hasta ahora no tenemos otros shortcuts, lo dejo aca;
-        window.addEventListener("keydown", (e) => {
-            if (e.key === "F" || (e.key === "Escape" && queryMode)) {
-                toggle_query();
-            }
-        });
+        dom.query.addEventListener("click", handleQueryClick);
+        globalThis.addEventListener("keydown", handleQueryKeydown);
     }
 }
 

@@ -1,29 +1,32 @@
 export function updateTabs(features) {
-  const layersList = document.getElementById("selected-layers");
-  if (!layersList) return;
+    const layersList = document.querySelector("#selected-layers");
+    if (!layersList) return;
 
-  layersList.querySelectorAll("li:not(#map-tab)").forEach((li) => li.remove());
+    const items = layersList.querySelectorAll("li:not(#map-tab)");
+    for (const li of items) {
+        li.remove()
+    }
 
-  if (features.length === 0) {
-    console.info("No features selected.");
-    return;
-  }
+    if (features.length === 0) {
+        console.info("No features selected.");
+        return;
+    }
 
-  const grouped = {};
+    const grouped = {};
+    for (const feat of features) {
+        const properties = feat.getProperties();
+        const fclass = properties.fclass || "Sin clase";
 
-  features.forEach((f) => {
-    const props = f.getProperties();
-    const fclass = props.fclass || "Sin clase";
+        if (!grouped[fclass]) grouped[fclass] = [];
+        grouped[fclass].push(properties);
+    };
 
-    if (!grouped[fclass]) grouped[fclass] = [];
-    grouped[fclass].push(props);
-  });
+    const keys = Object.keys(grouped);
+    for (const fclass of keys) {
+        const li = document.createElement("li");
+        li.textContent = fclass;
+        layersList.append(li);
+    };
 
-  Object.keys(grouped).forEach((fclass) => {
-    const li = document.createElement("li");
-    li.textContent = fclass;
-    layersList.appendChild(li);
-  });
-
-  console.log("Resultados:", grouped);
+    console.log("Resultados:", grouped);
 }
