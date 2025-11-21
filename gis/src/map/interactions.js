@@ -15,9 +15,71 @@ import CircleStyle from 'ol/style/Circle.js';
 import Fill from 'ol/style/Fill.js';
 import Stroke from 'ol/style/Stroke.js';
 import Style from 'ol/style/Style.js';
+import VectorLayer from 'ol/layer/Vector.js';
 
 // Esta asi por cosas sobre referencias estables en JS, lean el MDN.
 const hideTooltip = () => helpTooltipElement.classList.add('hidden');
+
+// WARN:GLOBAL
+let draw;
+// WARN:GLOBAL
+let pointerMoveKey;
+// WARN:GLOBAL
+let measureOverlays = [];
+// WARN:GLOBAL
+const source = new VectorSource();
+// WARN:GLOBAL
+const activeDrawStyle = new Style({
+    fill: new Fill({
+        color: 'rgba(255, 255, 255, 0.2)',
+    }),
+    stroke: new Stroke({
+        color: 'rgba(0, 0, 0, 0.5)',
+        lineDash: [10, 10],
+        width: 2,
+    }),
+    image: new CircleStyle({
+        radius: 5,
+        stroke: new Stroke({
+            color: 'rgba(0, 0, 0, 0.7)',
+        }),
+        fill: new Fill({
+            color: 'rgba(255, 255, 255, 0.2)',
+        }),
+    }),
+});
+
+// WARN:GLOBAL
+const finalMeasureStyle = new Style({
+    stroke: new Stroke({
+        color: 'rgba(255, 204, 51, 0.9)', // light blue
+        width: 3,
+    }),
+});
+
+// WARN:GLOBAL
+let sketch;
+// WARN:GLOBAL
+let helpTooltipElement;
+// WARN:GLOBAL
+let helpTooltip;
+// WARN:GLOBAL
+let measureTooltipElement;
+// WARN:GLOBAL
+let measureTooltip;
+
+// WARN:GLOBAL
+const continueLineMessage = 'Click para seguir trazando la linea';
+// WARN:GLOBAL
+const continuePolygonMessage = 'Click para seguir trazando el poligono';
+// WARN:GLOBAL
+let helpMessage = 'Click para empezar a dibujar';
+
+// WARN:GLOBAL
+const measureLayer = new VectorLayer({
+    source: source,
+    style: finalMeasureStyle,
+});
 
 const selectInteraction = new Select({
     // Define el estilo de la capa al ser seleccionada
@@ -52,6 +114,7 @@ export function setupInteractions(map, layersWFS) {
     dragBoxInteraction.on("boxstart", () => {
         selectInteraction.getFeatures().clear();
     });
+    map.addLayer(measureLayer);
 
     return {
         enableQueryMode: () => {
@@ -97,28 +160,11 @@ export function setupInteractions(map, layersWFS) {
                 }
                 map.removeOverlay(ov);
             }
+            source.clear()
         },
     };
 }
 
-// WARN:GLOBAL
-let measureOverlays = [];
-// WARN:GLOBAL
-const source = new VectorSource();
-// WARN:GLOBAL
-let sketch;
-// WARN:GLOBAL
-let helpTooltipElement;
-// WARN:GLOBAL
-let helpTooltip;
-// WARN:GLOBAL
-let measureTooltipElement;
-// WARN:GLOBAL
-let measureTooltip;
-
-const continueLineMessage = 'Click para seguir trazando la linea';
-const continuePolygonMessage = 'Click para seguir trazando el poligono';
-let helpMessage = 'Click para empezar a dibujar';
 
 const pointerMoveHandler = function(event) {
     if (event.dragging) {
@@ -141,13 +187,7 @@ const pointerMoveHandler = function(event) {
 };
 
 
-// const typeSelect = document.getElementById('type');
-// TODO: Para probar estoy usando para medir distancias nomas, no areas todavia.
-const typeSelect = document.querySelector('#measure');
 
-// WARN:GLOBAL
-let draw;
-let pointerMoveKey;
 
 const formatLength = function(line) {
     const length = getLength(line);
@@ -163,25 +203,6 @@ const formatArea = function(polygon) {
     return output;
 };
 
-const drawStyle = new Style({
-    fill: new Fill({
-        color: 'rgba(255, 255, 255, 0.2)',
-    }),
-    stroke: new Stroke({
-        color: 'rgba(0, 0, 0, 0.5)',
-        lineDash: [10, 10],
-        width: 2,
-    }),
-    image: new CircleStyle({
-        radius: 5,
-        stroke: new Stroke({
-            color: 'rgba(0, 0, 0, 0.7)',
-        }),
-        fill: new Fill({
-            color: 'rgba(255, 255, 255, 0.2)',
-        }),
-    }),
-});
 
 function addDrawInteraction(map) {
     if (pointerMoveKey) {
@@ -196,7 +217,7 @@ function addDrawInteraction(map) {
         style: function(feature) {
             // const geometryType = feature.getGeometry().getType();
             // if (geometryType === type || geometryType === 'Point') {
-            return drawStyle;
+            return activeDrawStyle;
             // }
         },
     });
