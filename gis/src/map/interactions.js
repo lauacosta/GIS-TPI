@@ -17,7 +17,8 @@ import VectorLayer from 'ol/layer/Vector.js';
 const source = new VectorSource();
 
 export function createMeasureController(map) {
-    let draw = undefined;
+    let activeDraw = undefined;
+    let activeType = undefined;
     let pointerMoveKey = undefined;
     let measureOverlays = [];
 
@@ -66,13 +67,22 @@ export function createMeasureController(map) {
 
 
     function addDrawInteraction(map, drawType) {
+        drawType = drawType ? drawType : 'Polygon';
+        if (activeType === drawType) { return }
+
+        if (activeDraw) {
+            map.removeInteraction(activeDraw);
+            activeDraw = null;
+        }
+        activeType = drawType;
+
         if (pointerMoveKey) {
             unByKey(pointerMoveKey);
         }
 
-        draw = new Draw({
+        activeDraw = new Draw({
             source: source,
-            type: drawType ? drawType : 'Polygon',
+            type: activeType,
             style: () => activeDrawStyle,
         });
 
@@ -83,7 +93,7 @@ export function createMeasureController(map) {
         }
 
         let listener;
-        draw.on('drawstart', function(event) {
+        activeDraw.on('drawstart', function(event) {
             sketch = event.feature;
 
             let tooltipCoord;
@@ -103,7 +113,7 @@ export function createMeasureController(map) {
             });
         });
 
-        draw.on('drawend', function() {
+        activeDraw.on('drawend', function() {
             measureTooltipElement.className = 'ol-tooltip ol-tooltip-static';
             measureTooltip.setOffset([0, -7]);
             // unset sketch
@@ -114,11 +124,9 @@ export function createMeasureController(map) {
             unByKey(listener);
         });
 
-        map.addInteraction(draw);
+        map.addInteraction(activeDraw);
         pointerMoveKey = map.on('pointermove', pointerMoveHandler);
-        map.getViewport()
-
-            .addEventListener('mouseout', hideTooltip)
+        map.getViewport().addEventListener('mouseout', hideTooltip)
     }
 
 
@@ -158,7 +166,11 @@ export function createMeasureController(map) {
             addDrawInteraction(map, drawType)
         },
         disable: () => {
-            map.removeInteraction(draw);
+            activeType = undefined;
+            if (activeDraw) {
+                map.removeInteraction(activeDraw);
+                activeDraw = undefined;
+            }
 
             if (pointerMoveKey) {
                 unByKey(pointerMoveKey);
