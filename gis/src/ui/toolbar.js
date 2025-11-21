@@ -1,6 +1,6 @@
 import { centerInitialPos, zoomIn, zoomOut } from "../map/controls";
+import { createMeasureController } from "../map/interactions";
 
-// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener
 export function initToolbar(map, interactionControls) {
     const dom = {
         center: document.querySelector("#centerInitialPos"),
@@ -13,6 +13,20 @@ export function initToolbar(map, interactionControls) {
 
     let measureMode = false;
     let queryMode = false;
+    const measure_controller = createMeasureController(map);
+
+    function handleMeasureTypeKeydown(event) {
+        if (!measureMode) return;
+
+        if (event.key === "L") {
+            measure_controller.activate("LineString");
+        }
+
+        if (event.key === "P") {
+            measure_controller.activate("Polygon");
+        }
+    }
+    globalThis.addEventListener("keydown", handleMeasureTypeKeydown);
 
     function handleCenterClick() {
         centerInitialPos(map.getView())
@@ -32,12 +46,10 @@ export function initToolbar(map, interactionControls) {
 
     function toggleMeasure() {
         if (measureMode) {
-            // Disable measure mode
             measureMode = false;
             dom.measure.classList.remove("active");
-            interactionControls.disableMeasureMode();
+            measure_controller.disable()
         } else {
-            // Disable query mode if active, then enable measure
             if (queryMode) {
                 queryMode = false;
                 dom.query.classList.remove("active");
@@ -45,22 +57,20 @@ export function initToolbar(map, interactionControls) {
             }
             measureMode = true;
             dom.measure.classList.add("active");
-            interactionControls.enableMeasureMode();
+            measure_controller.activate("LineString")
         }
     }
 
     function toggleQuery() {
         if (queryMode) {
-            // Disable query mode
             queryMode = false;
             dom.query.classList.remove("active");
             interactionControls.disableQueryMode();
         } else {
-            // Disable measure mode if active, then enable query
             if (measureMode) {
                 measureMode = false;
                 dom.measure.classList.remove("active");
-                interactionControls.disableMeasureMode();
+                measure_controller.disable()
             }
             queryMode = true;
             dom.query.classList.add("active");

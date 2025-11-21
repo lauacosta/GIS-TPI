@@ -6,12 +6,14 @@
 
     --border-400: #d8d6cf;
     /* (Lautaro) Todavia hay que decidir como se va a ver, pero el gris no se apreciaba mucho */
-    --border-500: #b521e3;
+    --border-500: #181818;
     /* --border-500: #a3a3a3; */
     --box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     --border-radius: 8px;
     --border-radius-sm: 4px;
     --transition: all 0.3s ease;
+    --orange-filler: #ff7300;
+    --orange-border: #ff7300;
 }
 
 /* 1. Use a more-intuitive box-sizing model */
@@ -325,8 +327,7 @@ footer {
 }
 
 .active {
-    border-radius: var(--border-radius);
-    border: 1px solid var(--border-500) !important;
+    border: 3px solid var(--orange-border) !important;
 }
 
 .nav-and-aside {
@@ -397,9 +398,9 @@ nav {
 }
 
 .ol-tooltip-static {
-    background-color: #ff7300;
+    /* background-color: var(--orange-border); */
     color: black;
-    border: 1px solid white;
+    border: 1px solid var(--orange-border);
 }
 
 .ol-tooltip-measure:before,
@@ -415,5 +416,5 @@ nav {
 }
 
 .ol-tooltip-static:before {
-    border-top-color: #ff7300;
+    border-top-color: var(--orange-filler);
 }

@@ -31,12 +31,14 @@ export const measureLineStyle = new Style({
         color: "rgba(255, 115, 0, 1)",
         width: 2,
     }),
+    fill: new Fill({
+        color: "rgba(255, 165, 0, 0.25)",
+    }),
 });
-
 
 export const activeDrawStyle = new Style({
     fill: new Fill({
-        color: 'rgba(255, 255, 255, 0.2)',
+        color: 'rgba(168, 168, 168, 0.25)',
     }),
     stroke: new Stroke({
         color: 'rgba(0, 0, 0, 0.5)',
