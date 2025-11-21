@@ -1,6 +1,7 @@
 import { Style, Stroke, Fill, Circle } from "ol/style";
 
-export const selectedStyle = new Style({
+export const selectedPolygonStyle = new Style({
+  zIndex: 1000,
   fill: new Fill({
     color: "rgba(255, 165, 0, 0.25)",
   }),
@@ -11,6 +12,7 @@ export const selectedStyle = new Style({
 });
 
 export const selectedPointStyle = new Style({
+  zIndex: 1000,
   image: new Circle({
     radius: 8,
     fill: new Fill({ color: "rgba(255,165,0,0.9)" }),
@@ -19,6 +21,7 @@ export const selectedPointStyle = new Style({
 });
 
 export const selectedLineStyle = new Style({
+  zIndex: 1000,
   stroke: new Stroke({
     color: "rgba(255, 115, 0, 1)",
     width: 3,

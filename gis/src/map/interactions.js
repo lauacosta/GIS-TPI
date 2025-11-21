@@ -4,15 +4,22 @@ import { platformModifierKeyOnly } from "ol/events/condition.js";
 import { getFeaturesInDragBox } from "../utils/dragBoxQuery";
 import { updateTabs } from "../ui/tabs";
 
-import { selectedStyle, selectedPointStyle } from "./styles";
+import {
+  selectedPolygonStyle,
+  selectedPointStyle,
+  selectedLineStyle,
+} from "./styles";
 
 const selectInteraction = new Select({
-  // Define el estilo de la capa al ser seleccionada
   style: function (feature) {
     const geom = feature && feature.getGeometry && feature.getGeometry();
     const type = geom && geom.getType && geom.getType();
-    if (type === "Point" || type === "MultiPoint") return selectedPointStyle;
-    return selectedStyle;
+    if (type === "Point" || type === "MultiPoint") {
+      return selectedPointStyle;
+    } else if (type === "LineString" || type === "MultiLineString") {
+      return selectedLineStyle;
+    }
+    return selectedPolygonStyle;
   },
 });
 

@@ -11,6 +11,7 @@ import { CORRIENTES_TIENE_PAYE, workspace } from "./config/mapConst";
 import { createWFSLayer } from "./map/layerFactory";
 import { initToolbar } from "./ui/toolbar";
 import "ol/ol.css";
+import { Layer } from "ol/layer";
 
 const capaBaseOSM = new TileLayer({
   source: new OSM(),
@@ -28,7 +29,9 @@ const map = new Map({
 async function init_map() {
   try {
     const layers = await fetchLayersFromGeoServer(workspace);
-    const WFSlayers = layers.map(([layerName]) => createWFSLayer(layerName));
+    const WFSlayers = layers.map(([layerName, label, type]) =>
+      createWFSLayer(layerName, type)
+    );
 
     map.setLayers([capaBaseOSM, ...WFSlayers]);
     const mapControls = setupInteractions(map, WFSlayers);
