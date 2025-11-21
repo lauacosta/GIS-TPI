@@ -1,7 +1,5 @@
 ---
 import AsideHeader from "./asideHeader.astro";
-
-// src/components/SideMenu.astro
 ---
 
 <div class="nav-and-aside">
@@ -95,10 +93,11 @@ import AsideHeader from "./asideHeader.astro";
       <div id="panel-tables" class="panel-content">
         <AsideHeader titulo="Tablas de atributos" />
         <div class="layers">
-          <p>
+          <p id="table-info">
             Use la herramienta "Consultar informacion" sobre una capa para
             visualizar las tablas del área seleccionada.
           </p>
+          <ul id="selected-layers"></ul>
         </div>
       </div>
 

@@ -1,3 +1,5 @@
+import { setEmoji } from "../utils/setEmoji";
+
 export function initLayerList(layersData, wfsLayers) {
   const ulLayers = document.querySelector(".layers");
   const searchInput = document.getElementById("layer-search");
@@ -11,16 +13,11 @@ export function initLayerList(layersData, wfsLayers) {
         (l) => l.get("layerName") === layerName
       );
 
-      const emoji =
-        {
-          point: "📍",
-          polygon: "⬟",
-          line: "➖",
-        }[type] ?? "❓";
-
       ulLayers.insertAdjacentHTML(
         "beforeend",
-        `<li><input type="checkbox" id="${layerName}"><label for="${layerName}"><span class="layer-symbol">${emoji}</span><span class="layer-name">${label}</span></label></li>`
+        `<li><input type="checkbox" id="${layerName}"><label for="${layerName}"><span class="layer-symbol">${setEmoji(
+          type
+        )}</span><span class="layer-name">${label}</span></label></li>`
       );
 
       const checkbox = document.getElementById(layerName);

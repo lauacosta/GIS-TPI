@@ -2,7 +2,7 @@ import Select from "ol/interaction/Select.js";
 import DragBox from "ol/interaction/DragBox.js";
 import { platformModifierKeyOnly } from "ol/events/condition.js";
 import { getFeaturesInDragBox } from "../utils/dragBoxQuery";
-import { updateTabs } from "../ui/tabs";
+import { updateTabs } from "../ui/tableList";
 
 import {
   selectedPolygonStyle,
@@ -39,7 +39,7 @@ export function setupInteractions(map, layersWFS) {
     if (selectedFeatures.length > 0) {
       selectInteraction.getFeatures().extend(selectedFeatures);
     }
-
+    console.log(selectedFeatures);
     updateTabs(selectedFeatures);
   });
 

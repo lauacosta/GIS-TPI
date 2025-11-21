@@ -30,7 +30,6 @@ const LAYER_Z_INDEX = {
 };
 
 export function createWFSLayer(layerName, type) {
-  console.log(`Capa: ${layerName} - Tipo detectado de GeoServer: "${type}"`);
   const color = layerColors[layerIndex % layerColors.length];
   layerIndex++;
 
