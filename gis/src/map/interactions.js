@@ -4,17 +4,13 @@ import { platformModifierKeyOnly } from "ol/events/condition.js";
 import { getFeaturesInDragBox } from "../utils/dragBoxQuery";
 import { updateTabs } from "../ui/tabs";
 import VectorSource from 'ol/source/Vector.js';
-import { selectedStyle, selectedPointStyle } from "./styles";
+import { selectedStyle, selectedPointStyle, activeDrawStyle, measureLineStyle } from "./styles";
 import { unByKey } from 'ol/Observable.js';
 import Overlay from 'ol/Overlay.js';
 import LineString from 'ol/geom/LineString.js';
 import Polygon from 'ol/geom/Polygon.js';
 import Draw from 'ol/interaction/Draw.js';
 import { getArea, getLength } from 'ol/sphere.js';
-import CircleStyle from 'ol/style/Circle.js';
-import Fill from 'ol/style/Fill.js';
-import Stroke from 'ol/style/Stroke.js';
-import Style from 'ol/style/Style.js';
 import VectorLayer from 'ol/layer/Vector.js';
 
 // Esta asi por cosas sobre referencias estables en JS, lean el MDN.
@@ -28,34 +24,7 @@ let pointerMoveKey;
 let measureOverlays = [];
 // WARN:GLOBAL
 const source = new VectorSource();
-// WARN:GLOBAL
-const activeDrawStyle = new Style({
-    fill: new Fill({
-        color: 'rgba(255, 255, 255, 0.2)',
-    }),
-    stroke: new Stroke({
-        color: 'rgba(0, 0, 0, 0.5)',
-        lineDash: [10, 10],
-        width: 2,
-    }),
-    image: new CircleStyle({
-        radius: 5,
-        stroke: new Stroke({
-            color: 'rgba(0, 0, 0, 0.7)',
-        }),
-        fill: new Fill({
-            color: 'rgba(255, 255, 255, 0.2)',
-        }),
-    }),
-});
 
-// WARN:GLOBAL
-const finalMeasureStyle = new Style({
-    stroke: new Stroke({
-        color: 'rgba(255, 204, 51, 0.9)', // light blue
-        width: 3,
-    }),
-});
 
 // WARN:GLOBAL
 let sketch;
@@ -78,7 +47,7 @@ let helpMessage = 'Click para empezar a dibujar';
 // WARN:GLOBAL
 const measureLayer = new VectorLayer({
     source: source,
-    style: finalMeasureStyle,
+    style: measureLineStyle,
 });
 
 const selectInteraction = new Select({

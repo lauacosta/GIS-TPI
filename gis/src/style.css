@@ -397,7 +397,7 @@ nav {
 }
 
 .ol-tooltip-static {
-    background-color: #ffcc33;
+    background-color: #ff7300;
     color: black;
     border: 1px solid white;
 }
@@ -415,5 +415,5 @@ nav {
 }
 
 .ol-tooltip-static:before {
-    border-top-color: #ffcc33;
+    border-top-color: #ff7300;
 }
