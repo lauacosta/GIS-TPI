@@ -13,33 +13,30 @@ import "ol/ol.css";
 import TileLayer from "ol/layer/Tile.js";
 
 const capaBaseOSM = new TileLayer({
-  source: new OSM(),
+    source: new OSM(),
 });
 
 const map = new Map({
-  controls: defaultControls().extend([scaleControl()]),
-  target: "map",
-  view: new View({
-    center: CORRIENTES_TIENE_PAYE,
-    zoom: 12,
-  }),
+    controls: defaultControls().extend([scaleControl()]),
+    target: "map",
+    view: new View({
+        center: CORRIENTES_TIENE_PAYE,
+        zoom: 12,
+    }),
 });
 
-// async function init_map() {
 try {
-  const layers = await fetchLayersFromGeoServer(workspace);
-  const WFSlayers = layers.map(([layerName, label, type]) =>
-    createWFSLayer(layerName, type)
-  );
+    const layers = await fetchLayersFromGeoServer(workspace);
+    const WFSlayers = layers.map(([layerName, label, type]) =>
+        createWFSLayer(layerName, type)
+    );
 
-  map.setLayers([capaBaseOSM, ...WFSlayers]);
-  const mapControls = setupInteractions(map, WFSlayers);
+    map.setLayers([capaBaseOSM, ...WFSlayers]);
+    const mapControls = setupInteractions(map, WFSlayers);
 
-  initLayerList(layers, WFSlayers);
-  initToolbar(map, mapControls);
+    initLayerList(layers, WFSlayers);
+    initToolbar(map, mapControls);
 } catch (error) {
-  console.error("Error iniciando la aplicación:", error);
+    console.error("Error iniciando la aplicación:", error);
 }
-// }
 
-// init_map();
