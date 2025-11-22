@@ -56,7 +56,15 @@ export function initToolbar(map, interactionControls) {
         } else {
             if (measureMode) {
                 measureMode = false;
-                dom.measureLine.classList.remove("active");
+                matchMode(currentMeasureType, {
+                    LineString: () => {
+                        dom.measureLine.classList.remove("active");
+                    },
+                    Polygon: () => {
+                        dom.measurePolygon.classList.remove("active");
+                    }
+                })
+
                 measure_controller.disable();
             }
             queryMode = true;
