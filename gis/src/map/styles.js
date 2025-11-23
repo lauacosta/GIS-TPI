@@ -109,29 +109,6 @@ export const activeDrawStyle = new Style({
     }),
 });
 
-export const createLayerStyle = (color) => {
-    return {
-        point: new Style({
-            image: new Circle({
-                radius: 6,
-                fill: new Fill({ color }),
-                stroke: new Stroke({ color: "#222", width: 1 }),
-            }),
-        }),
-        line: new Style({
-            stroke: new Stroke({
-                color,
-                width: 3,
-                lineCap: "round",
-                lineJoin: "round",
-            }),
-        }),
-        polygon: new Style({
-            fill: new Fill({ color }),
-            stroke: new Stroke({ color: "#222", width: 1 }),
-        }),
-    };
-};
 
 const superscriptMap = {
     "0": "⁰",

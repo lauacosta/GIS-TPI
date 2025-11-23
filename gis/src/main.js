@@ -11,6 +11,9 @@ import { initToolbar } from "./ui/toolbar";
 import "ol/ol.css";
 import Rotate from "ol/control/Rotate.js";
 import TileLayer from "ol/layer/Tile.js";
+import { preloadIcons } from "./map/icon_registry";
+
+await preloadIcons();
 
 const capaBaseOSM = new TileLayer({
     source: new OSM(),
@@ -38,7 +41,7 @@ const map = new Map({
 
 try {
     const layers = await fetchLayersFromGeoServer(workspace);
-    const WFSlayers = layers.map(([layerName, _, type]) =>
+    const WFSlayers = layers.map(([layerName, label, type]) =>
         createWFSLayer(layerName, type)
     );
 
@@ -50,4 +53,6 @@ try {
 } catch (error) {
     console.error("Error iniciando la aplicación:", error);
 }
+
+
 

@@ -18,9 +18,9 @@ export const fetchLayersFromGeoServer = async (workspace) => {
 
         const layers = result.Capability.Layer.Layer;
 
-        return layers.map((l) => {
-            const type = l.Style[0].Name;
-            const raw = l.Name.replace(`${workspace}:`, "");
+        return layers.map((layer) => {
+            const type = layer.Style[0].Name;
+            const raw = layer.Name.replace(`${workspace}:`, "");
             const format = raw.replaceAll("_", " ").toLowerCase();
 
             return [raw, format, type];
