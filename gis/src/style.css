@@ -410,33 +410,6 @@ nav::-webkit-scrollbar {
   user-select: none;
 }
 
-.ol-tooltip-measure {
-  opacity: 1;
-  font-weight: bold;
-}
-
-.ol-tooltip-static {
-  /* background-color: var(--orange-border); */
-  color: black;
-  border: 1px solid var(--orange-border);
-}
-
-.ol-tooltip-measure:before,
-.ol-tooltip-static:before {
-  border-top: 6px solid rgba(0, 0, 0, 0.5);
-  border-right: 6px solid transparent;
-  border-left: 6px solid transparent;
-  content: "";
-  position: absolute;
-  bottom: -6px;
-  margin-left: -7px;
-  left: 50%;
-}
-
-.ol-tooltip-static:before {
-  border-top-color: var(--orange-filler);
-}
-
 .tables-container {
   max-width: calc(100% - 408px);
   max-height: calc(100dvh - 16px);
@@ -509,3 +482,65 @@ nav::-webkit-scrollbar {
   height: auto;
   margin-bottom: 1rem;
 }
+
+.progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 0%;
+  background: var(--orange-filler);
+  /* background: #00aaff; */
+  transition: width 0.2s;
+  z-index: 2000;
+}
+
+.hidden {
+  display: none;
+}
+
+.ol-rotate {
+    top: 10px;
+    right: 10px;
+}
+
+.ol-rotate button {
+    background: white;
+    border-radius: 50%;
+    border: 2px solid #666;
+    width: 40px;
+    height: 40px;
+    /* background-image: url('compass-icon.svg'); /1* or emoji 🧭 *1/ */
+    background-size: 70%;
+    background-repeat: no-repeat;
+    background-position: center;
+    transform: rotate(0deg);
+}
+
+.ol-rotate.ol-hidden {
+    opacity: 1 !important; /* never hide */
+}
+
+
+/* Required for ScaleLine bar mode */
+.ol-scale-bar {
+    display: block;
+    background: rgba(255,255,255,0.7);
+    border: 2px solid #333;
+    border-radius: 4px;
+    padding: 2px;
+    margin: 4px;
+}
+
+.ol-scale-bar-inner {
+    background: #333;
+    height: 4px;
+}
+
+.ol-scale-line {
+    background: rgba(255,255,255,0.7);
+    padding: 3px 6px;
+    border-radius: 3px;
+    border: 1px solid #333;
+}
+
