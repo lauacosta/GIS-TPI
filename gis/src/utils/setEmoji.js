@@ -1,5 +1,3 @@
-import { MultiLineString } from "ol/geom";
-
 export function setEmoji(type) {
   const emoji =
     {

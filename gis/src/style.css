@@ -507,50 +507,48 @@ nav::-webkit-scrollbar {
 }
 
 .ol-rotate {
-    top: 10px;
-    right: 10px;
+  top: 10px;
+  right: 10px;
 }
 
 .ol-rotate button {
-    background: white;
-    border-radius: 50%;
-    border: 2px solid #666;
-    width: 40px;
-    height: 40px;
-    /* background-image: url('compass-icon.svg'); /1* or emoji 🧭 *1/ */
-    background-size: 70%;
-    background-repeat: no-repeat;
-    background-position: center;
-    transform: rotate(0deg);
+  background: white;
+  border-radius: 50%;
+  border: 2px solid #666;
+  width: 40px;
+  height: 40px;
+  /* background-image: url('compass-icon.svg'); /1* or emoji 🧭 *1/ */
+  background-size: 70%;
+  background-repeat: no-repeat;
+  background-position: center;
+  transform: rotate(0deg);
 }
 
 .ol-rotate.ol-hidden {
-    opacity: 1 !important; /* never hide */
+  opacity: 1 !important; /* never hide */
 }
-
 
 /* Required for ScaleLine bar mode */
 .ol-scale-bar {
-    display: block;
-    background: rgba(255,255,255,0.7);
-    border: 2px solid #333;
-    border-radius: 4px;
-    padding: 2px;
-    margin: 4px;
+  display: block;
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px solid #333;
+  border-radius: 4px;
+  padding: 2px;
+  margin: 4px;
 }
 
 .ol-scale-bar-inner {
-    background: #333;
-    height: 4px;
+  background: #333;
+  height: 4px;
 }
 
 .ol-scale-line {
-    background: rgba(255,255,255,0.7);
-    padding: 3px 6px;
-    border-radius: 3px;
-    border: 1px solid #333;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 3px 6px;
+  border-radius: 3px;
+  border: 1px solid #333;
 }
-
 
 .legends-container {
   position: fixed;
@@ -624,65 +622,67 @@ nav::-webkit-scrollbar {
 }
 
 .legend-symbol.point-icon {
-    width: 20px;
-    height: 20px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+  width: 20px;
+  height: 20px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
-
 .ol-legend {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background: white;
-    padding: 10px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0,0,0,.2);
-    max-height: 300px;
-    overflow-y: auto;
-    font-size: 13px;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  max-height: 300px;
+  overflow-y: auto;
+  font-size: 13px;
 }
 
 .ol-legend.hidden {
-    display: none;
+  display: none;
 }
 
 .legend-group-title {
-    font-weight: bold;
-    margin-bottom: 6px;
-    margin-top: 10px;
+  font-weight: bold;
+  margin-bottom: 6px;
+  margin-top: 10px;
 }
 
 .legend-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
 }
 
 .legend-symbol {
-    width: 18px;
-    height: 18px;
-    margin-right: 8px;
-    border-radius: 3px;
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  border-radius: 3px;
 }
 
 .legend-symbol.line {
-    width: 30px;
-    height: 4px;
-    border-radius: 2px;
+  width: 30px;
+  height: 4px;
+  border-radius: 2px;
 }
 
 .legend-symbol.point-icon {
-    width: 18px;
-    height: 18px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+  width: 18px;
+  height: 18px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .legend-symbol.point {
-    border-radius: 50%;
+  border-radius: 50%;
 }
 
+.ol-attribution {
+  display: none !important;
+}
