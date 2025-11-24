@@ -173,4 +173,6 @@ export function initToolbar(map, wfsLayers, layersData) {
       exportTool.export("a4");
     });
   }
+
+  moveScale(true);
 }

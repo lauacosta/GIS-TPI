@@ -114,20 +114,6 @@ body {
   overflow: hidden;
 }
 
-/* body {
-  opacity: 0;
-  animation: fadeIn 1s forwards;
-} */
-
-/* @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-} */
-
 #map {
   position: absolute;
   top: 0;
@@ -509,8 +495,8 @@ nav::-webkit-scrollbar {
 }
 
 .ol-scale-bar {
-  left: 400px !important;
-  bottom: 0.5rem !important;
+  left: 400px;
+  bottom: -30px;
   height: 22px;
 
   background: rgba(255, 255, 255, 0.44);
@@ -520,12 +506,18 @@ nav::-webkit-scrollbar {
   -webkit-backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   font-weight: 800;
+  transition: var(--transition);
+  animation: fadeIn 1.6s forwards;
 }
-
-/* .ol-scale-bar-inner { */
-/*     background: #333; */
-/*     height: 4px; */
-/* } */
+@keyframes fadeIn {
+  from {
+    bottom: -100px;
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 
 .legend-symbol {
   width: 24px;

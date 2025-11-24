@@ -181,9 +181,9 @@ import AsideHeader from "./AsideHeader.astro";
 </style>
 
 <script>
+  import { moveScale } from "../utils/manageScalePos";
   const buttons = document.querySelectorAll(".icon-container[data-target]");
   const panels = document.querySelectorAll(".panel-content");
-
   const closeBtns = document.querySelectorAll(".close-menu-btn");
   const aside = document.getElementById("main-aside");
 
@@ -193,6 +193,8 @@ import AsideHeader from "./AsideHeader.astro";
         aside.classList.remove("menu-open");
 
         buttons.forEach((b) => b.classList.remove("activeMenu"));
+
+        moveScale(false);
       });
     });
   }
@@ -211,12 +213,15 @@ import AsideHeader from "./AsideHeader.astro";
       }
 
       btn.classList.add("activeMenu");
+
       const targetId = btn.getAttribute("data-target");
       const targetPanel = document.querySelector(`#panel-${targetId}`);
 
       if (targetPanel) {
         targetPanel.classList.add("activeMenu");
       }
+
+      moveScale(true);
     });
   }
 </script>
