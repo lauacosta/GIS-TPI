@@ -1,0 +1,48 @@
+<div class="legends-container" id="legends-container">
+  <span class="legends-title"
+    ><img
+      src="/assets/information-square-stroke-rounded.svg"
+      alt="Exportar a PDF"
+    />
+    <h3>Información</h3></span
+  >
+  <div class="divider-y"></div>
+  <div id="legends-list" class="legends-list">
+    <p>Active una capa para ver su leyenda...</p>
+  </div>
+</div>
+
+<style>
+  .legends-container {
+    position: fixed;
+    right: 0.5rem;
+    bottom: 0.5rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--box-shadow);
+    padding: 1rem;
+    max-width: 280px;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+    z-index: 1000;
+    display: grid;
+    gap: 0.5rem;
+    font-size: 14px;
+  }
+
+  h3 {
+    font-size: 14px;
+  }
+
+  .legends-title {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .legends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+</style>

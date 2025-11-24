@@ -5,6 +5,7 @@ import { fetchLayersFromGeoServer } from "./api/geoserver";
 import ScaleLine from "ol/control/ScaleLine.js";
 import { initLayerList } from "./ui/layerList";
 import { initMapLegend } from "./ui/legendTable";
+import { initHtmlLegend } from "./ui/legendTableHTML";
 import { CORRIENTES_TIENE_PAYE, workspace } from "./config/mapConst";
 import { createWFSLayer } from "./map/layerFactory";
 import { initToolbar } from "./ui/toolbar";
@@ -46,6 +47,7 @@ try {
 
   map.setLayers([capaBaseOSM, ...WFSlayers]);
   initLayerList(layers, WFSlayers);
+  initHtmlLegend(map, WFSlayers, layers);
   initMapLegend(map, WFSlayers, layers);
 
   initToolbar(map, WFSlayers, layers);

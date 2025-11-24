@@ -20,6 +20,8 @@ export function initMapLegend(map, wfsLayers, layersData) {
     zIndex: 9999,
     updateWhileAnimating: true,
     updateWhileInteracting: true,
+    visible: false,
+    properties: { name: "pdf_legend_layer" },
   });
 
   map.addLayer(legendLayer);

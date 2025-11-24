@@ -11,8 +11,19 @@ const DIMS = {
 
 export function generatePdf(map, format = "a4", wfsLayers, layersData) {
   return new Promise((resolve, reject) => {
+    const legendLayer = map
+      .getAllLayers()
+      .find((layer) => layer.get("name") === "pdf_legend_layer");
+
+    const originalLegendVisibility = legendLayer
+      ? legendLayer.getVisible()
+      : false;
+
     try {
-      const resolution = 125; // dpi
+      if (legendLayer) {
+        legendLayer.setVisible(true);
+      }
+      const resolution = 125;
       const dim = DIMS[format];
       const width = Math.round((dim[0] * resolution) / 25.4);
       const height = Math.round((dim[1] * resolution) / 25.4);
@@ -53,7 +64,7 @@ export function generatePdf(map, format = "a4", wfsLayers, layersData) {
 
           drawScaleBar(map, ctx, width, height, scale);
           drawNorthArrow(ctx, width, height, scale);
-          drawLegend(ctx, width, height, scale, wfsLayers, layersData);
+          // drawLegend(ctx, width, height, scale, wfsLayers, layersData);
 
           const pdf = new jsPDF("landscape", undefined, format);
           pdf.addImage(
@@ -68,6 +79,9 @@ export function generatePdf(map, format = "a4", wfsLayers, layersData) {
 
           view.setResolution(originalResolution);
           map.setSize(originalSize);
+          if (legendLayer) {
+            legendLayer.setVisible(originalLegendVisibility);
+          }
 
           resolve();
         } catch (error) {

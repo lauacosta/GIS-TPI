@@ -155,7 +155,7 @@ header {
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
-  padding: 0.5rem;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
   width: 383px;
   z-index: 2;
   background-color: var(--bg-200);
@@ -550,44 +550,6 @@ nav::-webkit-scrollbar {
   border: 1px solid #333;
 }
 
-.legends-container {
-  position: fixed;
-  right: 20px;
-  top: 120px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  padding: 16px;
-  max-width: 280px;
-  max-height: calc(100vh - 140px);
-  overflow-y: auto;
-  z-index: 1000;
-}
-
-.legends-container h3 {
-  margin: 0 0 12px 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  border-bottom: 2px solid #e0e0e0;
-  padding-bottom: 8px;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-  font-size: 14px;
-}
-
-.legend-symbol {
-  width: 24px;
-  height: 24px;
-  margin-right: 10px;
-  border: 1px solid #ccc;
-  flex-shrink: 0;
-}
-
 .legend-symbol.line {
   height: 3px;
   border: none;
@@ -645,6 +607,9 @@ nav::-webkit-scrollbar {
 .ol-legend.hidden {
   display: none;
 }
+#table-info {
+  padding-left: 0.5rem;
+}
 
 .legend-group-title {
   font-weight: bold;
@@ -654,14 +619,15 @@ nav::-webkit-scrollbar {
 
 .legend-item {
   display: flex;
+  gap: 0.5rem;
   align-items: center;
-  margin-bottom: 4px;
+  font-size: 14px;
 }
 
 .legend-symbol {
   width: 18px;
   height: 18px;
-  margin-right: 8px;
+  margin: 3px;
   border-radius: 3px;
 }
 
