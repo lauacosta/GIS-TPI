@@ -4,7 +4,8 @@ import { defaults as defaultControls } from "ol/control/defaults.js";
 import { setupInteractions } from "./map/interactions";
 import { fetchLayersFromGeoServer } from "./api/geoserver";
 import ScaleLine from "ol/control/ScaleLine.js";
-import { initLayerList } from "./ui/layerList";
+import { initLayerList, } from "./ui/layerList";
+import { initMapLegend } from "./ui/legendTable";
 import { CORRIENTES_TIENE_PAYE, workspace } from "./config/mapConst";
 import { createWFSLayer } from "./map/layerFactory";
 import { initToolbar } from "./ui/toolbar";
@@ -41,7 +42,7 @@ const map = new Map({
 
 try {
     const layers = await fetchLayersFromGeoServer(workspace);
-    const WFSlayers = layers.map(([layerName, label, type]) =>
+    const WFSlayers = layers.map(([layerName, _, type]) =>
         createWFSLayer(layerName, type)
     );
 
@@ -49,6 +50,8 @@ try {
     const mapControls = setupInteractions(map, WFSlayers);
 
     initLayerList(layers, WFSlayers);
+    initMapLegend(map, WFSlayers, layers);
+
     initToolbar(map, mapControls);
 } catch (error) {
     console.error("Error iniciando la aplicación:", error);

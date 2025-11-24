@@ -5,10 +5,16 @@ export function initLayerList(layersData, wfsLayers) {
     const searchInput = document.querySelector("#layer-search");
     const cleanButton = document.querySelector(".clean-selection");
 
+
     function makeCheckboxHandler(targetLayer, checkbox) {
         return function handleCheckboxChangeEvent() {
             targetLayer.setVisible(checkbox.checked);
             updateCleanButton();
+
+            if (globalUpdateLegends) {
+                globalUpdateLegends();
+            } else {
+            }
         };
     }
 
@@ -28,6 +34,10 @@ export function initLayerList(layersData, wfsLayers) {
         }
         searchInput.dispatchEvent(new Event("input"));
         updateCleanButton();
+
+        if (globalUpdateLegends) {
+            globalUpdateLegends();
+        }
     }
 
     function renderList(list) {

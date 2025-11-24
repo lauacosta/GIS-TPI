@@ -1,6 +1,6 @@
 import { Fill, Icon, Style, Stroke } from 'ol/style';
 
-const ICON_CACHE = {};
+export const ICON_CACHE = {};
 
 function tintSvg(svgText, color) {
     return svgText.replace(/currentColor/g, color);
@@ -218,14 +218,14 @@ export function classifyLayer(layerName) {
 
 
 
-export function generateLayerStyle(layerName, geometryType) {
+export function getLayerStyle(layerName, geometryType) {
+    const type = geometryType.toLowerCase()
     const category = classifyLayer(layerName);
-    console.log("Layer:", layerName, "→ Category:", category);
 
     const cfg = CATEGORIES[category] || CATEGORIES.unknown;
 
-
-    if (geometryType.includes("Point")) {
+    if (type.includes("point")) {
+        console.log(geometryType)
         return new Style({
             image: new Icon({
                 src: ICON_CACHE[cfg.icon],
@@ -235,8 +235,7 @@ export function generateLayerStyle(layerName, geometryType) {
         });
     }
 
-
-    if (geometryType.includes("Line")) {
+    if (type.includes("line")) {
         return new Style({
             stroke: new Stroke({ color: cfg.color, width: 2 }),
         });

@@ -259,9 +259,16 @@ header {
   border: 1px solid var(--border-500);
 }
 
+.legend-label {
+  max-width: 216px;
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .layer-name {
   max-width: 216px;
-  text-transform: lowercase;
   text-transform: capitalize;
   white-space: nowrap;
   overflow: hidden;
@@ -542,5 +549,140 @@ nav::-webkit-scrollbar {
     padding: 3px 6px;
     border-radius: 3px;
     border: 1px solid #333;
+}
+
+
+.legends-container {
+  position: fixed;
+  right: 20px;
+  top: 120px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  max-width: 280px;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.legends-container h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.legend-symbol {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  flex-shrink: 0;
+}
+
+.legend-symbol.line {
+  height: 3px;
+  border: none;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.legend-symbol.point {
+  border-radius: 50%;
+}
+
+.legend-label {
+  color: #555;
+  line-height: 1.3;
+}
+
+.legend-group {
+  margin-bottom: 16px;
+}
+
+.legend-group:last-child {
+  margin-bottom: 0;
+}
+
+.legend-group-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.legend-symbol.point-icon {
+    width: 20px;
+    height: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+
+.ol-legend {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    max-height: 300px;
+    overflow-y: auto;
+    font-size: 13px;
+}
+
+.ol-legend.hidden {
+    display: none;
+}
+
+.legend-group-title {
+    font-weight: bold;
+    margin-bottom: 6px;
+    margin-top: 10px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.legend-symbol {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    border-radius: 3px;
+}
+
+.legend-symbol.line {
+    width: 30px;
+    height: 4px;
+    border-radius: 2px;
+}
+
+.legend-symbol.point-icon {
+    width: 18px;
+    height: 18px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.legend-symbol.point {
+    border-radius: 50%;
 }
 

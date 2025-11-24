@@ -4,20 +4,8 @@ import GeoJSON from "ol/format/GeoJSON";
 import { bbox as bboxStrategy } from "ol/loadingstrategy";
 import { transformExtent } from "ol/proj";
 import { EPSG_ID, workspace } from "../config/mapConst";
-import { generateLayerStyle } from "./icon_registry.js";
+import { getLayerStyle } from "./icon_registry.js";
 import { getWFSUrl } from "../api/geoserver";
-
-// const layerColors = [
-//     "#ff6666",
-//     "#66ccff",
-//     "#66ff99",
-//     "#ffcc66",
-//     "#cc99ff",
-//     "#ff99cc",
-//     "#99ffcc",
-//     "#cccc66",
-// ];
-// let layerIndex = 0;
 
 const LAYER_Z_INDEX = {
     point: 100,
@@ -30,9 +18,6 @@ const LAYER_Z_INDEX = {
 };
 
 export function createWFSLayer(layerName, type) {
-    // const color = layerColors[layerIndex % layerColors.length];
-    // layerIndex++;
-
     const layer = new VectorLayer({
         source: new VectorSource({
             format: new GeoJSON(),
@@ -49,7 +34,7 @@ export function createWFSLayer(layerName, type) {
         visible: false,
         style: function(feature) {
             const geometryType = feature.getGeometry().getType();
-            return generateLayerStyle(layerName, geometryType);
+            return getLayerStyle(layerName, geometryType);
         },
     });
     layer.set("layerName", layerName);
