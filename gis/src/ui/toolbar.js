@@ -1,9 +1,9 @@
 "use strict"
 import { jsPDF } from 'jspdf';
+import html2canvas from "html2canvas";
 import { centerInitialPos, zoomIn, zoomOut } from "../map/controls";
 import { createMeasureController } from "../map/interactions";
-import Map from 'ol/Map.js';
-import View from 'ol/View.js';
+import { scaleControl } from "../map/controls"
 
 const Mode = Object.freeze({
     LineString: "LineString",
@@ -197,10 +197,9 @@ export function initToolbar(map, interactionControls) {
     }
     if (dom.export_pdf) {
         // TODO: Revisar el calculo de las dimensiones, no me gusta mucho el resultado.
-        dom.export_pdf.addEventListener("click", () => {
+        dom.export_pdf.addEventListener("click", async () => {
             dom.export_pdf.disabled = true;
             document.body.style.cursor = "progress";
-
             const stopProgress = startProgress();
 
             const format = "a4";
@@ -214,41 +213,47 @@ export function initToolbar(map, interactionControls) {
             const originalResolution = view.getResolution();
 
             const scale = resolution / 96;
-            console.log(scale)
-            const exportResolution = view.getResolution() / scale;
+            const exportResolution = originalResolution / scale;
 
             view.setResolution(exportResolution);
             map.setSize([width, height]);
 
-            map.once("rendercomplete", () => {
+            await new Promise(requestAnimationFrame);
+            await new Promise(requestAnimationFrame);
+
+            scaleControl.changed();
+
+            await new Promise(requestAnimationFrame);
+            await new Promise(requestAnimationFrame);
+
+            map.once("rendercomplete", async () => {
                 const exportCanvas = document.createElement("canvas");
                 exportCanvas.width = width;
                 exportCanvas.height = height;
                 const ctx = exportCanvas.getContext("2d");
 
                 const layerCanvases = document.querySelectorAll(".ol-layer canvas");
-
-                layerCanvases.forEach(canvas => {
-                    if (canvas.width <= 0) return;
+                for (const canvas of layerCanvases) {
+                    if (canvas.width <= 0) continue;
 
                     const opacity = canvas.parentNode.style.opacity;
                     ctx.globalAlpha = opacity === "" ? 1 : Number(opacity);
 
-                    const transform = canvas.style.transform;
-                    const matrix = transform
-                        .match(/^matrix\(([^\)]*)\)$/)[1]
+                    const matrix = canvas.style.transform
+                        .match(/^matrix\((.+)\)$/)[1]
                         .split(",")
                         .map(Number);
 
                     ctx.setTransform(...matrix);
                     ctx.drawImage(canvas, 0, 0);
-                });
+                }
 
-                ctx.globalAlpha = 1;
                 ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.globalAlpha = 1;
 
-                drawScaleBarForPdf(map, ctx, width, height, scale);
-                drawNorthArrow(ctx, width, height, scale);
+                const sx = 40;
+                const sy = exportCanvas.height - scaleBarCanvas.height - 40;
+                ctx.drawImage(scaleBarCanvas, sx, sy);
 
                 const pdf = new jsPDF("landscape", undefined, format);
                 pdf.addImage(
@@ -271,6 +276,7 @@ export function initToolbar(map, interactionControls) {
 
             map.renderSync();
         });
+
     }
 
 }
@@ -293,142 +299,4 @@ function startProgress() {
     };
 }
 
-function getMetersPerUnit(unit) {
-    const table = {
-        'm': 1,
-        'meter': 1,
-        'meters': 1,
-        'degrees': 111319.49079327357,
-        'ft': 0.3048
-    };
-    return table[unit] || 1;
-}
-
-function niceScaleDistance(d) {
-    const base = Math.pow(10, Math.floor(Math.log10(d)));
-    for (const step of [1, 2, 5]) {
-        const val = step * base;
-        if (val >= d) return val;
-    }
-    return 10 * base;
-}
-function drawScaleBarForPdf(map, ctx, canvasWidth, canvasHeight, scale) {
-    const view = map.getView();
-    const proj = view.getProjection();
-    const resolution = view.getResolution();
-    const metersPerPixel =
-        resolution * getMetersPerUnit(proj.getUnits()) / window.devicePixelRatio;
-
-    // --- DPI-aware sizes ---
-    const barMaxPx = 180 * scale;     // desired width on PDF
-    const barHeight = 10 * scale;     // height per block
-    const padding = 35 * scale;       // from canvas edge
-    const fontSize = 18 * scale;      // text size
-
-    // --- nice round distance ---
-    const rawMeters = metersPerPixel * barMaxPx;
-    const niceMeters = niceScaleDistance(rawMeters);
-    const totalWidthPx = niceMeters / metersPerPixel;
-
-    // label text
-    const label =
-        niceMeters >= 1000
-            ? `${(niceMeters / 1000).toFixed(0)} km`
-            : `${niceMeters} m`;
-
-    // position
-    const x0 = padding;
-    const y0 = canvasHeight - padding;
-
-    // --- background box ---
-    ctx.save();
-    ctx.shadowColor = "rgba(0,0,0,0.18)";
-    ctx.shadowBlur = 10 * scale;
-    ctx.fillStyle = "white";
-    ctx.fillRect(
-        x0 - 10 * scale,
-        y0 - barHeight - 50 * scale,
-        totalWidthPx + 20 * scale,
-        barHeight + 65 * scale
-    );
-    ctx.restore();
-
-    // --- 4 block layout ---
-    const segmentWidth = totalWidthPx / 4;
-
-    const colors = ["#000", "#fff", "#000", "#fff"];
-
-    ctx.lineWidth = 1.4 * scale;
-    ctx.strokeStyle = "#000";
-
-    // draw blocks
-    for (let i = 0; i < 4; i++) {
-        ctx.fillStyle = colors[i];
-        ctx.fillRect(
-            x0 + i * segmentWidth,
-            y0 - barHeight,
-            segmentWidth,
-            barHeight
-        );
-        ctx.strokeRect(
-            x0 + i * segmentWidth,
-            y0 - barHeight,
-            segmentWidth,
-            barHeight
-        );
-    }
-
-    // --- ticks ---
-    ctx.beginPath();
-    for (let i = 0; i <= 4; i++) {
-        const tx = x0 + i * segmentWidth;
-        ctx.moveTo(tx, y0 - barHeight - 4 * scale);
-        ctx.lineTo(tx, y0 - barHeight + barHeight + 4 * scale);
-    }
-    ctx.stroke();
-
-    // --- label ---
-    ctx.font = `${fontSize}px Arial`;
-    ctx.textBaseline = "bottom";
-    ctx.textAlign = "left";
-    ctx.fillStyle = "#000";
-    ctx.fillText(label, x0, y0 - barHeight - 12 * scale);
-}
-
-function drawNorthArrow(ctx, canvasWidth, canvasHeight, scale) {
-    const size = 40 * scale;
-    const padding = 40 * scale;
-
-    const cx = canvasWidth - padding;
-    const cy = padding + size;
-
-    // // --- soft shadow halo ---
-    // ctx.save();
-    // ctx.shadowColor = "rgba(0,0,0,0.25)";
-    // ctx.shadowBlur = 12 * scale;
-
-    ctx.fillStyle = "#000";
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - size);
-    ctx.lineTo(cx - size * 0.45, cy);
-    ctx.lineTo(cx + size * 0.45, cy);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.restore();
-
-    ctx.fillStyle = "#fff";
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - size * 0.70);
-    ctx.lineTo(cx - size * 0.32, cy);
-    ctx.lineTo(cx + size * 0.32, cy);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.font = `${22 * scale}px Arial`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "bottom";
-    ctx.fillStyle = "#000";
-    ctx.fillText("N", cx, cy - size - 6 * scale);
-}
 

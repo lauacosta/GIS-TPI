@@ -3,16 +3,15 @@ import { Map, View } from "ol";
 import { defaults as defaultControls } from "ol/control/defaults.js";
 import { setupInteractions } from "./map/interactions";
 import { fetchLayersFromGeoServer } from "./api/geoserver";
-import ScaleLine from "ol/control/ScaleLine.js";
 import { initLayerList, } from "./ui/layerList";
 import { initMapLegend } from "./ui/legendTable";
 import { CORRIENTES_TIENE_PAYE, workspace } from "./config/mapConst";
 import { createWFSLayer } from "./map/layerFactory";
 import { initToolbar } from "./ui/toolbar";
 import "ol/ol.css";
-import Rotate from "ol/control/Rotate.js";
 import TileLayer from "ol/layer/Tile.js";
 import { preloadIcons } from "./map/icon_registry";
+import { scaleControl } from "./map/controls";
 
 await preloadIcons();
 
@@ -22,16 +21,7 @@ const capaBaseOSM = new TileLayer({
 
 const map = new Map({
     controls: defaultControls().extend([
-        new Rotate({
-            autoHide: false,
-        }),
-        new ScaleLine({
-            units: "metric",
-            steps: 4,
-            text: true,
-            minWidth: 140,
-
-        }),
+        scaleControl,
     ]),
     target: "map",
     view: new View({
@@ -39,6 +29,8 @@ const map = new Map({
         zoom: 12,
     }),
 });
+console.log(scaleControl.element);
+
 
 try {
     const layers = await fetchLayersFromGeoServer(workspace);

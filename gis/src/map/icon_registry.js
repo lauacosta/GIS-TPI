@@ -17,62 +17,59 @@ export async function preloadIcons() {
     }
 }
 
-
 // Por como se itera sobre las categorias, conviene que las mas especificas esten primero
 export const CATEGORIES = {
     estacion_tren: {
         icon: "train",
-        color: "#9c27b0",
+        color: "#7E57C2",
         keywords: ["ferroviarios"],
     },
 
     act_economicas: {
-        color: "#c47f00",
         icon: "econ",
+        color: "#FF8F00",
         keywords: ["economicas"],
     },
 
     energia: {
-        color: "#cddc39",
         icon: "energy",
+        color: "#C0CA33",
         keywords: ["energia"],
     },
 
     seguridad: {
-        color: "#1976d2",
         icon: "security",
+        color: "#0288D1",
         keywords: ["seguridad"],
     },
+
     comunicacion: {
-        color: "#e91e63",
         icon: "coms",
+        color: "#EC407A",
         keywords: ["comunicación"],
     },
+
     educacion: {
-        color: "#0097a7",
         icon: "school",
+        color: "#00838F",
         keywords: ["educacion"],
     },
 
     iglesias: {
         icon: "church",
-        color: "#ff7350",
-        keywords: [
-            "religiosos",
-        ],
+        color: "#F57C00",
+        keywords: ["religiosos"],
     },
 
     salud: {
         icon: "salud",
-        color: "#ff7300",
-        keywords: [
-            "salud"
-        ],
+        color: "#D84315",
+        keywords: ["salud"],
     },
 
     buildings: {
         icon: "house",
-        color: "#ff7300",
+        color: "#6D4C41",
         keywords: [
             "edif", "edificio", "construccion", "construcciones",
             "turisticas", "seguridad",
@@ -82,72 +79,72 @@ export const CATEGORIES = {
 
     airports: {
         icon: "plane",
-        color: "#1e40af",
+        color: "#3949AB",
         keywords: ["aeroportuaria"],
     },
 
     ports: {
         icon: "boat",
-        color: "#1d4ed8",
+        color: "#1565C0",
         keywords: ["portuaria", "portuarias", "obra_portuaria"],
     },
 
     roads: {
-        color: "#666",
         icon: "train",
+        color: "#4E342E",
         keywords: ["red_vial", "vias_secundarias", "vial"],
     },
 
     hydrology: {
-        color: "#2ea8ff",
         icon: "hidro",
+        color: "#29B6F6",
         keywords: ["hid", "curso_agua", "espejo", "hidro"],
     },
 
     vegetation_tree: {
-        color: "#8d6e63",
+        color: "#795548",
         keywords: ["arborea"],
     },
 
     vegetation_bush: {
-        color: "#558b2f",
+        color: "#558B2F",
         keywords: ["arbustiva"],
     },
 
     vegetation_crop: {
-        color: "#c0ca33",
+        color: "#9E9D24",
         keywords: ["cultivos"],
     },
 
     vegetation_wetland: {
-        color: "#26a69a",
+        color: "#26A69A",
         keywords: ["hidrofila"],
     },
 
     vegetation_bare: {
-        color: "#8d6e63",
+        color: "#A1887F",
         keywords: ["suelo_desnudo"],
     },
 
     political: {
-        color: "#d32f2f",
+        color: "#C62828",
         keywords: ["limite", "provincias", "pais"],
     },
 
     topo: {
-        color: "#a67c52",
+        color: "#8D6E63",
         keywords: ["curvas_nivel", "alturas_topograficas"],
     },
 
     agro: {
-        color: "#8f7a2c",
         icon: "farm",
+        color: "#7CB342",
         keywords: ["agropec", "agro"],
     },
 
     unknown: {
         icon: "dunno",
-        color: "#777",
+        color: "#9E9E9E",
         keywords: [],
     },
 };
@@ -186,10 +183,7 @@ function levenshtein(a, b) {
         }
     }
     return dp[a.length][b.length];
-}
-
-
-function classifyByFuzzy(layerName) {
+} function classifyByFuzzy(layerName) {
     const name = layerName.toLowerCase();
 
     let bestCategory = "unknown";
@@ -225,7 +219,6 @@ export function getLayerStyle(layerName, geometryType) {
     const cfg = CATEGORIES[category] || CATEGORIES.unknown;
 
     if (type.includes("point")) {
-        console.log(geometryType)
         return new Style({
             image: new Icon({
                 src: ICON_CACHE[cfg.icon],
@@ -243,7 +236,7 @@ export function getLayerStyle(layerName, geometryType) {
 
 
     return new Style({
-        fill: new Fill({ color: cfg.color + "80" }),
+        fill: new Fill({ color: cfg.color }),
         stroke: new Stroke({ color: "#000", width: 1 }),
     });
 }
