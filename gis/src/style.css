@@ -342,20 +342,6 @@ header {
   z-index: 100;
 }
 
-.ol-scale-line {
-  left: 400px !important;
-  top: 1.5rem !important;
-  height: 22px;
-  /* From https://css.glass */
-  background: rgba(255, 255, 255, 0.44);
-  border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  font-weight: 800;
-}
-
 .active {
   border-radius: var(--border-radius);
   background-color: var(--bg-400);
@@ -508,48 +494,45 @@ nav::-webkit-scrollbar {
   display: none;
 }
 
-.ol-rotate {
-  top: 10px;
-  right: 10px;
-}
-
-.ol-rotate button {
-  background: white;
-  border-radius: 50%;
-  border: 2px solid #666;
-  width: 40px;
-  height: 40px;
-  /* background-image: url('compass-icon.svg'); /1* or emoji 🧭 *1/ */
-  background-size: 70%;
-  background-repeat: no-repeat;
-  background-position: center;
-  transform: rotate(0deg);
-}
-
-.ol-rotate.ol-hidden {
-  opacity: 1 !important; /* never hide */
-}
-
-/* Required for ScaleLine bar mode */
-.ol-scale-bar {
-  display: block;
-  background: rgba(255, 255, 255, 0.7);
-  border: 2px solid #333;
-  border-radius: 4px;
-  padding: 2px;
-  margin: 4px;
-}
-
-.ol-scale-bar-inner {
-  background: #333;
-  height: 4px;
-}
-
 .ol-scale-line {
-  background: rgba(255, 255, 255, 0.7);
-  padding: 3px 6px;
-  border-radius: 3px;
-  border: 1px solid #333;
+  left: 400px !important;
+  top: 1.5rem !important;
+  height: 22px;
+  /* From https://css.glass */
+  background: rgba(255, 255, 255, 0.44);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: 800;
+}
+
+.ol-scale-bar {
+  left: 400px !important;
+  bottom: 0.5rem !important;
+  height: 22px;
+
+  background: rgba(255, 255, 255, 0.44);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: 800;
+}
+
+/* .ol-scale-bar-inner { */
+/*     background: #333; */
+/*     height: 4px; */
+/* } */
+
+.legend-symbol {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  flex-shrink: 0;
 }
 
 .legend-symbol.line {
@@ -651,6 +634,21 @@ nav::-webkit-scrollbar {
   border-radius: 50%;
 }
 
+.north-arrow {
+  position: absolute;
+  bottom: 100px;
+  right: 20px;
+  z-index: 9999;
+  font-size: 20px;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #333;
+  pointer-events: none;
+  user-select: none;
+  font-family: sans-serif;
+}
 .ol-attribution {
   display: none !important;
 }

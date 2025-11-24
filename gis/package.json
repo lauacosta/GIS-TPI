@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "astro": "^5.16.0",
+    "html2canvas": "^1.4.1",
     "jspdf": "^3.0.4",
     "ol": "latest"
   }
