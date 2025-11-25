@@ -4,10 +4,12 @@ import { platformModifierKeyOnly } from "ol/events/condition.js";
 import { getFeaturesInDragBox } from "../../utils/dragBoxQuery";
 import { updateTabs } from "../../ui/tableList";
 import {
-  selectedPointStyle,
+  // selectedPointStyle,
   selectedLineStyle,
   selectedPolygonStyle,
 } from "../styles.js";
+
+import { getSelectionStyleForFeature } from "../icon_registry.js";
 
 export function createQueryTool(map, layersWFS) {
   const selectInteraction = new Select({
@@ -15,7 +17,7 @@ export function createQueryTool(map, layersWFS) {
       const geom = feature && feature.getGeometry && feature.getGeometry();
       const type = geom && geom.getType && geom.getType();
       if (type === "Point" || type === "MultiPoint") {
-        return selectedPointStyle;
+        return getSelectionStyleForFeature(feature);
       } else if (type === "LineString" || type === "MultiLineString") {
         return selectedLineStyle;
       }

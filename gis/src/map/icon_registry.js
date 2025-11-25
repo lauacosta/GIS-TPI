@@ -1,6 +1,8 @@
 import { Fill, Icon, Style, Stroke } from "ol/style";
 
 export const ICON_CACHE = {};
+export const RAW_SVG_CACHE = {};
+const SELECTION_COLOR = "rgba(255, 115, 0, 1)";
 
 function tintSvg(svgText, color) {
   return svgText.replace(/currentColor/g, color);
@@ -10,6 +12,9 @@ export async function preloadIcons() {
   for (const [cat, cfg] of Object.entries(CATEGORIES)) {
     const response = await fetch(`/assets/${cfg.icon}.svg`);
     const rawSvg = await response.text();
+
+    RAW_SVG_CACHE[cfg.icon] = rawSvg;
+
     const tinted = tintSvg(rawSvg, cfg.color);
 
     ICON_CACHE[cfg.icon] =
@@ -239,4 +244,34 @@ export function getLayerStyle(layerName, geometryType) {
     fill: new Fill({ color: cfg.color }),
     stroke: new Stroke({ color: "#000", width: 1 }),
   });
+}
+
+export function getSelectionStyleForFeature(feature) {
+  try {
+    const featureId = feature.getId();
+
+    if (!featureId) return selectedPointStyle;
+
+    const layerName = featureId.split(".")[0];
+    const category = classifyLayer(layerName);
+    const cfg = CATEGORIES[category] || CATEGORIES.unknown;
+
+    if (RAW_SVG_CACHE[cfg.icon]) {
+      const tintedOrange = tintSvg(RAW_SVG_CACHE[cfg.icon], SELECTION_COLOR);
+      const src = "data:image/svg+xml;utf8," + encodeURIComponent(tintedOrange);
+
+      return new Style({
+        zIndex: 1000,
+        image: new Icon({
+          src: src,
+          anchor: [0.5, 1],
+          scale: 1.2,
+        }),
+      });
+    }
+  } catch (e) {
+    console.error("Error generando estilo de selección", e);
+  }
+
+  return selectedPointStyle; // Fallback
 }
