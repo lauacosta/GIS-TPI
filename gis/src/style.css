@@ -551,6 +551,7 @@ nav::-webkit-scrollbar {
 @keyframes fadeIn {
   from {
     bottom: -100px;
+
     opacity: 0;
   }
   to {
