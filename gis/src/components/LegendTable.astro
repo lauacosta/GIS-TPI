@@ -59,7 +59,7 @@
   .legends-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0.5rem;
   }
 
   .legends-open {
@@ -68,7 +68,7 @@
   }
 
   .change-opacity {
-    display: block;
+    display: flex;
   }
 </style>
 
@@ -80,14 +80,14 @@
 
   closeBtn?.addEventListener("click", () => {
     elToHide.forEach((el) => {
-      el.style.display = "none";
+      (el as HTMLElement).style.display = "none";
     });
     container?.classList.add("legends-open");
   });
 
   openBtn?.addEventListener("click", () => {
     elToHide.forEach((el) => {
-      el.style.display = "block";
+      (el as HTMLElement).style.display = "block";
     });
     container?.classList.remove("legends-open");
   });

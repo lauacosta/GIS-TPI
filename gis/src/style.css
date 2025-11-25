@@ -218,8 +218,6 @@ header {
 }
 
 .layers li {
-  padding: 0.5rem;
-  transition: var(--transition);
   cursor: pointer;
   border-radius: var(--border-radius);
   display: flex;
@@ -229,7 +227,12 @@ header {
 
   & label {
     display: inline-flex;
+    flex: 1;
     gap: 0.5rem;
+    padding: 0.5rem;
+    transition: var(--transition);
+    border-radius: var(--border-radius);
+    cursor: pointer;
   }
 }
 
