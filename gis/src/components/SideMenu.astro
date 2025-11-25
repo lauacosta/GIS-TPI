@@ -22,14 +22,6 @@ import AsideHeader from "./AsideHeader.astro";
         class="svg-icon"
       />
     </button>
-    <!-- 
-    <button class="icon-container" data-target="legends" title="Leyendas">
-      <img
-        src="/assets/right-to-left-list-dash-stroke-rounded.svg"
-        alt="Leyendas"
-        class="svg-icon"
-      />
-    </button> -->
 
     <div class="divider-y"></div>
 
@@ -96,9 +88,10 @@ import AsideHeader from "./AsideHeader.astro";
             placeholder="Buscar capa..."
             class="search"
           />
-          <button class="clean-selection" style="display: none;"
-            >Limpiar selección</button
-          >
+          <button class="clean-selection" disabled>
+            <span class="icono-limpieza"> </span>
+            Limpiar selección
+          </button>
         </div>
         <ul class="layers"></ul>
       </div>
@@ -112,11 +105,6 @@ import AsideHeader from "./AsideHeader.astro";
           </p>
           <ul id="selected-layers"></ul>
         </div>
-      </div>
-
-      <div id="panel-legends" class="panel-content">
-        <AsideHeader titulo="Leyendas" />
-        <div class="layers"><p>Contenido de leyendas...</p></div>
       </div>
     </div>
   </aside>

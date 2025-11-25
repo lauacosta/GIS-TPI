@@ -12,7 +12,6 @@ import "ol/ol.css";
 import TileLayer from "ol/layer/Tile.js";
 import { preloadIcons } from "./map/icon_registry";
 import { scaleControl } from "./map/controls";
-import { moveScale } from "./utils/manageScalePos";
 
 await preloadIcons();
 
@@ -39,7 +38,7 @@ try {
   initLayerList(layers, WFSlayers);
   initHtmlLegend(map, WFSlayers, layers);
   initMapLegend(map, WFSlayers, layers);
-  moveScale(true);
+
   initToolbar(map, WFSlayers, layers);
 } catch (error) {
   console.error("Error iniciando la aplicación:", error);

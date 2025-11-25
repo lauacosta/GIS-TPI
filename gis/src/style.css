@@ -5,6 +5,7 @@
   --bg-400: rgba(228, 244, 245, 0.712);
 
   --border-400: #d8d6cf;
+  --border-600: #535353;
   /* (Lautaro) Todavia hay que decidir como se va a ver, pero el gris no se apreciaba mucho */
   --border-500: #16bcee;
   /* --border-500: #a3a3a3; */
@@ -283,16 +284,54 @@ header {
   border: 1px solid var(--border-400);
 }
 
-.clean-selection {
-  width: 100%;
-  padding-block: 0.5rem;
-  text-align: center;
+.search:focus,
+.clean-selection:focus,
+.clean-selection:hover {
+  border-color: var(--border-600);
+}
 
-  font-weight: 600;
+.clean-selection {
+  width: calc(100% - 18px);
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
   border-radius: var(--border-radius-sm);
   border: 1px solid var(--border-400);
+  /* background-color: var(--bg-300); */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+  justify-content: center;
+  color: var(--border-600);
+}
+
+.clean-selection:disabled {
   background-color: var(--bg-300);
-  display: none;
+  cursor: auto;
+  color: var(--gricesito);
+}
+
+.clean-selection:disabled:hover {
+  border-color: var(--border-400);
+}
+
+.icono-limpieza {
+  width: 24px;
+  height: 24px;
+
+  background-color: var(--border-600);
+  transition: var(--transition);
+
+  -webkit-mask: url("./assets/clean-stroke-rounded.svg") no-repeat center;
+  mask: url("./assets/clean-stroke-rounded.svg") no-repeat center;
+
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.clean-selection:disabled .icono-limpieza {
+  background-color: var(--gricesito);
 }
 
 .ol-zoom {
