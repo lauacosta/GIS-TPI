@@ -217,7 +217,7 @@ header {
 }
 
 .layers li {
-  padding: 0.5rem;
+  padding: 0.3rem;
   transition: var(--transition);
   cursor: pointer;
   border-radius: var(--border-radius);
@@ -226,12 +226,27 @@ header {
   margin-bottom: 8px;
   font-size: 0.875rem;
 
-  & label {
+  /* & label {
     display: inline-flex;
     gap: 0.5rem;
-  }
+  } */
+  
 }
 
+.select-layer {
+  all: unset;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  gap: 0.7rem;
+  
+}
+.select-layer:hover {
+  background-color: var(--bg-600);
+  border-radius: var(--border-radius-sm);
+}
 .layer-btn {
   display: flex;
   gap: 1rem;
@@ -292,7 +307,6 @@ header {
   border-radius: var(--border-radius-sm);
   border: 1px solid var(--border-400);
   background-color: var(--bg-300);
-  display: none;
 }
 
 .ol-zoom {
