@@ -1,19 +1,24 @@
-<div class="legends-container" id="legends-container">
-  <span class="legends-title"
-    ><img
-      src="/assets/information-square-stroke-rounded.svg"
-      alt="Exportar a PDF"
-    />
-    <h3>Información</h3></span
-  >
-  <div class="divider-y"></div>
-  <div id="legends-list" class="legends-list">
+<div class="legends-container-html" id="legends-container-html">
+  <div class="legends-title-container">
+    <span class="legends-title">
+      <button class="info-icon" title="Información de capas"
+        ><img src="/assets/information-square-stroke-rounded.svg" /></button
+      >
+      <h3 class="change-opacity">Información</h3></span
+    >
+    <button title="Ocultar leyendas" class="change-opacity close-legend-btn">
+      <img src="/assets/cancel-01-stroke-rounded.svg" alt="Cerrar" />
+    </button>
+  </div>
+
+  <div class="divider-y change-opacity"></div>
+  <div id="legends-list" class="legends-list change-opacity">
     <p>Active una capa para ver su leyenda...</p>
   </div>
 </div>
 
 <style>
-  .legends-container {
+  .legends-container-html {
     position: fixed;
     right: 0.5rem;
     bottom: 0.5rem;
@@ -21,6 +26,7 @@
     border-radius: 8px;
     box-shadow: var(--box-shadow);
     padding: 1rem;
+
     max-width: 280px;
     max-height: calc(100vh - 140px);
     overflow-y: auto;
@@ -28,12 +34,20 @@
     display: grid;
     gap: 0.5rem;
     font-size: 14px;
-    transition: all 0.3s ease;
+
+    overflow: hidden;
   }
 
   h3 {
     font-size: 14px;
     opacity: 1;
+  }
+
+  .legends-title-container {
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
   }
 
   .legends-title {
@@ -47,4 +61,34 @@
     flex-direction: column;
     gap: 8px;
   }
+
+  .legends-open {
+    width: 56px;
+    height: 56px;
+  }
+
+  .change-opacity {
+    display: block;
+  }
 </style>
+
+<script>
+  const closeBtn = document.querySelector(".close-legend-btn");
+  const elToHide = document.querySelectorAll(".change-opacity");
+  const container = document.querySelector(".legends-container-html");
+  const openBtn = document.querySelector(".info-icon");
+
+  closeBtn?.addEventListener("click", () => {
+    elToHide.forEach((el) => {
+      el.style.display = "none";
+    });
+    container?.classList.add("legends-open");
+  });
+
+  openBtn?.addEventListener("click", () => {
+    elToHide.forEach((el) => {
+      el.style.display = "block";
+    });
+    container?.classList.remove("legends-open");
+  });
+</script>

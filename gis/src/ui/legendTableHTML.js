@@ -14,7 +14,7 @@ export function initHtmlLegend(map, wfsLayers, layersData) {
     listContainer.innerHTML = "";
 
     if (visibleLayers.length === 0) {
-      listContainer.innerHTML = `<p class="empty-msg">Active una capa para ver su leyenda...</p>`;
+      listContainer.innerHTML = `<p>Active una capa para ver su leyenda...</p>`;
       return;
     }
 

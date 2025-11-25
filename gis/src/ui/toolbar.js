@@ -1,6 +1,6 @@
 "use strict";
 import { centerInitialPos, zoomIn, zoomOut } from "../map/controls";
-
+import { moveScale } from "../utils/manageScalePos";
 import { createMeasureTool } from "../map/interactions/measureTool";
 import { createQueryTool } from "../map/interactions/queryTool.JS";
 import { createExportTool } from "../map/interactions/exportTool";
