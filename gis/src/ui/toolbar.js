@@ -1,22 +1,20 @@
-"use strict";
 import { centerInitialPos, zoomIn, zoomOut } from "../map/controls";
 import { moveScale } from "../utils/manageScalePos";
 import { createMeasureTool } from "../map/interactions/measureTool";
 import { createQueryTool } from "../map/interactions/queryTool.JS";
 import { createExportTool } from "../map/interactions/exportTool";
 
+const Tools = {
+  QUERY: "query",
+  MEASURE_LINE: "measureLine",
+  MEASURE_POLYGON: "measurePolygon",
+  DRAW: "draw",
+};
+
 const Mode = Object.freeze({
   LineString: "LineString",
   Polygon: "Polygon",
 });
-
-function matchMode(value, patterns) {
-  const handler = patterns[value];
-  if (!handler) throw new Error("No match for " + value);
-  return handler();
-}
-
-let currentMeasureType = null;
 
 export function initToolbar(map, wfsLayers, layersData) {
   const dom = {
@@ -32,147 +30,141 @@ export function initToolbar(map, wfsLayers, layersData) {
 
   const measureTool = createMeasureTool(map);
   const queryTool = createQueryTool(map, wfsLayers);
-
   const exportTool = createExportTool(map, wfsLayers, layersData);
 
-  let measureMode = false;
-  let queryMode = false;
+  let activeToolName = null;
 
-  function handleCenterClick() {
-    centerInitialPos(map.getView());
-  }
+  const toolsConfig = {
+    [Tools.QUERY]: {
+      domElement: dom.query,
+      toolInstance: queryTool,
+      enable: () => queryTool.enable(),
+      disable: () => queryTool.disable(),
+    },
+    [Tools.MEASURE_LINE]: {
+      domElement: dom.measureLine,
+      toolInstance: measureTool,
+      enable: () => measureTool.activate(Mode.LineString),
+      disable: () => measureTool.disable(),
+    },
+    [Tools.MEASURE_POLYGON]: {
+      domElement: dom.measurePolygon,
+      toolInstance: measureTool,
+      enable: () => measureTool.activate(Mode.Polygon),
+      disable: () => measureTool.disable(),
+    },
+    [Tools.DRAW]: {
+      domElement: dom.draw,
+      toolInstance: "drawToolPlaceholder",
+      enable: () => console.log("Draw ON"),
+      disable: () => console.log("Draw OFF"),
+    },
+  };
 
-  function handleZoomOutClick() {
-    zoomOut(map.getView());
-  }
+  function setActiveTool(newToolName) {
+    const newTool = toolsConfig[newToolName];
+    const currentTool = activeToolName ? toolsConfig[activeToolName] : null;
 
-  function handleZoomInClick() {
-    zoomIn(map.getView());
-  }
-
-  function handleDrawClick() {
-    alert("CHAQUE. Aún no esta implementado. Anda a UI/toolbar");
-  }
-
-  function toggleQuery() {
-    if (queryMode) {
-      queryMode = false;
-      dom.query.classList.remove("active");
-      queryTool.disable();
-    } else {
-      if (measureMode) {
-        measureMode = false;
-
-        matchMode(currentMeasureType, {
-          LineString: () => dom.measureLine.classList.remove("active"),
-          Polygon: () => dom.measurePolygon.classList.remove("active"),
-        });
-        measureTool.disable();
-      }
-      queryMode = true;
-      dom.query.classList.add("active");
-      queryTool.enable();
-    }
-  }
-
-  function toggleMeasureModes(mode) {
-    if (measureMode) {
-      if (mode === currentMeasureType) {
-        measureMode = false;
-        matchMode(currentMeasureType, {
-          LineString: () => dom.measureLine.classList.remove("active"),
-          Polygon: () => dom.measurePolygon.classList.remove("active"),
-        });
-        currentMeasureType = mode;
-        measureTool.disable();
-        return;
-      }
-
-      matchMode(currentMeasureType, {
-        LineString: () => dom.measureLine.classList.remove("active"),
-        Polygon: () => dom.measurePolygon.classList.remove("active"),
-      });
-
-      matchMode(mode, {
-        LineString: () => dom.measureLine.classList.add("active"),
-        Polygon: () => dom.measurePolygon.classList.add("active"),
-      });
-      currentMeasureType = mode;
-
-      measureTool.activate(mode);
-    } else {
-      if (queryMode) {
-        queryMode = false;
-        dom.query.classList.remove("active");
-        queryTool.disable();
-      }
-      measureMode = true;
-      currentMeasureType = mode;
-
-      matchMode(mode, {
-        LineString: () => dom.measureLine.classList.add("active"),
-        Polygon: () => dom.measurePolygon.classList.add("active"),
-      });
-      measureTool.activate(mode);
-    }
-  }
-
-  dom.center.addEventListener("click", handleCenterClick);
-  dom.zoomout.addEventListener("click", handleZoomOutClick);
-  dom.zoomin.addEventListener("click", handleZoomInClick);
-  dom.draw.addEventListener("click", handleDrawClick);
-
-  function handleMeasureKeydown(event) {
-    if (event.key === "l") {
-      toggleMeasureModes(Mode.LineString);
-      return;
-    }
-    if (event.key === "p") {
-      toggleMeasureModes(Mode.Polygon);
+    if (activeToolName === newToolName) {
+      deactivateCurrentTool();
       return;
     }
 
-    if (!measureMode) return;
-
-    if (event.key === "Escape") {
-      toggleMeasureModes(currentMeasureType);
+    if (currentTool && newTool.toolInstance === currentTool.toolInstance) {
+      currentTool.domElement.classList.remove("active");
+      newTool.domElement.classList.add("active");
+      newTool.enable();
+      activeToolName = newToolName;
       return;
     }
 
-    if (event.key === "Enter") {
-      event.preventDefault();
-      measureTool.finish();
+    if (activeToolName) {
+      deactivateCurrentTool();
+    }
+
+    if (newTool) {
+      if (newTool.domElement) newTool.domElement.classList.add("active");
+      newTool.enable();
+      activeToolName = newToolName;
     }
   }
 
-  if (dom.measureLine) {
-    dom.measureLine.addEventListener("click", () =>
-      toggleMeasureModes(Mode.LineString)
-    );
-    globalThis.addEventListener("keydown", handleMeasureKeydown);
+  function deactivateCurrentTool() {
+    if (!activeToolName) return;
+    const tool = toolsConfig[activeToolName];
+
+    if (tool.domElement) tool.domElement.classList.remove("active");
+    tool.disable();
+    activeToolName = null;
+  }
+  function deactivateCurrentTool() {
+    if (!activeToolName) return;
+
+    const tool = toolsConfig[activeToolName];
+
+    if (tool.domElement) tool.domElement.classList.remove("active");
+
+    tool.disable();
+
+    activeToolName = null;
   }
 
-  if (dom.measurePolygon) {
-    dom.measurePolygon.addEventListener("click", () =>
-      toggleMeasureModes(Mode.Polygon)
-    );
-  }
-
-  if (dom.query) {
-    dom.query.addEventListener("click", toggleQuery);
-
-    globalThis.addEventListener("keydown", (event) => {
-      if (event.key === "f" || (event.key === "Escape" && queryMode)) {
-        toggleQuery();
-      }
-    });
-  }
+  dom.center.addEventListener("click", () => centerInitialPos(map.getView()));
+  dom.zoomout.addEventListener("click", () => zoomOut(map.getView()));
+  dom.zoomin.addEventListener("click", () => zoomIn(map.getView()));
 
   if (dom.export_pdf) {
-    dom.export_pdf.addEventListener("click", () => {
-      exportTool.export("a4");
-    });
+    dom.export_pdf.addEventListener("click", () => exportTool.export("a4"));
   }
+
+  Object.keys(toolsConfig).forEach((key) => {
+    const cfg = toolsConfig[key];
+    if (cfg.domElement) {
+      cfg.domElement.addEventListener("click", () => setActiveTool(key));
+    }
+  });
+
+  globalThis.addEventListener("keydown", (event) => {
+    if (event.target.tagName === "INPUT") return;
+
+    const key = event.key.toLowerCase();
+
+    switch (key) {
+      case "x":
+        centerInitialPos(map.getView());
+
+        dom.center.classList.add("active");
+        setTimeout(() => dom.center.classList.remove("active"), 1000);
+        break;
+
+      case "f":
+        setActiveTool(Tools.QUERY);
+        break;
+      case "l":
+        setActiveTool(Tools.MEASURE_LINE);
+        break;
+      case "p":
+        setActiveTool(Tools.MEASURE_POLYGON);
+        break;
+      case "d":
+        setActiveTool(Tools.DRAW);
+        break;
+
+      case "escape":
+        if (activeToolName) setActiveTool(activeToolName);
+        break;
+
+      case "enter":
+        if (
+          activeToolName === Tools.MEASURE_LINE ||
+          activeToolName === Tools.MEASURE_POLYGON
+        ) {
+          event.preventDefault();
+          measureTool.finish();
+        }
+        break;
+    }
+  });
 
   moveScale(true);
 }
