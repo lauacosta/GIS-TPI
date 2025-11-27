@@ -167,4 +167,19 @@ export function initToolbar(map, wfsLayers, layersData) {
   });
 
   moveScale(true);
+
+  document.addEventListener("click", (event) => {
+    const activeElement = document.activeElement;
+
+    if (activeElement) {
+      const isButton = activeElement.tagName === "BUTTON";
+      const isCheckboxOrRadio =
+        activeElement.tagName === "INPUT" &&
+        (activeElement.type === "checkbox" || activeElement.type === "radio");
+
+      if (isButton || isCheckboxOrRadio) {
+        activeElement.blur();
+      }
+    }
+  });
 }
