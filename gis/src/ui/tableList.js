@@ -45,6 +45,7 @@ export function updateTabs(features) {
       .toLowerCase();
 
     const li = document.createElement("li");
+    li.classList.add("li-item-inspect-table");
     li.innerHTML = `
     <button class="layer-btn" data-table-id="table-${safeId}">
       <span class="layer-symbol">${setEmoji(type)}</span>

@@ -692,3 +692,7 @@ nav::-webkit-scrollbar {
 .ol-rotate:has(.ol-compass) {
   display: none;
 }
+
+.li-item-inspect-table {
+  padding: 0.5rem;
+}

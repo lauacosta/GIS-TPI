@@ -105,7 +105,7 @@ import AsideHeader from "./AsideHeader.astro";
             Use la herramienta "Consultar informacion" sobre una capa para
             visualizar las tablas del área seleccionada.
           </p>
-          <ul id="selected-layers"></ul>
+          <ul id="selected-layers" class="selected-layer-table"></ul>
         </div>
       </div>
     </div>
@@ -117,6 +117,10 @@ import AsideHeader from "./AsideHeader.astro";
     display: none;
     height: 100%;
     overflow-y: auto;
+  }
+
+  .layers .selected-layer-table li {
+    padding: 0.5rem !important;
   }
 
   .panel-content.activeMenu {
