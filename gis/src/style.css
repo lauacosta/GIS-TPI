@@ -435,7 +435,8 @@ nav::-webkit-scrollbar {
 }
 
 .tables-container {
-  max-width: calc(100% - 408px);
+  max-width: calc(100% - 406px);
+  width: 100%;
   max-height: calc(100dvh - 16px);
   position: absolute;
   z-index: 10;
@@ -449,6 +450,7 @@ nav::-webkit-scrollbar {
   box-shadow: var(--box-shadow);
   display: none;
   overflow: hidden;
+  transition: var(--transition);
 }
 
 .attribute-table-wrapper {
@@ -471,7 +473,6 @@ nav::-webkit-scrollbar {
   height: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
-  margin-bottom: 1rem;
 }
 
 .attribute-table-wrapper th,
@@ -484,7 +485,6 @@ nav::-webkit-scrollbar {
 .attribute-table-wrapper thead {
   position: sticky;
   top: 0;
-  border-top: 1px solid transparent;
 }
 
 .attribute-table-wrapper th {
@@ -695,4 +695,5 @@ nav::-webkit-scrollbar {
 
 .li-item-inspect-table {
   padding: 0.5rem;
+  width: 100%;
 }

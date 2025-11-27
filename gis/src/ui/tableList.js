@@ -45,9 +45,9 @@ export function updateTabs(features) {
       .toLowerCase();
 
     const li = document.createElement("li");
-    li.classList.add("li-item-inspect-table");
+
     li.innerHTML = `
-    <button class="layer-btn" data-table-id="table-${safeId}">
+    <button class="layer-btn li-item-inspect-table" data-table-id="table-${safeId}">
       <span class="layer-symbol">${setEmoji(type)}</span>
       <span class="layer-name">${fclass}</span>
     </button>
@@ -60,35 +60,50 @@ export function updateTabs(features) {
     tableWrapper.style.display = "none";
 
     if (items.length > 0) {
-      const columns = Object.keys(items[0]).filter((k) => k !== "geometry");
+      const allKeys = Object.keys(items[0]).filter((k) => k !== "geometry");
+      const columns = allKeys.filter((key) => {
+        return items.some((item) => {
+          const val = item[key];
+          if (val === null || val === undefined) return false;
+          if (typeof val === "string" && val.trim() === "") return false;
+          if (val === 0 || val === "0") return false;
+          return true;
+        });
+      });
 
-      const tableHTML = `
-      <div class="table-header-row">
-          <h3>${fclass}</h3>
-          <button class="close-table-btn" title="Cerrar tabla">
-             <img src="/assets/cancel-01-stroke-rounded.svg" alt="Cerrar" />
-          </button>
-      </div>
-      <div class="table-responsive">
-        <table>
-          <thead>
-            <tr>${columns.map((col) => `<th>${col}</th>`).join("")}</tr>
-          </thead>
-          <tbody>
-            ${items
-              .map(
-                (item) => `
-              <tr>
-                ${columns.map((col) => `<td>${item[col] || ""}</td>`).join("")}
-              </tr>
-            `
-              )
-              .join("")}
-          </tbody>
-        </table>
-      </div>
-    `;
-      tableWrapper.innerHTML = tableHTML;
+      if (columns.length === 0) {
+        tableWrapper.innerHTML = `<p>No hay atributos visibles para ${fclass}</p>`;
+      } else {
+        const tableHTML = `
+          <div class="table-header-row">
+              <h3>${fclass}</h3>
+              <button class="close-table-btn" title="Cerrar tabla">
+                  <img src="/assets/cancel-01-stroke-rounded.svg" alt="Cerrar" />
+              </button>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>${columns.map((col) => `<th>${col}</th>`).join("")}</tr>
+              </thead>
+              <tbody>
+                ${items
+                  .map(
+                    (item) => `
+                  <tr>
+                    ${columns
+                      .map((col) => `<td>${item[col] || ""}</td>`)
+                      .join("")}
+                  </tr>
+                `
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+        tableWrapper.innerHTML = tableHTML;
+      }
     } else {
       tableWrapper.innerHTML = `<p>No hay datos para ${fclass}</p>`;
     }
@@ -122,5 +137,5 @@ export function updateTabs(features) {
     }
   });
 
-  // console.log("Resultados:", grouped);
+  console.log("Resultados:", grouped);
 }
