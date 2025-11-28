@@ -35,7 +35,7 @@ try {
   );
 
   map.setLayers([capaBaseOSM, ...WFSlayers]);
-  initLayerList(layers, WFSlayers);
+  initLayerList(map, WFSlayers, layers);
   initHtmlLegend(map, WFSlayers, layers);
   initMapLegend(map, WFSlayers, layers);
 

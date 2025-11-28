@@ -3,6 +3,7 @@ import { moveScale } from "../utils/manageScalePos";
 import { createMeasureTool } from "../map/interactions/measureTool";
 import { createQueryTool } from "../map/interactions/queryTool.JS";
 import { createExportTool } from "../map/interactions/exportTool";
+import { createDrawTool } from "../map/interactions/drawTool";
 
 const Tools = {
   QUERY: "query",
@@ -31,6 +32,7 @@ export function initToolbar(map, wfsLayers, layersData) {
   const measureTool = createMeasureTool(map);
   const queryTool = createQueryTool(map, wfsLayers);
   const exportTool = createExportTool(map, wfsLayers, layersData);
+  const drawTool = createDrawTool(map);
 
   let activeToolName = null;
 
@@ -56,8 +58,8 @@ export function initToolbar(map, wfsLayers, layersData) {
     [Tools.DRAW]: {
       domElement: dom.draw,
       toolInstance: "drawToolPlaceholder",
-      enable: () => console.log("Draw ON"),
-      disable: () => console.log("Draw OFF"),
+      enable: () => drawTool.activate(Mode.Polygon),
+      disable: () => drawTool.disable(),
     },
   };
 
@@ -165,6 +167,46 @@ export function initToolbar(map, wfsLayers, layersData) {
         break;
     }
   });
+
+  // Nuevos atajos de teclado para drawTool
+  document.addEventListener("keydown", (event) => {
+    // Evitar conflictos si estás escribiendo en un input
+    if (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA") {
+      return;
+    }
+
+    switch (event.key.toLowerCase()) {
+      // ...existing cases...
+      
+      case "s": // Guardar todos los dibujos
+        if (activeToolName === Tools.DRAW) {
+          event.preventDefault();
+          drawTool.saveAll();
+        }
+        break;
+        
+      case "c": // Limpiar dibujos guardados
+        if (activeToolName === Tools.DRAW) {
+          event.preventDefault();
+          const pending = drawTool.getPendingCount();
+          if (pending > 0) {
+            const confirm = window.confirm(
+              `Tienes ${pending} dibujo(s) sin guardar. ¿Limpiar de todos modos?`
+            );
+            if (confirm) {
+              drawTool.clearAll();
+            }
+          } else {
+            drawTool.clearSaved();
+          }
+        }
+        break;
+    }
+  });
+
+  console.log("Toolbar inicializado");
+  console.log("Atajos: Q=query, M=measure-polygon, L=measure-line, D=draw, S=save drawings, C=clear drawings");
+
 
   moveScale(true);
 }
