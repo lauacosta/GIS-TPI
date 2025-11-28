@@ -112,6 +112,12 @@ export function updateTabs(features) {
 
     const btn = li.querySelector(".layer-btn");
     btn.addEventListener("click", () => {
+      ul_layersList.querySelectorAll(".layer-btn").forEach((b) => {
+        b.classList.remove("active");
+      });
+
+      btn.classList.add("active");
+
       document.querySelectorAll(".attribute-table-wrapper").forEach((t) => {
         t.style.display = "none";
       });

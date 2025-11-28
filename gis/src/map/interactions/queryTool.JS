@@ -74,11 +74,22 @@ export function createQueryTool(map, layersWFS) {
     );
 
     selectInteraction.getFeatures().clear();
+
     if (selectedFeatures.length > 0) {
       selectInteraction.getFeatures().extend(selectedFeatures);
-    }
+      updateTabs(selectedFeatures);
+      const tablesBtn = document.querySelector('[data-target="tables"]');
+      if (tablesBtn) tablesBtn.click();
 
-    updateTabs(selectedFeatures);
+      const layersList = document.getElementById("selected-layers");
+      if (layersList) {
+        const firstLayerBtn = layersList.querySelector(".layer-btn");
+
+        if (firstLayerBtn) {
+          firstLayerBtn.click();
+        }
+      }
+    }
 
     isDrawing = false;
     helpMessage = startMessage;

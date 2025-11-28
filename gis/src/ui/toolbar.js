@@ -91,14 +91,6 @@ export function initToolbar(map, wfsLayers, layersData) {
 
   function deactivateCurrentTool() {
     if (!activeToolName) return;
-    const tool = toolsConfig[activeToolName];
-
-    if (tool.domElement) tool.domElement.classList.remove("active");
-    tool.disable();
-    activeToolName = null;
-  }
-  function deactivateCurrentTool() {
-    if (!activeToolName) return;
 
     const tool = toolsConfig[activeToolName];
 
