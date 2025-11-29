@@ -4,6 +4,10 @@ import { createMeasureTool } from "../map/interactions/measureTool";
 import { createQueryTool } from "../map/interactions/queryTool.JS";
 import { createExportTool } from "../map/interactions/exportTool";
 import { createDrawTool } from "../map/interactions/drawTool";
+import { getFeatureTypeInfo } from "../api/geoserver";
+import { workspace } from "../config/mapConst";
+import { selectedLayer } from "./layerList";
+import { Point } from "ol/geom";
 
 const Tools = {
   QUERY: "query",
@@ -13,6 +17,7 @@ const Tools = {
 };
 
 const Mode = Object.freeze({
+  Point: "Point",
   LineString: "LineString",
   Polygon: "Polygon",
 });
@@ -58,7 +63,9 @@ export function initToolbar(map, wfsLayers, layersData) {
     [Tools.DRAW]: {
       domElement: dom.draw,
       toolInstance: "drawToolPlaceholder",
-      enable: () => drawTool.activate(Mode.Polygon),
+      enable: () => {
+        const selectedStyle = getFeatureTypeInfo(workspace, selectedLayer.name);
+        drawTool.activate(selectedStyle)},
       disable: () => drawTool.disable(),
     },
   };

@@ -122,7 +122,7 @@ export async function insertFeatureWFST(workspace, layerName, geometry) {
 /**
  * Obtiene información del tipo de feature (namespace, nombre del campo de geometría)
  */
-async function getFeatureTypeInfo(workspace, layerName) {
+export async function getFeatureTypeInfo(workspace, layerName) {
   try {
     const url = `${BASE_URL}/${workspace}/wfs?service=WFS&version=1.1.0&request=DescribeFeatureType&typeName=${workspace}:${layerName}`;
     

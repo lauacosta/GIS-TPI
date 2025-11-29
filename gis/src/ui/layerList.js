@@ -1,7 +1,7 @@
 import { setEmoji } from "../utils/setEmoji";
 
 // Variable para mantener la capa seleccionada
-let selectedLayer = null;
+export let selectedLayer = null;
 
 export function initLayerList(map, wfsLayers, layersData) {
   const ulLayers = document.querySelector(".layers");
