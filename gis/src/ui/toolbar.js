@@ -28,10 +28,11 @@ export function initToolbar(map, wfsLayers, layersData) {
     zoomout: document.querySelector("#zoom-out"),
     zoomin: document.querySelector("#zoom-in"),
     query: document.querySelector("#query"),
-    draw: document.querySelector("#draw"),
+    // draw: document.querySelector("#draw"),
     measurePolygon: document.querySelector("#measure-polygon"),
     measureLine: document.querySelector("#measure-line"),
     export_pdf: document.querySelector("#export-pdf"),
+    layersList: document.getElementById("selected-layers"),
   };
 
   const measureTool = createMeasureTool(map);
@@ -40,6 +41,7 @@ export function initToolbar(map, wfsLayers, layersData) {
   const drawTool = createDrawTool(map);
 
   let activeToolName = null;
+  let activeLayerName = null;
 
   const toolsConfig = {
     [Tools.QUERY]: {
@@ -61,29 +63,29 @@ export function initToolbar(map, wfsLayers, layersData) {
       disable: () => measureTool.disable(),
     },
     [Tools.DRAW]: {
-      domElement: dom.draw,
-      toolInstance: "drawToolPlaceholder",
-      enable: () => {
-        const selectedStyle = getFeatureTypeInfo(workspace, selectedLayer.name);
-        drawTool.activate(selectedStyle)},
+      domElement: null, // null evita que se agregue la clase "active"
+      toolInstance: drawTool,
+
+      enable: (layerName) => {
+        const selectedStyle = getFeatureTypeInfo(workspace, layerName);
+        drawTool.activate(selectedStyle);
+        console.log(`Editando capa: ${layerName}`);
+      },
       disable: () => drawTool.disable(),
     },
   };
 
-  function setActiveTool(newToolName) {
+  function setActiveTool(newToolName, params = {}) {
     const newTool = toolsConfig[newToolName];
-    const currentTool = activeToolName ? toolsConfig[activeToolName] : null;
+    // const currentTool = activeToolName ? toolsConfig[activeToolName] : null;
 
-    if (activeToolName === newToolName) {
+    if (activeToolName === newToolName && newToolName === Tools.DRAW) {
+      if (activeLayerName === params.layerName) {
+        deactivateCurrentTool();
+        return;
+      }
+    } else if (activeToolName === newToolName) {
       deactivateCurrentTool();
-      return;
-    }
-
-    if (currentTool && newTool.toolInstance === currentTool.toolInstance) {
-      currentTool.domElement.classList.remove("active");
-      newTool.domElement.classList.add("active");
-      newTool.enable();
-      activeToolName = newToolName;
       return;
     }
 
@@ -92,9 +94,14 @@ export function initToolbar(map, wfsLayers, layersData) {
     }
 
     if (newTool) {
-      if (newTool.domElement) newTool.domElement.classList.add("active");
-      newTool.enable();
+      if (newTool.domElement) {
+        newTool.domElement.classList.add("active");
+      }
+
+      newTool.enable(params.layerName);
+
       activeToolName = newToolName;
+      if (params.layerName) activeLayerName = params.layerName;
     }
   }
 
@@ -130,6 +137,18 @@ export function initToolbar(map, wfsLayers, layersData) {
     const cfg = toolsConfig[key];
     if (cfg.domElement) {
       cfg.domElement.addEventListener("click", () => setActiveTool(key));
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    const editBtn = event.target.closest(".edit-button");
+
+    if (editBtn) {
+      const layerName = editBtn.dataset.layerName;
+
+      if (layerName) {
+        setActiveTool(Tools.DRAW, { layerName: layerName });
+      }
     }
   });
 
@@ -175,45 +194,45 @@ export function initToolbar(map, wfsLayers, layersData) {
     }
   });
 
-  // Nuevos atajos de teclado para drawTool
-  document.addEventListener("keydown", (event) => {
-    // Evitar conflictos si estás escribiendo en un input
-    if (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA") {
-      return;
-    }
+  // document.addEventListener("keydown", (event) => {
+  //   // Evitar conflictos si estás escribiendo en un input
+  //   if (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA") {
+  //     return;
+  //   }
 
-    switch (event.key.toLowerCase()) {
-      // ...existing cases...
-      
-      case "s": // Guardar todos los dibujos
-        if (activeToolName === Tools.DRAW) {
-          event.preventDefault();
-          drawTool.saveAll();
-        }
-        break;
-        
-      case "c": // Limpiar dibujos guardados
-        if (activeToolName === Tools.DRAW) {
-          event.preventDefault();
-          const pending = drawTool.getPendingCount();
-          if (pending > 0) {
-            const confirm = window.confirm(
-              `Tienes ${pending} dibujo(s) sin guardar. ¿Limpiar de todos modos?`
-            );
-            if (confirm) {
-              drawTool.clearAll();
-            }
-          } else {
-            drawTool.clearSaved();
-          }
-        }
-        break;
-    }
-  });
+  //   switch (event.key.toLowerCase()) {
+  //     // ...existing cases...
+
+  //     case "s": // Guardar todos los dibujos
+  //       if (activeToolName === Tools.DRAW) {
+  //         event.preventDefault();
+  //         drawTool.saveAll();
+  //       }
+  //       break;
+
+  //     case "c": // Limpiar dibujos guardados
+  //       if (activeToolName === Tools.DRAW) {
+  //         event.preventDefault();
+  //         const pending = drawTool.getPendingCount();
+  //         if (pending > 0) {
+  //           const confirm = window.confirm(
+  //             `Tienes ${pending} dibujo(s) sin guardar. ¿Limpiar de todos modos?`
+  //           );
+  //           if (confirm) {
+  //             drawTool.clearAll();
+  //           }
+  //         } else {
+  //           drawTool.clearSaved();
+  //         }
+  //       }
+  //       break;
+  //   }
+  // });
 
   console.log("Toolbar inicializado");
-  console.log("Atajos: Q=query, M=measure-polygon, L=measure-line, D=draw, S=save drawings, C=clear drawings");
-
+  console.log(
+    "Atajos: Q=query, M=measure-polygon, L=measure-line, S=save drawings, C=clear drawings"
+  );
 
   moveScale(true);
 }

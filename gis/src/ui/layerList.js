@@ -22,7 +22,7 @@ export function initLayerList(map, wfsLayers, layersData) {
 
   console.log("initLayerList llamado con:", {
     layersCount: layersData.length,
-    wfsLayersCount: wfsLayers.length
+    wfsLayersCount: wfsLayers.length,
   });
 
   function makeCheckboxHandler(targetLayer, checkbox) {
@@ -30,7 +30,7 @@ export function initLayerList(map, wfsLayers, layersData) {
       targetLayer.setVisible(checkbox.checked);
       updateCleanButton();
 
-      if (typeof globalUpdateLegends !== 'undefined' && globalUpdateLegends) {
+      if (typeof globalUpdateLegends !== "undefined" && globalUpdateLegends) {
         globalUpdateLegends();
       }
     };
@@ -53,7 +53,7 @@ export function initLayerList(map, wfsLayers, layersData) {
     searchInput.dispatchEvent(new Event("input"));
     updateCleanButton();
 
-    if (typeof globalUpdateLegends !== 'undefined' && globalUpdateLegends) {
+    if (typeof globalUpdateLegends !== "undefined" && globalUpdateLegends) {
       globalUpdateLegends();
     }
   }
@@ -77,6 +77,13 @@ export function initLayerList(map, wfsLayers, layersData) {
       ulLayers.insertAdjacentHTML(
         "beforeend",
         `<li class="layer-item">
+          <button class="edit-button" title="Editar capa" data-layer-name="${layerName}">
+            <img
+              src="./assets/pencil-edit-02-stroke-rounded.svg"
+              alt="Dibujar vector"
+            />
+          </button>
+          <div class="divider"></div>
           <label for="${layerName}">
             <input type="checkbox" id="${layerName}">
             <span class="layer-symbol">${setEmoji(type)}</span>
@@ -87,49 +94,33 @@ export function initLayerList(map, wfsLayers, layersData) {
 
       const checkbox = document.querySelector(`#${layerName}`);
       if (!checkbox) continue;
-      
+
       checkbox.checked = targetLayer.getVisible();
 
       const handler = makeCheckboxHandler(targetLayer, checkbox);
       checkbox.addEventListener("change", handler);
 
-      // Agregar funcionalidad de selección al hacer click en el nombre (NO en el checkbox)
-      const layerNameSpan = checkbox.parentElement.querySelector(".layer-name");
-      const layerSymbol = checkbox.parentElement.querySelector(".layer-symbol");
       const layerItem = checkbox.closest("li");
-      
-      if (layerNameSpan && layerItem) {
-        const clickHandler = (e) => {
-          e.stopPropagation(); // Evitar que el click se propague al checkbox
-          
-          console.log("Click en nombre de capa:", layerName);
-          
-          // Remover selección previa
-          const allItems = document.querySelectorAll(".layer-item");
-          allItems.forEach(item => {
+      const editBtn = layerItem.querySelector(".edit-button");
+
+      if (editBtn) {
+        editBtn.addEventListener("click", () => {
+          console.log("Activando edición para:", layerName);
+
+          document.querySelectorAll(".layer-item").forEach((item) => {
             item.classList.remove("selected");
           });
-          
-          // Marcar como seleccionada
+
           layerItem.classList.add("selected");
-          
-          // Guardar referencia a la capa seleccionada
+
           selectedLayer = {
             name: layerName,
             label: label,
             type: type,
             olLayer: targetLayer,
-            workspace: "TPI_GIS"
+            workspace: "TPI_GIS",
           };
-          
-          console.log("✅ Capa seleccionada:", selectedLayer);
-        };
-        
-        // Agregar listener SOLO al nombre y símbolo, NO al checkbox
-        layerNameSpan.addEventListener("click", clickHandler);
-        if (layerSymbol) {
-          layerSymbol.addEventListener("click", clickHandler);
-        }
+        });
       }
     }
   }
@@ -141,16 +132,13 @@ export function initLayerList(map, wfsLayers, layersData) {
     }
   }
 
-  // Event listener para búsqueda
   searchInput.addEventListener("input", handleSearchInput);
 
-  // Event listener para botón de limpiar
   if (cleanButton) {
     cleanButton.addEventListener("click", () => {
       handleCleanClick();
-      
-      // Limpiar la selección de capa
-      document.querySelectorAll(".layer-item").forEach(item => {
+
+      document.querySelectorAll(".layer-item").forEach((item) => {
         item.classList.remove("selected");
       });
       selectedLayer = null;
@@ -158,11 +146,9 @@ export function initLayerList(map, wfsLayers, layersData) {
     });
   }
 
-  // Renderizar lista inicial
   renderList(layersData);
 }
 
-// Función para obtener la capa seleccionada
 export function getSelectedLayer() {
   return selectedLayer;
 }

@@ -8,6 +8,7 @@
   --border-600: #535353;
   /* (Lautaro) Todavia hay que decidir como se va a ver, pero el gris no se apreciaba mucho */
   --border-500: #16bcee;
+  --border-700: #4394d3;
   /* --border-500: #a3a3a3; */
   --box-shadow: 0px 8px 24px rgba(149, 157, 165, 0.2);
   --border-radius: 8px;
@@ -221,7 +222,7 @@ header {
   cursor: pointer;
   border-radius: var(--border-radius);
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
   margin-bottom: 8px;
   font-size: 0.875rem;
   border: 1px solid transparent;
@@ -242,13 +243,13 @@ header {
   gap: 1rem;
 }
 
-.layers li:hover {
+.layers li label:hover {
   background-color: var(--bg-400);
 }
 
-.layers li:has(input:checked) {
+.layers li label:has(input:checked) {
   background-color: var(--bg-400);
-  border: 1px solid var(--border-500);
+  /* border: 1px solid var(--border-500); */
 }
 
 .legend-label {
@@ -260,7 +261,7 @@ header {
 }
 
 .layer-name {
-  max-width: 216px;
+  max-width: 175px;
   text-transform: capitalize;
   white-space: nowrap;
   overflow: hidden;
@@ -697,9 +698,23 @@ nav::-webkit-scrollbar {
   padding: 0.5rem;
 }
 
-.layer-item.selected {
-  background-color: #ff6b35;
-  border-left: 4px solid #ff4500;
+.divider {
+  width: 3px;
+  border-radius: 100px;
+  height: 1rem;
+  margin-block: auto;
+  background-color: var(--border-400);
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition);
+}
+
+.edit-button:hover + .divider {
+  background-color: var(--border-500);
+}
+
+.selected .divider,
+.selected .edit-button:hover + .divider {
+  background-color: var(--border-700);
 }
 
 .layer-item.selected .layer-label {
