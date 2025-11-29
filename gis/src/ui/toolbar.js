@@ -66,10 +66,23 @@ export function initToolbar(map, wfsLayers, layersData) {
       domElement: null, // null evita que se agregue la clase "active"
       toolInstance: drawTool,
 
-      enable: (layerName) => {
-        const selectedStyle = getFeatureTypeInfo(workspace, layerName);
-        drawTool.activate(selectedStyle);
-        console.log(`Editando capa: ${layerName}`);
+      enable: async (layerName) => {
+        try {
+          // 2. Agregamos 'await' para esperar la respuesta de GeoServer
+          const featureInfo = await getFeatureTypeInfo(workspace, layerName);
+
+          // Ahora 'featureInfo' es el objeto real, no una promesa
+          console.log("Info recibida:", featureInfo);
+
+          // 3. Pasamos el dato resuelto a la herramienta
+          // OJO: Asegúrate de que drawTool.activate sepa leer este objeto
+          // o pásale solo el tipo de geometría (ej: featureInfo.geometryType)
+          drawTool.activate(featureInfo);
+
+          console.log(`Editando capa: ${layerName}`);
+        } catch (error) {
+          console.error("Error al obtener info de la capa:", error);
+        }
       },
       disable: () => drawTool.disable(),
     },
@@ -174,12 +187,37 @@ export function initToolbar(map, wfsLayers, layersData) {
       case "p":
         setActiveTool(Tools.MEASURE_POLYGON);
         break;
+
       case "d":
         setActiveTool(Tools.DRAW);
         break;
 
       case "escape":
         if (activeToolName) setActiveTool(activeToolName);
+        break;
+
+      case "s": // Guardar todos los dibujos
+        if (activeToolName === Tools.DRAW) {
+          event.preventDefault();
+          drawTool.saveAll();
+        }
+        break;
+
+      case "c": // Limpiar dibujos guardados
+        if (activeToolName === Tools.DRAW) {
+          event.preventDefault();
+          const pending = drawTool.getPendingCount();
+          if (pending > 0) {
+            const confirm = window.confirm(
+              `Tienes ${pending} dibujo(s) sin guardar. ¿Limpiar de todos modos?`
+            );
+            if (confirm) {
+              drawTool.clearAll();
+            }
+          } else {
+            drawTool.clearSaved();
+          }
+        }
         break;
 
       case "enter":
@@ -194,14 +232,13 @@ export function initToolbar(map, wfsLayers, layersData) {
     }
   });
 
-  // document.addEventListener("keydown", (event) => {
+  //   document.addEventListener("keydown", (event) => {
   //   // Evitar conflictos si estás escribiendo en un input
   //   if (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA") {
   //     return;
   //   }
 
   //   switch (event.key.toLowerCase()) {
-  //     // ...existing cases...
 
   //     case "s": // Guardar todos los dibujos
   //       if (activeToolName === Tools.DRAW) {

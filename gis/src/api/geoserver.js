@@ -5,41 +5,41 @@ import GML from "ol/format/GML.js";
 const BASE_URL = "/geoserver";
 
 export const fetchLayersFromGeoServer = async (workspace) => {
-    try {
-        const url = `${BASE_URL}/${workspace}/wms?service=WMS&request=GetCapabilities`;
+  try {
+    const url = `${BASE_URL}/${workspace}/wms?service=WMS&request=GetCapabilities`;
 
-        const response = await fetch(url);
+    const response = await fetch(url);
 
-        if (!response.ok) {
-            throw new Error(`Error de GeoServer: ${response.status}`);
-        }
-
-        const text = await response.text();
-        const parser = new WMSCapabilities();
-        const result = parser.read(text);
-
-        const layers = result.Capability.Layer.Layer;
-
-        return layers.map((layer) => {
-            const type = layer.Style[0].Name;
-            const raw = layer.Name.replace(`${workspace}:`, "");
-            const format = raw.replaceAll("_", " ").toLowerCase();
-
-            return [raw, format, type];
-        });
-    } catch (error) {
-        console.error("Error al obtener capas:", error);
-        return [];
+    if (!response.ok) {
+      throw new Error(`Error de GeoServer: ${response.status}`);
     }
+
+    const text = await response.text();
+    const parser = new WMSCapabilities();
+    const result = parser.read(text);
+
+    const layers = result.Capability.Layer.Layer;
+
+    return layers.map((layer) => {
+      const type = layer.Style[0].Name;
+      const raw = layer.Name.replace(`${workspace}:`, "");
+      const format = raw.replaceAll("_", " ").toLowerCase();
+
+      return [raw, format, type];
+    });
+  } catch (error) {
+    console.error("Error al obtener capas:", error);
+    return [];
+  }
 };
 
 export const getWFSUrl = (workspace, layerName, extent, epsg) => {
-    return (
-        `/geoserver/${workspace}/ows?service=WFS&` +
-        `version=1.1.0&request=GetFeature&typeName=${workspace}:${layerName}&` +
-        `outputFormat=application/json&` +
-        `srsname=EPSG:${epsg}&bbox=${extent.join(",")},EPSG:${epsg}`
-    );
+  return (
+    `/geoserver/${workspace}/ows?service=WFS&` +
+    `version=1.1.0&request=GetFeature&typeName=${workspace}:${layerName}&` +
+    `outputFormat=application/json&` +
+    `srsname=EPSG:${epsg}&bbox=${extent.join(",")},EPSG:${epsg}`
+  );
 };
 
 // ...existing code...
@@ -55,17 +55,17 @@ export async function insertFeatureWFST(workspace, layerName, geometry) {
   try {
     // Obtener información del namespace desde DescribeFeatureType
     const namespaceInfo = await getFeatureTypeInfo(workspace, layerName);
-    
+
     // Transformar geometría a EPSG:4326 primero
     const geomClone = geometry.clone();
     geomClone.transform("EPSG:3857", "EPSG:4326");
-    
+
     // Generar GML manualmente con las coordenadas correctas
     const geometryGML = geometryToGML(geomClone, namespaceInfo.geometryName);
-    
+
     // Fecha actual para metadata
-    const now = new Date().toISOString().split('T')[0];
-    
+    const now = new Date().toISOString().split("T")[0];
+
     const wfsTransaction = `<?xml version="1.0" encoding="UTF-8"?>
 <wfs:Transaction 
   service="WFS" 
@@ -106,8 +106,13 @@ export async function insertFeatureWFST(workspace, layerName, geometry) {
     }
 
     // Verificar si hay errores en el XML de respuesta
-    if (responseText.includes("ExceptionReport") || responseText.includes("ows:Exception")) {
-      const errorMatch = responseText.match(/<ows:ExceptionText>(.*?)<\/ows:ExceptionText>/);
+    if (
+      responseText.includes("ExceptionReport") ||
+      responseText.includes("ows:Exception")
+    ) {
+      const errorMatch = responseText.match(
+        /<ows:ExceptionText>(.*?)<\/ows:ExceptionText>/
+      );
       const errorMsg = errorMatch ? errorMatch[1] : responseText;
       throw new Error(errorMsg);
     }
@@ -125,33 +130,55 @@ export async function insertFeatureWFST(workspace, layerName, geometry) {
 export async function getFeatureTypeInfo(workspace, layerName) {
   try {
     const url = `${BASE_URL}/${workspace}/wfs?service=WFS&version=1.1.0&request=DescribeFeatureType&typeName=${workspace}:${layerName}`;
-    
+
     const response = await fetch(url);
     const text = await response.text();
-    
+
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(text, "text/xml");
-    
+
     // Obtener el targetNamespace
     const schema = xmlDoc.querySelector("schema, xsd\\:schema");
-    const targetNamespace = schema?.getAttribute("targetNamespace") || `http://geoserver.org/${workspace}`;
-    
+    const targetNamespace =
+      schema?.getAttribute("targetNamespace") ||
+      `http://geoserver.org/${workspace}`;
+
     // Buscar el campo de geometría (puede ser 'geom', 'the_geom', 'geometry', etc.)
-    const elements = xmlDoc.querySelectorAll("element[type*='gml'], xsd\\:element[type*='gml']");
+    const elements = xmlDoc.querySelectorAll(
+      "element[type*='gml'], xsd\\:element[type*='gml']"
+    );
     let geometryName = "geom"; // Default
-    
+    let geometryType = "Point";
+
     if (elements.length > 0) {
-      geometryName = elements[0].getAttribute("name");
+      const geomElement = elements[0];
+      geometryName = geomElement.getAttribute("name");
+
+      // 3. Extraer el tipo crudo (ej: "gml:MultiPolygonPropertyType")
+      const rawType = geomElement.getAttribute("type");
+
+      // 4. Traducir de GML a OpenLayers (Point, LineString, Polygon)
+      if (rawType.includes("Polygon") || rawType.includes("Surface")) {
+        geometryType = "Polygon";
+      } else if (rawType.includes("Line") || rawType.includes("Curve")) {
+        geometryType = "LineString";
+      } else if (rawType.includes("Point")) {
+        geometryType = "Point";
+      }
     }
-    
+
     console.log("Feature type info:", { targetNamespace, geometryName });
-    
-    return { targetNamespace, geometryName };
+
+    return { targetNamespace, geometryName, geometryType };
   } catch (error) {
-    console.warn("No se pudo obtener DescribeFeatureType, usando valores por defecto:", error);
+    console.warn(
+      "No se pudo obtener DescribeFeatureType, usando valores por defecto:",
+      error
+    );
     return {
       targetNamespace: `http://geoserver.org/${workspace}`,
-      geometryName: "geom"
+      geometryName: "geom",
+      geometryType: "Point",
     };
   }
 }
@@ -163,7 +190,7 @@ export async function getFeatureTypeInfo(workspace, layerName) {
 function geometryToGML(geometry, geometryFieldName = "geom") {
   const type = geometry.getType();
   const coords = geometry.getCoordinates();
-  
+
   switch (type) {
     case "Point":
       // GML usa lon,lat (X,Y) para EPSG:4326
@@ -172,19 +199,19 @@ function geometryToGML(geometry, geometryFieldName = "geom") {
           <gml:pos>${coords[0]} ${coords[1]}</gml:pos>
         </gml:Point>
       </${geometryFieldName}>`;
-      
+
     case "LineString":
       // Coordenadas como lon lat lon lat...
-      const lineCoords = coords.map(c => `${c[0]} ${c[1]}`).join(" ");
+      const lineCoords = coords.map((c) => `${c[0]} ${c[1]}`).join(" ");
       return `<${geometryFieldName}>
         <gml:LineString srsName="EPSG:4326">
           <gml:posList>${lineCoords}</gml:posList>
         </gml:LineString>
       </${geometryFieldName}>`;
-      
+
     case "Polygon":
       // Anillo exterior con coordenadas lon lat lon lat...
-      const exteriorRing = coords[0].map(c => `${c[0]} ${c[1]}`).join(" ");
+      const exteriorRing = coords[0].map((c) => `${c[0]} ${c[1]}`).join(" ");
       return `<${geometryFieldName}>
         <gml:Polygon srsName="EPSG:4326">
           <gml:exterior>
@@ -194,7 +221,7 @@ function geometryToGML(geometry, geometryFieldName = "geom") {
           </gml:exterior>
         </gml:Polygon>
       </${geometryFieldName}>`;
-      
+
     default:
       throw new Error(`Tipo de geometría no soportado: ${type}`);
   }

@@ -70,7 +70,7 @@ export function createDrawTool(map) {
 
   function addDrawInteraction(drawType) {
     drawType = drawType || "Polygon";
-    
+
     if (activeType === drawType) return;
 
     if (activeDraw) {
@@ -82,7 +82,7 @@ export function createDrawTool(map) {
     if (pointerMoveKey) unByKey(pointerMoveKey);
 
     activeDraw = new Draw({
-      source: source, // Las features se agregan directamente al source
+      source: source,
       type: activeType,
       style: () => activeDrawStyle,
     });
@@ -91,28 +91,32 @@ export function createDrawTool(map) {
 
     activeDraw.on("drawstart", function (event) {
       sketch = event.feature;
-      helpMessage = 
-        activeType === "Point" 
-          ? continuePointMessage 
-          : activeType === "LineString" 
-          ? continueLineMessage 
+      helpMessage =
+        activeType === "Point"
+          ? continuePointMessage
+          : activeType === "LineString"
+          ? continueLineMessage
           : continuePolygonMessage;
     });
 
     activeDraw.on("drawend", function (event) {
       const feature = event.feature;
       const selectedLayer = getSelectedLayer();
-      
+
       // Verificar que haya una capa seleccionada al terminar de dibujar
       if (!selectedLayer) {
-        console.warn("No hay capa seleccionada, feature no tendrá información de capa");
-        alert("Advertencia: No has seleccionado una capa. Este feature no se podrá guardar en la base de datos.");
+        console.warn(
+          "No hay capa seleccionada, feature no tendrá información de capa"
+        );
+        alert(
+          "Advertencia: No has seleccionado una capa. Este feature no se podrá guardar en la base de datos."
+        );
       }
-      
+
       // Agregar metadata al feature
       feature.setProperties({
-        layerName: selectedLayer?.name || 'unknown',
-        workspace: selectedLayer?.workspace || 'TPI_GIS',
+        layerName: selectedLayer?.name || "unknown",
+        workspace: selectedLayer?.workspace || "TPI_GIS",
         drawType: activeType,
         timestamp: new Date().toISOString(),
         saved: false, // Marca como no guardado en BD
@@ -121,11 +125,13 @@ export function createDrawTool(map) {
       // Agregar a la lista de features pendientes
       drawnFeatures.push(feature);
 
-      console.log(`Feature dibujado (${activeType}). Total pendientes: ${drawnFeatures.length}`);
-      
+      console.log(
+        `Feature dibujado (${activeType}). Total pendientes: ${drawnFeatures.length}`
+      );
+
       sketch = undefined;
       helpMessage = startDrawingMessage;
-      
+
       // NO limpiamos el source, las features permanecen visibles
     });
 
@@ -151,7 +157,7 @@ export function createDrawTool(map) {
     const errors = [];
 
     for (const feature of drawnFeatures) {
-      if (feature.get('saved')) continue; // Ya está guardado
+      if (feature.get("saved")) continue; // Ya está guardado
 
       try {
         const geometry = feature.getGeometry();
@@ -176,35 +182,40 @@ export function createDrawTool(map) {
     }
 
     const message = `Guardados: ${successCount}, Errores: ${errorCount}`;
-    
+
     if (successCount > 0) {
       // Limpiar features temporales
       clearSavedFeatures();
-      
-      alert(message + "\n\n✅ Los datos se guardaron correctamente en la base de datos.\n\n💡 Recarga la página (F5) para visualizar los cambios en el mapa.");
-      
-      console.log(`✅ ${successCount} feature(s) guardado(s) en la base de datos`);
+
+      alert(
+        message +
+          "\n\n✅ Los datos se guardaron correctamente en la base de datos.\n\n💡 Recarga la página (F5) para visualizar los cambios en el mapa."
+      );
+
+      console.log(
+        `✅ ${successCount} feature(s) guardado(s) en la base de datos`
+      );
     } else {
       alert(message);
     }
 
-    return { 
-      success: errorCount === 0, 
-      successCount, 
-      errorCount, 
-      errors 
+    return {
+      success: errorCount === 0,
+      successCount,
+      errorCount,
+      errors,
     };
   }
 
   // Función para limpiar SOLO los features guardados
   function clearSavedFeatures() {
     // Filtrar features no guardados
-    const unsavedFeatures = drawnFeatures.filter(f => !f.get('saved'));
-    
+    const unsavedFeatures = drawnFeatures.filter((f) => !f.get("saved"));
+
     // Remover features guardados del source visual
     const allFeatures = source.getFeatures();
-    allFeatures.forEach(feature => {
-      if (feature.get('saved')) {
+    allFeatures.forEach((feature) => {
+      if (feature.get("saved")) {
         source.removeFeature(feature);
       }
     });
@@ -213,7 +224,9 @@ export function createDrawTool(map) {
     drawnFeatures.length = 0;
     drawnFeatures.push(...unsavedFeatures);
 
-    console.log(`Features guardados eliminados. Pendientes: ${drawnFeatures.length}`);
+    console.log(
+      `Features guardados eliminados. Pendientes: ${drawnFeatures.length}`
+    );
   }
 
   // Función para limpiar TODOS los dibujos
@@ -224,8 +237,8 @@ export function createDrawTool(map) {
   }
 
   return {
-    activate: (drawType) => {
-      addDrawInteraction(drawType);
+    activate: (featureInfo) => {
+      addDrawInteraction(featureInfo.geometryType);
     },
     disable: () => {
       activeType = undefined;
@@ -242,7 +255,7 @@ export function createDrawTool(map) {
         helpTooltip = undefined;
         helpTooltipElement = undefined;
       }
-      
+
       // NO limpiamos el source - los dibujos permanecen
       // source.clear(); // ← COMENTADO para mantener los dibujos
     },
@@ -256,6 +269,6 @@ export function createDrawTool(map) {
     clearSaved: clearSavedFeatures,
     clearAll: clearAllDrawings,
     getDrawnFeatures: () => drawnFeatures,
-    getPendingCount: () => drawnFeatures.filter(f => !f.get('saved')).length,
+    getPendingCount: () => drawnFeatures.filter((f) => !f.get("saved")).length,
   };
 }
