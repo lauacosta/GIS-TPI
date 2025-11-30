@@ -1162,6 +1162,11 @@ nav::-webkit-scrollbar {
   mask-size: contain;
 }
 
+.edit-button:hover,
+.selected .edit-button {
+  background-color: black;
+}
+
 .layer-item {
   place-items: center;
 }
