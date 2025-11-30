@@ -17,28 +17,29 @@ export function updateTabs(features) {
 
   features.forEach((f) => {
     const props = f.getProperties();
-    const fclass = props.fclass || "Sin clase";
+    // Obtener el nombre de la capa desde las propiedades de la feature
+    const layerName = f.get("_layerName") || props.fclass || "Sin Clase";
     const type = props.geometry.getType();
-    // console.log(type);
-    if (!grouped[fclass]) {
-      grouped[fclass] = {
+    
+    if (!grouped[layerName]) {
+      grouped[layerName] = {
         type: type,
         items: [],
       };
     }
-    grouped[fclass].items.push(props);
+    grouped[layerName].items.push(props);
   });
 
   const tablesContainer = document.getElementById("tables-container");
   tablesContainer.style.display = "none";
   if (tablesContainer) tablesContainer.innerHTML = "";
 
-  Object.keys(grouped).forEach((fclass) => {
-    const groupData = grouped[fclass];
+  Object.keys(grouped).forEach((layerName) => {
+    const groupData = grouped[layerName];
     const type = groupData.type;
     const items = groupData.items;
 
-    const safeId = fclass
+    const safeId = layerName
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/\s+/g, "_")
@@ -49,7 +50,7 @@ export function updateTabs(features) {
     li.innerHTML = `
     <button class="layer-btn li-item-inspect-table" data-table-id="table-${safeId}">
       <span class="layer-symbol">${setEmoji(type)}</span>
-      <span class="layer-name">${fclass}</span>
+      <span class="layer-name">${layerName}</span>
     </button>
   `;
     ul_layersList.appendChild(li);
@@ -60,7 +61,7 @@ export function updateTabs(features) {
     tableWrapper.style.display = "none";
 
     if (items.length > 0) {
-      const allKeys = Object.keys(items[0]).filter((k) => k !== "geometry");
+      const allKeys = Object.keys(items[0]).filter((k) => k !== "geometry" && k !== "layer" && k !== "_layerName");
       const columns = allKeys.filter((key) => {
         return items.some((item) => {
           const val = item[key];
@@ -72,11 +73,11 @@ export function updateTabs(features) {
       });
 
       if (columns.length === 0) {
-        tableWrapper.innerHTML = `<p>No hay atributos visibles para ${fclass}</p>`;
+        tableWrapper.innerHTML = `<p>No hay atributos visibles para ${layerName}</p>`;
       } else {
         const tableHTML = `
           <div class="table-header-row">
-              <h3>${fclass}</h3>
+              <h3>${layerName}</h3>
               <button class="close-table-btn" title="Cerrar tabla">
                   <img src="/assets/cancel-01-stroke-rounded.svg" alt="Cerrar" />
               </button>
@@ -105,7 +106,7 @@ export function updateTabs(features) {
         tableWrapper.innerHTML = tableHTML;
       }
     } else {
-      tableWrapper.innerHTML = `<p>No hay datos para ${fclass}</p>`;
+      tableWrapper.innerHTML = `<p>No hay datos para ${layerName}</p>`;
     }
 
     if (tablesContainer) tablesContainer.appendChild(tableWrapper);
