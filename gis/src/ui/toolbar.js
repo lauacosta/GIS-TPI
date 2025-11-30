@@ -237,6 +237,13 @@ export function initToolbar(map, wfsLayers, layersData) {
         }
         break;
 
+      case "b": // Borrar features seleccionadas (DELETE)
+        if (activeToolName === Tools.QUERY) {
+          event.preventDefault();
+          queryTool.deleteSelected();
+        }
+        break;
+
       case "enter":
         if (
           activeToolName === Tools.MEASURE_LINE ||
@@ -251,7 +258,7 @@ export function initToolbar(map, wfsLayers, layersData) {
 
   console.log("Toolbar inicializado");
   console.log(
-    "Atajos: Q=query, M=measure-polygon, L=measure-line, S=save drawings, C=clear drawings, Z=undo last"
+    "Atajos: Q=query, M=measure-polygon, L=measure-line, S=save drawings, C=clear drawings, Z=undo last, B=delete selected"
   );
 
   moveScale(true);

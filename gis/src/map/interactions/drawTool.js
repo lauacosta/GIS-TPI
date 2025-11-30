@@ -238,6 +238,90 @@ export function createDrawTool(map) {
     console.log("Todos los dibujos eliminados");
   }
 
+  // Función para deshacer el último dibujo (UNDO)
+  function undoLast() {
+    if (drawnFeatures.length === 0) {
+      console.log("No hay dibujos para deshacer");
+      return { success: false, message: "No hay dibujos" };
+    }
+
+    // Obtener el último feature
+    const lastFeature = drawnFeatures[drawnFeatures.length - 1];
+
+    // Verificar que no esté guardado
+    if (lastFeature.get("saved")) {
+      console.log("El último feature ya fue guardado, no se puede deshacer");
+      return {
+        success: false,
+        message: "El último dibujo ya está guardado en BD",
+      };
+    }
+
+    // Remover del array
+    drawnFeatures.pop();
+
+    // Remover del source visual
+    source.removeFeature(lastFeature);
+
+    console.log(
+      `Feature eliminado. Pendientes: ${drawnFeatures.length}`
+    );
+    return {
+      success: true,
+      remaining: drawnFeatures.length,
+    };
+  }
+
+  // Configurar event listeners para los botones del panel de edición
+  function setupEditingButtons(onCancelCallback) {
+    const saveBtn = document.querySelector("#save-edit");
+    const undoBtn = document.querySelector("#go-back-action");
+    const clearBtn = document.querySelector("#borrar-todo");
+    const cancelBtn = document.querySelector("#cancel-edit");
+
+    if (saveBtn) {
+      saveBtn.addEventListener("click", () => {
+        saveAllFeatures();
+      });
+    }
+
+    if (undoBtn) {
+      undoBtn.addEventListener("click", () => {
+        const result = undoLast();
+        if (!result.success && result.message) {
+          console.warn(result.message);
+        }
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener("click", () => {
+        const pending = drawnFeatures.filter((f) => !f.get("saved")).length;
+        if (pending > 0) {
+          const confirm = window.confirm(
+            `Tienes ${pending} dibujo(s) sin guardar. ¿Limpiar de todos modos?`
+          );
+          if (confirm) {
+            clearAllDrawings();
+          }
+        } else {
+          clearSavedFeatures();
+        }
+      });
+    }
+
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", () => {
+        // Llamar al callback para desactivar la herramienta desde toolbar
+        if (onCancelCallback) {
+          onCancelCallback();
+        }
+      });
+    }
+  }
+
+  let cancelCallback = null;
+
   return {
     activate: (featureInfo) => {
       addDrawInteraction(featureInfo.geometryType);
@@ -269,7 +353,14 @@ export function createDrawTool(map) {
     saveAll: saveAllFeatures,
     clearSaved: clearSavedFeatures,
     clearAll: clearAllDrawings,
+    undo: undoLast,
     getDrawnFeatures: () => drawnFeatures,
     getPendingCount: () => drawnFeatures.filter((f) => !f.get("saved")).length,
+    
+    // Método para configurar el callback de cancelación
+    setCancelCallback: (callback) => {
+      cancelCallback = callback;
+      setupEditingButtons(callback);
+    },
   };
 }

@@ -226,3 +226,76 @@ function geometryToGML(geometry, geometryFieldName = "geom") {
       throw new Error(`Tipo de geometría no soportado: ${type}`);
   }
 }
+
+/**
+ * Elimina una feature de GeoServer usando WFS-T (Delete)
+ * @param {string} workspace - Nombre del workspace en GeoServer
+ * @param {string} layerName - Nombre de la capa
+ * @param {string} featureId - ID de la feature a eliminar (ej: "isla.1")
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+export async function deleteFeatureWFST(workspace, layerName, featureId) {
+  try {
+    const namespaceInfo = await getFeatureTypeInfo(workspace, layerName);
+
+    const wfsTransaction = `<?xml version="1.0" encoding="UTF-8"?>
+<wfs:Transaction 
+  service="WFS" 
+  version="1.1.0"
+  xmlns:wfs="http://www.opengis.net/wfs"
+  xmlns:ogc="http://www.opengis.net/ogc"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:${workspace}="${namespaceInfo.targetNamespace}"
+  xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd">
+  <wfs:Delete typeName="${workspace}:${layerName}">
+    <ogc:Filter>
+      <ogc:FeatureId fid="${featureId}"/>
+    </ogc:Filter>
+  </wfs:Delete>
+</wfs:Transaction>`;
+
+    console.log("Enviando WFS-T Delete:", wfsTransaction);
+
+    const response = await fetch(`${BASE_URL}/${workspace}/wfs`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/xml",
+      },
+      body: wfsTransaction,
+    });
+
+    const responseText = await response.text();
+    console.log("Respuesta GeoServer (Delete):", responseText);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${responseText}`);
+    }
+
+    // Verificar si hay errores en el XML de respuesta
+    if (
+      responseText.includes("ExceptionReport") ||
+      responseText.includes("ows:Exception")
+    ) {
+      const errorMatch = responseText.match(
+        /<ows:ExceptionText>(.*?)<\/ows:ExceptionText>/
+      );
+      const errorMsg = errorMatch ? errorMatch[1] : responseText;
+      throw new Error(errorMsg);
+    }
+
+    // Verificar si se eliminó alguna feature
+    const deletedMatch = responseText.match(
+      /<wfs:totalDeleted>(\d+)<\/wfs:totalDeleted>/
+    );
+    const deletedCount = deletedMatch ? parseInt(deletedMatch[1]) : 0;
+
+    if (deletedCount === 0) {
+      throw new Error("No se eliminó ninguna feature");
+    }
+
+    return { success: true, deletedCount };
+  } catch (error) {
+    console.error("Error en deleteFeatureWFST:", error);
+    return { success: false, error: error.message };
+  }
+}
