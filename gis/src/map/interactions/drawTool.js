@@ -10,6 +10,8 @@ import { getSelectedLayer } from "../../ui/layerList.js";
 import { insertFeatureWFST } from "../../api/geoserver.js";
 
 export function createDrawTool(map) {
+  const editSideBar = document.querySelector(".editing-side-menu");
+
   // Source y layer para features dibujadas (persistentes)
   const source = new VectorSource();
   const vectorLayer = new VectorLayer({
@@ -239,6 +241,7 @@ export function createDrawTool(map) {
   return {
     activate: (featureInfo) => {
       addDrawInteraction(featureInfo.geometryType);
+      editSideBar.classList.add("active-edit-controls");
     },
     disable: () => {
       activeType = undefined;
@@ -255,16 +258,14 @@ export function createDrawTool(map) {
         helpTooltip = undefined;
         helpTooltipElement = undefined;
       }
-
-      // NO limpiamos el source - los dibujos permanecen
-      // source.clear(); // ← COMENTADO para mantener los dibujos
+      editSideBar.classList.remove("active-edit-controls");
     },
     finish: () => {
       if (activeDraw) {
         activeDraw.finishDrawing();
       }
     },
-    // Nuevas funciones públicas
+
     saveAll: saveAllFeatures,
     clearSaved: clearSavedFeatures,
     clearAll: clearAllDrawings,
