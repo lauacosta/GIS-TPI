@@ -220,6 +220,16 @@ export function initToolbar(map, wfsLayers, layersData) {
         }
         break;
 
+      case "z": // Deshacer último dibujo (UNDO)
+        if (activeToolName === Tools.DRAW) {
+          event.preventDefault();
+          const result = drawTool.undo();
+          if (!result.success && result.message) {
+            console.warn(result.message);
+          }
+        }
+        break;
+
       case "enter":
         if (
           activeToolName === Tools.MEASURE_LINE ||
@@ -234,7 +244,7 @@ export function initToolbar(map, wfsLayers, layersData) {
 
   console.log("Toolbar inicializado");
   console.log(
-    "Atajos: Q=query, M=measure-polygon, L=measure-line, S=save drawings, C=clear drawings"
+    "Atajos: Q=query, M=measure-polygon, L=measure-line, S=save drawings, C=clear drawings, Z=undo last"
   );
 
   moveScale(true);
