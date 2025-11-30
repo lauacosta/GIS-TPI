@@ -8,6 +8,7 @@ import Feature from "ol/Feature.js";
 import { activeDrawStyle } from "../styles.js";
 import { getSelectedLayer } from "../../ui/layerList.js";
 import { insertFeatureWFST } from "../../api/geoserver.js";
+import { showToast } from "../../utils/toast.js";
 
 export function createDrawTool(map) {
   const editSideBar = document.querySelector(".editing-side-menu");
@@ -217,16 +218,21 @@ export function createDrawTool(map) {
       // Limpiar features temporales
       clearSavedFeatures();
 
-      // alert(
-      //   message +
-      //     "\n\n✅ Los datos se guardaron correctamente en la base de datos.\n\n💡 Recarga la página (F5) para visualizar los cambios en el mapa."
-      // );
+      showToast(
+        `${successCount} elemento(s) guardado(s) correctamente en la base de datos.`,
+        'success',
+        6000
+      );
 
-      // console.log(
-      //   `✅ ${successCount} feature(s) guardado(s) en la base de datos`
-      // );
+      console.log(
+        `✅ ${successCount} feature(s) guardado(s) en la base de datos`
+      );
     } else {
-      alert(message);
+      showToast(
+        `No se pudieron guardar los elementos. ${errors.join(', ')}`,
+        'error',
+        6000
+      );
     }
 
     return {
