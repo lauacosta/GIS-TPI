@@ -40,9 +40,6 @@ export function createExportTool(map, wfsLayers, layersData) {
         console.log("Exportación finalizada con éxito.");
       } catch (error) {
         console.error("Error en exportTool:", error);
-        alert(
-          "Ocurrió un error al generar el mapa. Revisa la consola para más detalles."
-        );
       } finally {
         stopProgress();
         if (btn) btn.disabled = false;

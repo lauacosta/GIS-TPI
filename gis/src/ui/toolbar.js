@@ -200,12 +200,7 @@ export function initToolbar(map, wfsLayers, layersData) {
           event.preventDefault();
           const pending = drawTool.getPendingCount();
           if (pending > 0) {
-            const confirm = window.confirm(
-              `Tienes ${pending} dibujo(s) sin guardar. ¿Limpiar de todos modos?`
-            );
-            if (confirm) {
-              drawTool.clearAll();
-            }
+            drawTool.clearAll();
           } else {
             drawTool.clearSaved();
           }

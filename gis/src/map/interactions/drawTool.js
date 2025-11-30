@@ -111,9 +111,6 @@ export function createDrawTool(map) {
         console.warn(
           "No hay capa seleccionada, feature no tendrá información de capa"
         );
-        alert(
-          "Advertencia: No has seleccionado una capa. Este feature no se podrá guardar en la base de datos."
-        );
       }
 
       // Agregar metadata al feature
@@ -173,13 +170,11 @@ export function createDrawTool(map) {
   // Función para guardar TODAS las features pendientes en la BD
   async function saveAllFeatures() {
     if (drawnFeatures.length === 0) {
-      alert("No hay features para guardar");
       return { success: false, error: "No hay features" };
     }
 
     const selectedLayer = getSelectedLayer();
     if (!selectedLayer) {
-      alert("No hay una capa seleccionada");
       return { success: false, error: "No layer selected" };
     }
 
@@ -220,7 +215,7 @@ export function createDrawTool(map) {
 
       showToast(
         `${successCount} elemento(s) guardado(s) correctamente en la base de datos.`,
-        'success',
+        "success",
         6000
       );
 
@@ -229,8 +224,8 @@ export function createDrawTool(map) {
       );
     } else {
       showToast(
-        `No se pudieron guardar los elementos. ${errors.join(', ')}`,
-        'error',
+        `No se pudieron guardar los elementos. ${errors.join(", ")}`,
+        "error",
         6000
       );
     }
@@ -293,9 +288,7 @@ export function createDrawTool(map) {
     // Remover del source visual
     source.removeFeature(lastFeature);
 
-    console.log(
-      `Feature eliminado. Pendientes: ${drawnFeatures.length}`
-    );
+    console.log(`Feature eliminado. Pendientes: ${drawnFeatures.length}`);
     return {
       success: true,
       remaining: drawnFeatures.length,
@@ -328,9 +321,6 @@ export function createDrawTool(map) {
       clearBtn.addEventListener("click", () => {
         const pending = drawnFeatures.filter((f) => !f.get("saved")).length;
         if (pending > 0) {
-          const confirm = window.confirm(
-            `Tienes ${pending} dibujo(s) sin guardar. ¿Limpiar de todos modos?`
-          );
           if (confirm) {
             clearAllDrawings();
           }
@@ -394,7 +384,7 @@ export function createDrawTool(map) {
     undo: undoLast,
     getDrawnFeatures: () => drawnFeatures,
     getPendingCount: () => drawnFeatures.filter((f) => !f.get("saved")).length,
-    
+
     // Método para configurar el callback de cancelación
     setCancelCallback: (callback) => {
       cancelCallback = callback;
