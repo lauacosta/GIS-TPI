@@ -51,9 +51,9 @@ export const getWFSUrl = (workspace, layerName, extent, epsg) => {
  * @param {ol.geom.Geometry} geometry - Geometría de OpenLayers
  * @returns {Promise<{success: boolean, error?: string}>}
  */
-export async function insertFeatureWFST(workspace, layerName, geometry) {
+export async function insertFeatureWFST(workspace, layerName, geometry, attributes = {}) {
   try {
-    // Obtener información del namespace desde DescribeFeatureType
+    // Obtener información del namespace y campos desde DescribeFeatureType
     const namespaceInfo = await getFeatureTypeInfo(workspace, layerName);
 
     // Transformar geometría a EPSG:4326 primero
@@ -63,8 +63,40 @@ export async function insertFeatureWFST(workspace, layerName, geometry) {
     // Generar GML manualmente con las coordenadas correctas
     const geometryGML = geometryToGML(geomClone, namespaceInfo.geometryName);
 
-    // Fecha actual para metadata
-    const now = new Date().toISOString().split("T")[0];
+    // Generar campos dinámicamente basándose en el schema de la capa
+    let fieldsXML = '';
+    
+    if (namespaceInfo.fields && namespaceInfo.fields.length > 0) {
+      namespaceInfo.fields.forEach(field => {
+        // Usar valor proporcionado o generar uno por defecto
+        let value = attributes[field.name];
+        
+        if (value === undefined || value === null) {
+          // Generar valores por defecto inteligentes según el tipo
+          if (field.name.toLowerCase().includes('fecha') || 
+              field.name.toLowerCase().includes('actualizac') ||
+              field.name.toLowerCase().includes('date')) {
+            value = new Date().toISOString().split('T')[0];
+          } else if (field.name.toLowerCase().includes('nombre') || 
+                     field.name.toLowerCase().includes('name')) {
+            value = `Nuevo ${layerName}`;
+          } else if (field.type === 'int' || field.type === 'integer' || field.type === 'long') {
+            value = 0;
+          } else if (field.type === 'double' || field.type === 'float' || field.type === 'decimal') {
+            value = 0.0;
+          } else if (field.type === 'boolean') {
+            value = false;
+          } else {
+            // Por defecto, string vacío o NULL para campos opcionales
+            // Omitir el campo si no hay valor (GeoServer usará NULL o default)
+            return;
+          }
+        }
+        
+        // Agregar el campo al XML
+        fieldsXML += `\n      <${workspace}:${field.name}>${value}</${workspace}:${field.name}>`;
+      });
+    }
 
     const wfsTransaction = `<?xml version="1.0" encoding="UTF-8"?>
 <wfs:Transaction 
@@ -78,12 +110,7 @@ export async function insertFeatureWFST(workspace, layerName, geometry) {
   xsi:schemaLocation="http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd">
   <wfs:Insert>
     <${workspace}:${layerName}>
-      <${workspace}:${namespaceInfo.geometryName}>${geometryGML}</${workspace}:${namespaceInfo.geometryName}>
-      <${workspace}:nombre>Nueva Isla</${workspace}:nombre>
-      <${workspace}:tipo>polygon</${workspace}:tipo>
-      <${workspace}:fclass>island</${workspace}:fclass>
-      <${workspace}:fuente>Digitalizacion Web</${workspace}:fuente>
-      <${workspace}:actualizac>${now}</${workspace}:actualizac>
+      <${workspace}:${namespaceInfo.geometryName}>${geometryGML}</${workspace}:${namespaceInfo.geometryName}>${fieldsXML}
     </${workspace}:${layerName}>
   </wfs:Insert>
 </wfs:Transaction>`;
@@ -125,7 +152,7 @@ export async function insertFeatureWFST(workspace, layerName, geometry) {
 }
 
 /**
- * Obtiene información del tipo de feature (namespace, nombre del campo de geometría)
+ * Obtiene información del tipo de feature (namespace, nombre del campo de geometría, y todos los campos)
  */
 export async function getFeatureTypeInfo(workspace, layerName) {
   try {
@@ -143,33 +170,50 @@ export async function getFeatureTypeInfo(workspace, layerName) {
       schema?.getAttribute("targetNamespace") ||
       `http://geoserver.org/${workspace}`;
 
-    // Buscar el campo de geometría (puede ser 'geom', 'the_geom', 'geometry', etc.)
-    const elements = xmlDoc.querySelectorAll(
-      "element[type*='gml'], xsd\\:element[type*='gml']"
+    // Obtener TODOS los elementos (campos) de la capa
+    const allElements = xmlDoc.querySelectorAll(
+      "element, xsd\\:element"
     );
+    
     let geometryName = "geom"; // Default
     let geometryType = "Point";
+    const fields = []; // Lista de campos no-geométricos
 
-    if (elements.length > 0) {
-      const geomElement = elements[0];
-      geometryName = geomElement.getAttribute("name");
+    allElements.forEach(element => {
+      const name = element.getAttribute("name");
+      const type = element.getAttribute("type");
+      
+      if (!name) return;
 
-      // 3. Extraer el tipo crudo (ej: "gml:MultiPolygonPropertyType")
-      const rawType = geomElement.getAttribute("type");
-
-      // 4. Traducir de GML a OpenLayers (Point, LineString, Polygon)
-      if (rawType.includes("Polygon") || rawType.includes("Surface")) {
-        geometryType = "Polygon";
-      } else if (rawType.includes("Line") || rawType.includes("Curve")) {
-        geometryType = "LineString";
-      } else if (rawType.includes("Point")) {
-        geometryType = "Point";
+      // Si es un campo de geometría
+      if (type && type.includes("gml")) {
+        geometryName = name;
+        
+        // Traducir de GML a OpenLayers (Point, LineString, Polygon)
+        if (type.includes("Polygon") || type.includes("Surface")) {
+          geometryType = "Polygon";
+        } else if (type.includes("Line") || type.includes("Curve")) {
+          geometryType = "LineString";
+        } else if (type.includes("Point")) {
+          geometryType = "Point";
+        }
+      } else {
+        // Es un campo normal (atributo)
+        fields.push({
+          name,
+          type: type ? type.replace(/xsd:|xs:/, '') : 'string'
+        });
       }
-    }
+    });
 
-    console.log("Feature type info:", { targetNamespace, geometryName });
+    console.log("Feature type info:", { 
+      targetNamespace, 
+      geometryName, 
+      geometryType,
+      fields 
+    });
 
-    return { targetNamespace, geometryName, geometryType };
+    return { targetNamespace, geometryName, geometryType, fields };
   } catch (error) {
     console.warn(
       "No se pudo obtener DescribeFeatureType, usando valores por defecto:",
@@ -179,6 +223,7 @@ export async function getFeatureTypeInfo(workspace, layerName) {
       targetNamespace: `http://geoserver.org/${workspace}`,
       geometryName: "geom",
       geometryType: "Point",
+      fields: []
     };
   }
 }
