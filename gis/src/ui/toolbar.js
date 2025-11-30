@@ -40,6 +40,13 @@ export function initToolbar(map, wfsLayers, layersData) {
   const exportTool = createExportTool(map, wfsLayers, layersData);
   const drawTool = createDrawTool(map);
 
+  // Configurar el callback de cancelación para el botón Esc del panel de edición
+  drawTool.setCancelCallback(() => {
+    if (activeToolName === Tools.DRAW) {
+      deactivateCurrentTool();
+    }
+  });
+
   let activeToolName = null;
   let activeLayerName = null;
 
