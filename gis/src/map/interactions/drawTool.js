@@ -143,6 +143,7 @@ export function createDrawTool(map) {
     const modal = document.getElementById("simple-modal");
     const btnSave = document.getElementById("modal-btn-save");
     const btnCancel = document.getElementById("modal-btn-cancel");
+    const btnClose = document.getElementById("modal-btn-close");
 
     if (drawnFeatures.length === 0) {
       return;
@@ -165,16 +166,23 @@ export function createDrawTool(map) {
       modal.classList.remove("active");
       clearAllDrawings();
     };
+
+    btnClose.onclick = () => {
+      modal.classList.remove("active");
+      // No hacer nada, solo cerrar el modal y continuar editando
+    };
   }
 
   // Función para guardar TODAS las features pendientes en la BD
   async function saveAllFeatures() {
     if (drawnFeatures.length === 0) {
+      showToast("No hay features para guardar", "info");
       return { success: false, error: "No hay features" };
     }
 
     const selectedLayer = getSelectedLayer();
     if (!selectedLayer) {
+      alert("No hay una capa seleccionada");
       return { success: false, error: "No layer selected" };
     }
 
@@ -185,11 +193,21 @@ export function createDrawTool(map) {
     for (const feature of drawnFeatures) {
       if (feature.get("saved")) continue;
 
+      // Usar la capa que se guardó EN el feature cuando se dibujó
+      const featureLayerName = feature.get("layerName");
+      const featureWorkspace = feature.get("workspace");
+
+      if (!featureLayerName || !featureWorkspace) {
+        errorCount++;
+        errors.push("Feature sin información de capa");
+        continue;
+      }
+
       try {
         const geometry = feature.getGeometry();
         const result = await insertFeatureWFST(
-          selectedLayer.workspace,
-          selectedLayer.name,
+          featureWorkspace,
+          featureLayerName,
           geometry
         );
 

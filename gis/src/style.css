@@ -1046,7 +1046,7 @@ nav::-webkit-scrollbar {
   box-shadow: var(--box-shadow);
   display: flex;
   flex-direction: column;
-
+  position: relative;
   align-items: center;
   & h3 {
     margin-top: 0.5rem;
@@ -1055,6 +1055,26 @@ nav::-webkit-scrollbar {
   & p {
     color: #666666;
   }
+}
+
+.modal-close-x {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--gricesito);
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: var(--transition);
+  font-weight: 300;
+}
+
+.modal-close-x:hover {
+  color: var(--border-600);
+  transform: scale(1.1);
 }
 
 .modal-actions {
