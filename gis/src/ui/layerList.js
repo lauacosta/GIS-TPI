@@ -78,10 +78,7 @@ export function initLayerList(map, wfsLayers, layersData) {
         "beforeend",
         `<li class="layer-item">
           <button class="edit-button" title="Editar capa" data-layer-name="${layerName}">
-            <img
-              src="./assets/pencil-edit-02-stroke-rounded.svg"
-              alt="Dibujar vector"
-            />
+          
           </button>
           <div class="divider"></div>
           <label for="${layerName}">

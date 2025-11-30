@@ -3,6 +3,8 @@
   --bg-200: rgb(255, 254, 251);
   --bg-300: rgb(250, 247, 242);
   --bg-400: rgba(228, 244, 245, 0.712);
+  --color-400: #575656;
+  --color-500: #202020;
 
   --border-400: #d8d6cf;
   --border-600: #535353;
@@ -74,6 +76,7 @@ h4,
 h5,
 h6 {
   overflow-wrap: break-word;
+  color: var(--color-500);
 }
 
 /* 9. Improve line wrapping */
@@ -375,6 +378,7 @@ header {
 .active {
   border-radius: var(--border-radius);
   background-color: var(--bg-400);
+
   border: 1px solid var(--border-500) !important;
 }
 
@@ -1104,4 +1108,60 @@ nav::-webkit-scrollbar {
 
   -webkit-mask-size: contain;
   mask-size: contain;
+}
+
+.icon-container {
+  padding: 8px;
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition);
+  cursor: pointer;
+  border: 1px solid transparent;
+  position: relative;
+}
+
+.icon-container:hover {
+  background-color: var(--bg-400);
+}
+
+.badge {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+
+  color: var(--gricesito);
+  border-radius: 25%;
+  /* border: 0.5px solid var(--gricesito); */
+  width: 12px;
+
+  /* height: 20px;  */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  pointer-events: none;
+}
+
+.icon-container.activeMenu {
+  background-color: var(--bg-400);
+}
+
+.edit-button {
+  display: block;
+  width: 24px;
+  height: 24px;
+
+  background-color: var(--color-400);
+  transition: var(--transition);
+
+  -webkit-mask: url("/assets/pencil-edit-02-stroke-rounded.svg") no-repeat
+    center;
+  mask: url("/assets/pencil-edit-02-stroke-rounded.svg") no-repeat center;
+
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.layer-item {
+  place-items: center;
 }

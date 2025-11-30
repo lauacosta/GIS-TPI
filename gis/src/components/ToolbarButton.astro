@@ -1,0 +1,54 @@
+---
+interface Props {
+  src: string;
+  title: string;
+  id?: string;
+  dataTarget?: string;
+  badge?: string; // Para las letras X, F, L, P
+}
+
+const { src, title, id, dataTarget, badge } = Astro.props;
+
+const maskStyle = `url('${src}') no-repeat center / contain`;
+---
+
+<button class="icon-container" id={id} data-target={dataTarget} title={title}>
+  <span class="sidebar-icono" style={{ mask: maskStyle, WebkitMask: maskStyle }}
+  ></span>
+
+  {
+    badge && (
+      <span class:list={["badge", { "esc-badge": badge.length > 1 }]}>
+        {badge}
+      </span>
+    )
+  }
+</button>
+
+<style>
+  .sidebar-icono {
+    display: block;
+    width: 24px;
+    height: 24px;
+
+    background-color: var(--color-400);
+    transition: var(--transition);
+
+    -webkit-mask-size: contain;
+    mask-size: contain;
+  }
+
+  .icon-container:hover .sidebar-icono,
+  .active .sidebar-icono {
+    background-color: black;
+  }
+
+  .icono-capa {
+    -webkit-mask: url("./assets/layers-01-stroke-rounded.svg") no-repeat center;
+    mask: url("./assets/layers-01-stroke-rounded.svg") no-repeat center;
+  }
+  .esc-badge {
+    position: absolute;
+    right: 3px !important;
+  }
+</style>

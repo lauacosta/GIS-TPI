@@ -1,13 +1,10 @@
 <div class="legends-container-html" id="legends-container-html">
   <div class="legends-title-container">
     <span class="legends-title">
-      <button class="info-icon" title="Información de capas"
-        ><img src="/assets/information-square-stroke-rounded.svg" /></button
-      >
+      <button class="info-icon" title="Información de capas"></button>
       <h3 class="change-opacity">Información</h3></span
     >
     <button title="Ocultar leyendas" class="change-opacity close-legend-btn">
-      <img src="/assets/cancel-01-stroke-rounded.svg" alt="Cerrar" />
     </button>
   </div>
 
@@ -69,6 +66,42 @@
 
   .change-opacity {
     display: flex;
+  }
+
+  .close-legend-btn {
+    display: block;
+    width: 24px;
+    height: 24px;
+
+    background-color: var(--color-400);
+    transition: var(--transition);
+
+    -webkit-mask: url("/assets/cancel-01-stroke-rounded.svg") no-repeat center;
+    mask: url("/assets/cancel-01-stroke-rounded.svg") no-repeat center;
+
+    -webkit-mask-size: contain;
+    mask-size: contain;
+  }
+
+  .close-legend-btn:hover,
+  .info-icon:hover {
+    background-color: black;
+  }
+
+  .info-icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+
+    background-color: var(--color-400);
+    transition: var(--transition);
+
+    -webkit-mask: url("/assets/information-square-stroke-rounded.svg") no-repeat
+      center;
+    mask: url("/assets/information-square-stroke-rounded.svg") no-repeat center;
+
+    -webkit-mask-size: contain;
+    mask-size: contain;
   }
 </style>
 

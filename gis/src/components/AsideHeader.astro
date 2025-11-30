@@ -1,12 +1,12 @@
 ---
+import ToolbarButton from "./ToolbarButton.astro";
+
 const { titulo } = Astro.props;
 ---
 
 <div class="aside-header">
   <h2>{titulo}</h2>
-  <button title="Cerrar menú" class="close-menu-btn">
-    <img src="/assets/cancel-01-stroke-rounded.svg" alt="Cerrar" />
-  </button>
+  <button title="Cerrar menú" class="close-menu-btn"> </button>
 </div>
 
 <style>
@@ -21,5 +21,24 @@ const { titulo } = Astro.props;
       text-wrap: nowrap;
       font-size: 1rem;
     }
+  }
+
+  .close-menu-btn {
+    display: block;
+    width: 24px;
+    height: 24px;
+
+    background-color: var(--color-400);
+    transition: var(--transition);
+
+    -webkit-mask: url("/assets/cancel-01-stroke-rounded.svg") no-repeat center;
+    mask: url("/assets/cancel-01-stroke-rounded.svg") no-repeat center;
+
+    -webkit-mask-size: contain;
+    mask-size: contain;
+  }
+
+  .close-menu-btn:hover {
+    background-color: black;
   }
 </style>
