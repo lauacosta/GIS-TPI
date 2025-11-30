@@ -1,0 +1,80 @@
+<div class="editing-side-menu">
+  <button class="icon-container" id="save-edit" title="Guardar cambios">
+    <img src="./assets/save.svg" alt="Guardar cambios" />
+    <span class="badge">S</span>
+  </button>
+  <button class="icon-container" id="go-back-action" title="Volver">
+    <img src="./assets/undo.svg" alt="Volver" />
+    <span class="badge">Z</span>
+  </button>
+  <button class="icon-container" id="borrar-todo" title="Borrar todo">
+    <img src="./assets/eliminar.svg" alt="Borrar todo" />
+    <span class="badge">C</span>
+  </button>
+  <button class="icon-container" id="cancel-edit" title="Cancelar edición">
+    <img src="./assets/cancel-01-stroke-rounded.svg" alt="Cancelar edición" />
+    <span class="badge esc-badge">Esc</span>
+  </button>
+</div>
+
+<style>
+  .editing-side-menu {
+    background-color: var(--bg-200);
+    position: fixed;
+    top: 50%;
+    right: 0.5rem;
+    transform: translate(120%, -50%);
+    z-index: 20;
+    padding: 8px;
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: var(--transition);
+    box-shadow: var(--box-shadow);
+  }
+
+  .active-edit-controls {
+    position: fixed;
+    top: 50%;
+    right: 0.5rem;
+    transform: translate(0, -50%) !important;
+  }
+
+  .badge {
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+
+    color: var(--gricesito);
+    border-radius: 25%;
+    /* border: 0.5px solid var(--gricesito); */
+    width: 12px;
+
+    /* height: 20px;  */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    pointer-events: none;
+  }
+
+  .esc-badge {
+    position: absolute;
+    right: 3px !important;
+  }
+
+  .icon-container {
+    padding: 8px;
+    border-radius: var(--border-radius-sm);
+    transition: var(--transition);
+    cursor: pointer;
+    border: 1px solid transparent;
+    position: relative;
+  }
+
+  .icon-container:hover {
+    background-color: var(--bg-400);
+  }
+</style>

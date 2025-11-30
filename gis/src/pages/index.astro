@@ -2,6 +2,8 @@
 import LegendTable from "../components/LegendTable.astro";
 import SideMenu from "../components/SideMenu.astro";
 import Layout from "../layouts/Layout.astro";
+import EditingSideMenu from "../components/editingSideMenu.astro";
+import Popup from "../components/popup.astro";
 ---
 
 <Layout>
@@ -12,6 +14,7 @@ import Layout from "../layouts/Layout.astro";
     </div>
   </header>
   <SideMenu />
+  <EditingSideMenu />
   <div id="tables-container" class="tables-container"></div>
 
   <div id="map"></div>
@@ -19,6 +22,7 @@ import Layout from "../layouts/Layout.astro";
 
   <div id="legends-container" class="legends-container hidden"></div>
   <LegendTable />
+  <Popup />
 </Layout>
 
 <script>

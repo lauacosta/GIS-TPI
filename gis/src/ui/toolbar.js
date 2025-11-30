@@ -3,6 +3,11 @@ import { moveScale } from "../utils/manageScalePos";
 import { createMeasureTool } from "../map/interactions/measureTool";
 import { createQueryTool } from "../map/interactions/queryTool.JS";
 import { createExportTool } from "../map/interactions/exportTool";
+import { createDrawTool } from "../map/interactions/drawTool";
+import { getFeatureTypeInfo } from "../api/geoserver";
+import { workspace } from "../config/mapConst";
+import { selectedLayer } from "./layerList";
+import { Point } from "ol/geom";
 
 const Tools = {
   QUERY: "query",
@@ -12,6 +17,7 @@ const Tools = {
 };
 
 const Mode = Object.freeze({
+  Point: "Point",
   LineString: "LineString",
   Polygon: "Polygon",
 });
@@ -22,17 +28,27 @@ export function initToolbar(map, wfsLayers, layersData) {
     zoomout: document.querySelector("#zoom-out"),
     zoomin: document.querySelector("#zoom-in"),
     query: document.querySelector("#query"),
-    draw: document.querySelector("#draw"),
+    // draw: document.querySelector("#draw"),
     measurePolygon: document.querySelector("#measure-polygon"),
     measureLine: document.querySelector("#measure-line"),
     export_pdf: document.querySelector("#export-pdf"),
+    layersList: document.getElementById("selected-layers"),
   };
 
   const measureTool = createMeasureTool(map);
   const queryTool = createQueryTool(map, wfsLayers);
   const exportTool = createExportTool(map, wfsLayers, layersData);
+  const drawTool = createDrawTool(map);
+
+  // Configurar el callback de cancelación para el botón Esc del panel de edición
+  drawTool.setCancelCallback(() => {
+    if (activeToolName === Tools.DRAW) {
+      deactivateCurrentTool();
+    }
+  });
 
   let activeToolName = null;
+  let activeLayerName = null;
 
   const toolsConfig = {
     [Tools.QUERY]: {
@@ -54,27 +70,35 @@ export function initToolbar(map, wfsLayers, layersData) {
       disable: () => measureTool.disable(),
     },
     [Tools.DRAW]: {
-      domElement: dom.draw,
-      toolInstance: "drawToolPlaceholder",
-      enable: () => console.log("Draw ON"),
-      disable: () => console.log("Draw OFF"),
+      domElement: null,
+      toolInstance: drawTool,
+
+      enable: async (layerName) => {
+        try {
+          const featureInfo = await getFeatureTypeInfo(workspace, layerName);
+
+          drawTool.activate(featureInfo);
+
+          console.log(`Editando capa: ${layerName}`);
+        } catch (error) {
+          console.error("Error al obtener info de la capa:", error);
+        }
+      },
+      disable: () => drawTool.disable(),
     },
   };
 
-  function setActiveTool(newToolName) {
+  function setActiveTool(newToolName, params = {}) {
     const newTool = toolsConfig[newToolName];
-    const currentTool = activeToolName ? toolsConfig[activeToolName] : null;
+    // const currentTool = activeToolName ? toolsConfig[activeToolName] : null;
 
-    if (activeToolName === newToolName) {
+    if (activeToolName === newToolName && newToolName === Tools.DRAW) {
+      if (activeLayerName === params.layerName) {
+        deactivateCurrentTool();
+        return;
+      }
+    } else if (activeToolName === newToolName) {
       deactivateCurrentTool();
-      return;
-    }
-
-    if (currentTool && newTool.toolInstance === currentTool.toolInstance) {
-      currentTool.domElement.classList.remove("active");
-      newTool.domElement.classList.add("active");
-      newTool.enable();
-      activeToolName = newToolName;
       return;
     }
 
@@ -83,9 +107,14 @@ export function initToolbar(map, wfsLayers, layersData) {
     }
 
     if (newTool) {
-      if (newTool.domElement) newTool.domElement.classList.add("active");
-      newTool.enable();
+      if (newTool.domElement) {
+        newTool.domElement.classList.add("active");
+      }
+
+      newTool.enable(params.layerName);
+
       activeToolName = newToolName;
+      if (params.layerName) activeLayerName = params.layerName;
     }
   }
 
@@ -116,6 +145,18 @@ export function initToolbar(map, wfsLayers, layersData) {
     }
   });
 
+  document.addEventListener("click", (event) => {
+    const editBtn = event.target.closest(".edit-button");
+
+    if (editBtn) {
+      const layerName = editBtn.dataset.layerName;
+
+      if (layerName) {
+        setActiveTool(Tools.DRAW, { layerName: layerName });
+      }
+    }
+  });
+
   globalThis.addEventListener("keydown", (event) => {
     if (event.target.tagName === "INPUT") return;
 
@@ -138,12 +179,54 @@ export function initToolbar(map, wfsLayers, layersData) {
       case "p":
         setActiveTool(Tools.MEASURE_POLYGON);
         break;
+
       case "d":
         setActiveTool(Tools.DRAW);
         break;
 
       case "escape":
         if (activeToolName) setActiveTool(activeToolName);
+        break;
+
+      case "s": // Guardar todos los dibujos
+        if (activeToolName === Tools.DRAW) {
+          event.preventDefault();
+          drawTool.saveAll();
+        }
+        break;
+
+      case "c": // Limpiar dibujos guardados
+        if (activeToolName === Tools.DRAW) {
+          event.preventDefault();
+          const pending = drawTool.getPendingCount();
+          if (pending > 0) {
+            const confirm = window.confirm(
+              `Tienes ${pending} dibujo(s) sin guardar. ¿Limpiar de todos modos?`
+            );
+            if (confirm) {
+              drawTool.clearAll();
+            }
+          } else {
+            drawTool.clearSaved();
+          }
+        }
+        break;
+
+      case "z": // Deshacer último dibujo (UNDO)
+        if (activeToolName === Tools.DRAW) {
+          event.preventDefault();
+          const result = drawTool.undo();
+          if (!result.success && result.message) {
+            console.warn(result.message);
+          }
+        }
+        break;
+
+      case "b": // Borrar features seleccionadas (DELETE)
+        if (activeToolName === Tools.QUERY) {
+          event.preventDefault();
+          queryTool.deleteSelected();
+        }
         break;
 
       case "enter":
@@ -157,6 +240,11 @@ export function initToolbar(map, wfsLayers, layersData) {
         break;
     }
   });
+
+  console.log("Toolbar inicializado");
+  console.log(
+    "Atajos: Q=query, M=measure-polygon, L=measure-line, S=save drawings, C=clear drawings, Z=undo last, B=delete selected"
+  );
 
   moveScale(true);
 
