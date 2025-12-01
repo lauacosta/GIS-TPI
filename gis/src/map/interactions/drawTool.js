@@ -137,33 +137,54 @@ export function createDrawTool(map) {
     const modal = document.getElementById("simple-modal");
     const btnSave = document.getElementById("modal-btn-save");
     const btnCancel = document.getElementById("modal-btn-cancel");
-    const btnClose = document.getElementById("modal-btn-close");
+    const btnClose = document.getElementById("modal-btn-close"); // Si tienes botón de cerrar X
 
-    if (drawnFeatures.length === 0) {
-      return;
-    }
+    // Validación de seguridad
+    if (drawnFeatures.length === 0) return;
 
     modal.classList.add("active");
 
+    // --- BOTÓN GUARDAR ---
     btnSave.onclick = async () => {
+      // 1. Feedback visual en el botón
       btnSave.disabled = true;
+      const originalText = btnSave.textContent;
       btnSave.textContent = "Guardando...";
 
-      await saveAllFeatures();
+      // 2. Ejecutar guardado (Esto ya limpia el array y el mapa si sale bien)
+      const result = await saveAllFeatures();
 
+      // 3. Restaurar botón y cerrar modal
       modal.classList.remove("active");
       btnSave.disabled = false;
-      btnSave.textContent = "Guardar";
+      btnSave.textContent = originalText;
+
+      // ELIMINADO: selected.classList.remove("selected");
+      // ¿Por qué? Porque drawTool.disable() YA LO HIZO antes de abrir este modal.
+      // Si intentamos hacerlo aquí, podríamos romper el estilo de la NUEVA herramienta activa.
     };
 
+    // --- BOTÓN CANCELAR ---
     btnCancel.onclick = () => {
       modal.classList.remove("active");
+
+      // Si cancela, borramos todo lo dibujado para que no quede basura en el mapa
+      // sobre la nueva herramienta que el usuario seleccionó.
       clearAllDrawings();
     };
 
-    btnClose.onclick = () => {
-      modal.classList.remove("active");
-    };
+    // --- BOTÓN CERRAR (X) ---
+    if (btnClose) {
+      btnClose.onclick = () => {
+        modal.classList.remove("active");
+        // Decisión de diseño: ¿Si cierra la X, borramos o mantenemos?
+        // Generalmente es mejor mantener (no llamar a clearAllDrawings)
+        // pero ten en cuenta que los dibujos quedarán visibles sobre la nueva herramienta.
+
+        // Mi recomendación: Tratar la X igual que cancelar para evitar confusión visual.
+        clearAllDrawings();
+      };
+    }
   }
 
   async function saveAllFeatures() {
@@ -346,8 +367,6 @@ export function createDrawTool(map) {
       editSideBar.classList.add("active-edit-controls");
     },
     disable: () => {
-      const disableElement = document.querySelector(".selected");
-
       activeType = undefined;
       if (activeDraw) {
         map.removeInteraction(activeDraw);
@@ -370,8 +389,6 @@ export function createDrawTool(map) {
       }
 
       editSideBar.classList.remove("active-edit-controls");
-
-      disableElement.classList.remove("selected");
     },
     finish: () => {
       if (activeDraw) {

@@ -89,16 +89,21 @@ export function initToolbar(map, wfsLayers, layersData) {
   function setActiveTool(newToolName, params = {}) {
     const newTool = toolsConfig[newToolName];
 
-    const currentTool = activeToolName ? toolsConfig[activeToolName] : null;
+    if (newToolName !== Tools.DRAW) {
+      clearLayerListSelection();
+    }
 
     if (activeToolName === newToolName) {
       if (newToolName === Tools.DRAW && activeLayerName !== params.layerName) {
       } else {
         deactivateCurrentTool();
+
+        if (activeToolName === Tools.DRAW) {
+          clearLayerListSelection();
+        }
         return;
       }
     }
-
     if (activeToolName) {
       const isMeasureSwitch =
         (activeToolName === Tools.MEASURE_LINE &&
@@ -131,6 +136,8 @@ export function initToolbar(map, wfsLayers, layersData) {
       newTool.enable(params.layerName);
 
       activeToolName = newToolName;
+
+      if (params.layerName) activeLayerName = params.layerName;
     }
   }
 
@@ -264,4 +271,10 @@ export function initToolbar(map, wfsLayers, layersData) {
       }
     }
   });
+
+  function clearLayerListSelection() {
+    document.querySelectorAll(".layer-item.selected").forEach((item) => {
+      item.classList.remove("selected");
+    });
+  }
 }
