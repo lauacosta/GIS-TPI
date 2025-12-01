@@ -9,6 +9,7 @@ import { activeDrawStyle } from "../styles.js";
 import { getSelectedLayer } from "../../ui/layerList.js";
 import { insertFeatureWFST } from "../../api/geoserver.js";
 import { showToast } from "../../utils/toast.js";
+import { mapManager } from "../mapManager.js";
 
 export function createDrawTool(map) {
   const editSideBar = document.querySelector(".editing-side-menu");
@@ -182,7 +183,6 @@ export function createDrawTool(map) {
 
     const selectedLayer = getSelectedLayer();
     if (!selectedLayer) {
-      alert("No hay una capa seleccionada");
       return { success: false, error: "No layer selected" };
     }
 
@@ -225,8 +225,6 @@ export function createDrawTool(map) {
       }
     }
 
-    const message = `Guardados: ${successCount}, Errores: ${errorCount}`;
-
     if (successCount > 0) {
       // Limpiar features temporales
       clearSavedFeatures();
@@ -240,6 +238,7 @@ export function createDrawTool(map) {
       console.log(
         `✅ ${successCount} feature(s) guardado(s) en la base de datos`
       );
+      mapManager.refreshAllLayers();
     } else {
       showToast(
         `No se pudieron guardar los elementos. ${errors.join(", ")}`,
@@ -278,7 +277,7 @@ export function createDrawTool(map) {
   function clearAllDrawings() {
     source.clear();
     drawnFeatures.length = 0;
-    console.log("Todos los dibujos eliminados");
+    showToast(`Se han eliminado todos los cambios`, "success", 6000);
   }
 
   // Función para deshacer el último dibujo (UNDO)
@@ -366,6 +365,8 @@ export function createDrawTool(map) {
       editSideBar.classList.add("active-edit-controls");
     },
     disable: () => {
+      const disableElement = document.querySelector(".selected");
+
       activeType = undefined;
       if (activeDraw) {
         map.removeInteraction(activeDraw);
@@ -388,6 +389,8 @@ export function createDrawTool(map) {
       }
 
       editSideBar.classList.remove("active-edit-controls");
+
+      disableElement.classList.remove("selected");
     },
     finish: () => {
       if (activeDraw) {
@@ -399,6 +402,7 @@ export function createDrawTool(map) {
 
     clearSaved: clearSavedFeatures,
     clearAll: clearAllDrawings,
+
     undo: undoLast,
     getDrawnFeatures: () => drawnFeatures,
     getPendingCount: () => drawnFeatures.filter((f) => !f.get("saved")).length,

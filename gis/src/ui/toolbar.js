@@ -180,9 +180,9 @@ export function initToolbar(map, wfsLayers, layersData) {
         setActiveTool(Tools.MEASURE_POLYGON);
         break;
 
-      case "d":
-        setActiveTool(Tools.DRAW);
-        break;
+      // case "d":
+      //   setActiveTool(Tools.DRAW);
+      //   break;
 
       case "escape":
         if (activeToolName) setActiveTool(activeToolName);

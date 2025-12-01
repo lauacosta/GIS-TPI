@@ -108,7 +108,7 @@ export function createQueryTool(map, layersWFS) {
         <span class="label">Eliminar selección</span>
         <span class="count">0 features seleccionadas</span>
       </div>
-      <span class="badge">B</span>
+      <span class="badge-delete">B</span>
     `;
 
     button.addEventListener("click", () => {
@@ -308,7 +308,6 @@ export function createQueryTool(map, layersWFS) {
         })
         .join("");
 
-      // Actualizar contenido del modal
       const modalBody = modal.querySelector(".delete-modal-body");
       modalBody.innerHTML = `
         <div class="delete-warning">
@@ -324,7 +323,7 @@ export function createQueryTool(map, layersWFS) {
       modal.classList.add("active");
 
       // Event listeners
-      const closeBtn = modal.querySelector(".delete-modal-close");
+
       const cancelBtn = modal.querySelector(".delete-modal-button-cancel");
       const confirmBtn = modal.querySelector(".delete-modal-button-confirm");
 
@@ -338,7 +337,6 @@ export function createQueryTool(map, layersWFS) {
         resolve(true);
       };
 
-      closeBtn.onclick = closeModal;
       cancelBtn.onclick = closeModal;
       confirmBtn.onclick = confirmDelete;
 
@@ -356,16 +354,12 @@ export function createQueryTool(map, layersWFS) {
       <div class="delete-modal-content">
         <div class="delete-modal-header">
           <h2>Confirmar Eliminación</h2>
-          <button class="delete-modal-close" title="Cerrar">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </button>
+         
         </div>
         <div class="delete-modal-body"></div>
         <div class="delete-modal-footer">
-          <button class="delete-modal-button delete-modal-button-cancel">Cancelar</button>
-          <button class="delete-modal-button delete-modal-button-confirm">Eliminar</button>
+          <button class="delete-modal-button delete-modal-button-cancel btn-cancel">Cancelar</button>
+          <button class="delete-modal-button delete-modal-button-confirm btn-confirm">Eliminar</button>
         </div>
       </div>
     `;

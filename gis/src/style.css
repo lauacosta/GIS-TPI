@@ -845,7 +845,6 @@ nav::-webkit-scrollbar {
   font-size: 1.25rem;
   font-weight: 600;
   margin: 0;
-  color: #f44;
 }
 
 .delete-modal-close {
@@ -916,33 +915,21 @@ nav::-webkit-scrollbar {
 }
 
 .delete-modal-button {
-  padding: 0.625rem 1.25rem;
-  border-radius: var(--border-radius-sm);
-  font-weight: 600;
-  font-size: 0.875rem;
-  transition: var(--transition);
-  border: 1px solid var(--border-400);
 }
 
 .delete-modal-button-cancel {
-  background-color: var(--bg-200);
-  color: var(--border-600);
 }
 
 .delete-modal-button-cancel:hover {
-  background-color: var(--bg-300);
-  border-color: var(--border-600);
 }
 
 .delete-modal-button-confirm {
-  background-color: #f44;
+  background-color: #f44 !important;
   color: white;
-  border-color: #f44;
 }
 
 .delete-modal-button-confirm:hover {
-  background-color: #d33;
-  border-color: #d33;
+  background-color: #d33 !important;
 }
 
 /* Notificaciones toast */
@@ -1022,7 +1009,8 @@ nav::-webkit-scrollbar {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1094,6 +1082,7 @@ nav::-webkit-scrollbar {
   cursor: pointer;
   transition: var(--transition);
   flex: 1;
+  text-align: center;
 }
 
 .btn-confirm:hover {
@@ -1109,6 +1098,7 @@ nav::-webkit-scrollbar {
   cursor: pointer;
   flex: 1;
   transition: var(--transition);
+  text-align: center;
 }
 
 .btn-cancel:hover {
@@ -1160,6 +1150,25 @@ nav::-webkit-scrollbar {
   font-size: 10px;
   font-weight: bold;
   pointer-events: none;
+}
+
+.badge-delete {
+  color: var(--gricesito);
+  border-radius: 25%;
+  /* border: 0.5px solid var(--gricesito); */
+
+  background-color: var(--bg-300);
+  /* height: 20px;  */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  pointer-events: none;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--border-400);
 }
 
 .icon-container.activeMenu {
