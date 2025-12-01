@@ -13,7 +13,7 @@ import {
   measureLineStyle,
   measureToolTip,
   htmlSupToUnicode,
-} from "../styles.js";
+} from "../mapStyles.js";
 
 function createLabelFeature(coord, text) {
   const label = new Feature({
@@ -158,7 +158,7 @@ export function createMeasureTool(map) {
     activate: (drawType) => {
       addDrawInteraction(drawType);
     },
-    disable: () => {
+    disable: (shouldClear = true) => {
       activeType = undefined;
       if (activeDraw) {
         map.removeInteraction(activeDraw);
@@ -174,7 +174,10 @@ export function createMeasureTool(map) {
         helpTooltipElement = undefined;
       }
 
-      source.clear();
+      if (shouldClear) {
+        source.clear();
+        map.getOverlays().clear();
+      }
     },
     finish: () => {
       if (activeDraw) {

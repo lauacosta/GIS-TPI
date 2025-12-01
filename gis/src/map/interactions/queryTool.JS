@@ -10,8 +10,8 @@ import {
   // selectedPointStyle,
   selectedLineStyle,
   selectedPolygonStyle,
-} from "../styles.js";
-import { getSelectionStyleForFeature } from "../icon_registry.js";
+} from "../mapStyles.js";
+import { getSelectionStyleForFeature } from "../layerIcons.js";
 import { deleteFeatureWFST } from "../../api/geoserver.js";
 import { workspace } from "../../config/mapConst.js";
 

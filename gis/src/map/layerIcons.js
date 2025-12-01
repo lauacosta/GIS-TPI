@@ -151,6 +151,30 @@ export const CATEGORIES = {
     keywords: ["agropec", "agro"],
   },
 
+  localidades: {
+    icon: "localidades",
+    color: "#d40404ff",
+    keywords: ["Localidad"],
+  },
+
+  marcas: {
+    icon: "marcas",
+    color: "#d47304ff",
+    keywords: ["Marcas y Señales"],
+  },
+
+  puntoAlturaTopo: {
+    icon: "puntoAlturaTopo",
+    color: "#753f02ff",
+    keywords: [
+      "topografica",
+      "topograficas",
+      "topográficas",
+      "topográfica",
+      "puntos_de_alturas_topograficas",
+    ],
+  },
+
   unknown: {
     icon: "dunno",
     color: "#9E9E9E",

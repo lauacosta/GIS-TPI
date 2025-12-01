@@ -1,4 +1,4 @@
-import { centerInitialPos, zoomIn, zoomOut } from "../map/controls";
+import { centerInitialPos, zoomIn, zoomOut } from "../map/defaultControls";
 import { moveScale } from "../utils/manageScalePos";
 import { createMeasureTool } from "../map/interactions/measureTool";
 import { createQueryTool } from "../map/interactions/queryTool.JS";
@@ -6,8 +6,6 @@ import { createExportTool } from "../map/interactions/exportTool";
 import { createDrawTool } from "../map/interactions/drawTool";
 import { getFeatureTypeInfo } from "../api/geoserver";
 import { workspace } from "../config/mapConst";
-import { selectedLayer } from "./layerList";
-import { Point } from "ol/geom";
 
 const Tools = {
   QUERY: "query",
@@ -61,13 +59,13 @@ export function initToolbar(map, wfsLayers, layersData) {
       domElement: dom.measureLine,
       toolInstance: measureTool,
       enable: () => measureTool.activate(Mode.LineString),
-      disable: () => measureTool.disable(),
+      disable: (clear) => measureTool.disable(clear),
     },
     [Tools.MEASURE_POLYGON]: {
       domElement: dom.measurePolygon,
       toolInstance: measureTool,
       enable: () => measureTool.activate(Mode.Polygon),
-      disable: () => measureTool.disable(),
+      disable: (clear) => measureTool.disable(clear),
     },
     [Tools.DRAW]: {
       domElement: null,
@@ -90,20 +88,39 @@ export function initToolbar(map, wfsLayers, layersData) {
 
   function setActiveTool(newToolName, params = {}) {
     const newTool = toolsConfig[newToolName];
-    // const currentTool = activeToolName ? toolsConfig[activeToolName] : null;
 
-    if (activeToolName === newToolName && newToolName === Tools.DRAW) {
-      if (activeLayerName === params.layerName) {
+    const currentTool = activeToolName ? toolsConfig[activeToolName] : null;
+
+    if (activeToolName === newToolName) {
+      if (newToolName === Tools.DRAW && activeLayerName !== params.layerName) {
+      } else {
         deactivateCurrentTool();
         return;
       }
-    } else if (activeToolName === newToolName) {
-      deactivateCurrentTool();
-      return;
     }
 
     if (activeToolName) {
-      deactivateCurrentTool();
+      const isMeasureSwitch =
+        (activeToolName === Tools.MEASURE_LINE &&
+          newToolName === Tools.MEASURE_POLYGON) ||
+        (activeToolName === Tools.MEASURE_POLYGON &&
+          newToolName === Tools.MEASURE_LINE);
+
+      const isDrawSwitch =
+        activeToolName === Tools.DRAW && newToolName === Tools.DRAW;
+
+      let disableParam = true;
+
+      if (
+        activeToolName === Tools.MEASURE_LINE ||
+        activeToolName === Tools.MEASURE_POLYGON
+      ) {
+        disableParam = !isMeasureSwitch;
+      } else if (activeToolName === Tools.DRAW) {
+        disableParam = isDrawSwitch;
+      }
+
+      deactivateCurrentTool(disableParam);
     }
 
     if (newTool) {
@@ -114,20 +131,20 @@ export function initToolbar(map, wfsLayers, layersData) {
       newTool.enable(params.layerName);
 
       activeToolName = newToolName;
-      if (params.layerName) activeLayerName = params.layerName;
     }
   }
 
-  function deactivateCurrentTool() {
+  function deactivateCurrentTool(param = true) {
     if (!activeToolName) return;
 
     const tool = toolsConfig[activeToolName];
 
     if (tool.domElement) tool.domElement.classList.remove("active");
 
-    tool.disable();
+    tool.disable(param);
 
     activeToolName = null;
+    if (activeToolName !== Tools.DRAW) activeLayerName = null;
   }
 
   dom.center.addEventListener("click", () => centerInitialPos(map.getView()));
@@ -180,10 +197,6 @@ export function initToolbar(map, wfsLayers, layersData) {
         setActiveTool(Tools.MEASURE_POLYGON);
         break;
 
-      // case "d":
-      //   setActiveTool(Tools.DRAW);
-      //   break;
-
       case "escape":
         if (activeToolName) setActiveTool(activeToolName);
         break;
@@ -207,7 +220,7 @@ export function initToolbar(map, wfsLayers, layersData) {
         }
         break;
 
-      case "z": // Deshacer último dibujo (UNDO)
+      case "z":
         if (activeToolName === Tools.DRAW) {
           event.preventDefault();
           const result = drawTool.undo();
@@ -236,11 +249,6 @@ export function initToolbar(map, wfsLayers, layersData) {
     }
   });
 
-  console.log("Toolbar inicializado");
-  console.log(
-    "Atajos: Q=query, M=measure-polygon, L=measure-line, S=save drawings, C=clear drawings, Z=undo last, B=delete selected"
-  );
-
   moveScale(true);
 
   document.addEventListener("click", (event) => {
@@ -248,11 +256,10 @@ export function initToolbar(map, wfsLayers, layersData) {
 
     if (activeElement) {
       const isButton = activeElement.tagName === "BUTTON";
-      const isCheckboxOrRadio =
-        activeElement.tagName === "INPUT" &&
-        (activeElement.type === "checkbox" || activeElement.type === "radio");
+      const isCheckbox =
+        activeElement.tagName === "INPUT" && activeElement.type === "checkbox";
 
-      if (isButton || isCheckboxOrRadio) {
+      if (isButton || isCheckbox) {
         activeElement.blur();
       }
     }

@@ -1,4 +1,4 @@
-import { getLayerStyle } from "../map/icon_registry";
+import { getLayerStyle } from "../map/layerIcons";
 import { Icon } from "ol/style"; // Importamos Icon para comprobar el tipo
 
 export function initHtmlLegend(map, wfsLayers, layersData) {
@@ -31,50 +31,41 @@ export function initHtmlLegend(map, wfsLayers, layersData) {
       itemDiv.className = "legend-item";
 
       const symbolSpan = document.createElement("span");
-      // Asignamos una clase base
+
       symbolSpan.className = `legend-symbol symbol-${getTypeClass(
         geometryType
       )}`;
 
-      // --- LÓGICA CORREGIDA AQUÍ ---
       try {
         const style = getLayerStyle(layerName, geometryType);
         const imageStyle = style.getImage();
 
         if (imageStyle && imageStyle instanceof Icon) {
-          // CASO 1: Es un ICONO (SVG coloreado)
-          const src = imageStyle.getSrc(); // Obtenemos el data-uri del caché
+          const src = imageStyle.getSrc();
 
-          // Usamos backgroundImage en lugar de backgroundColor
           symbolSpan.style.backgroundImage = `url('${src}')`;
           symbolSpan.style.backgroundRepeat = "no-repeat";
           symbolSpan.style.backgroundPosition = "center";
           symbolSpan.style.backgroundSize = "contain";
-          symbolSpan.style.backgroundColor = "transparent"; // Quitamos el fondo gris
-          symbolSpan.style.border = "none"; // Los iconos suelen verse mejor sin borde
+          symbolSpan.style.backgroundColor = "transparent";
+          symbolSpan.style.border = "none";
         } else {
-          // CASO 2: VECTORES (Líneas o Polígonos)
           let color = "#333";
 
           if (geometryType.toLowerCase().includes("line")) {
-            // --- CAMBIO PARA LÍNEAS ---
             color = style.getStroke() ? style.getStroke().getColor() : "#333";
             symbolSpan.style.backgroundColor = color;
 
-            // Forzamos que parezca una línea aplastando la altura
             symbolSpan.style.height = "3px";
             symbolSpan.style.borderRadius = "2px";
             symbolSpan.style.border = "none";
           } else {
-            // --- CAMBIO PARA POLÍGONOS ---
             color = style.getFill() ? style.getFill().getColor() : "#333";
             symbolSpan.style.backgroundColor = color;
 
-            // El polígono sí debe ser cuadrado/completo
             symbolSpan.style.height = "";
 
             if (color.length > 7) {
-              // Si tiene transparencia
               symbolSpan.style.border = `1px solid ${color.substring(0, 7)}`;
             }
           }
@@ -100,7 +91,6 @@ export function initHtmlLegend(map, wfsLayers, layersData) {
   renderLegend();
 }
 
-// Helpers
 function getTypeClass(type) {
   const t = type.toLowerCase();
   if (t.includes("point")) return "point";

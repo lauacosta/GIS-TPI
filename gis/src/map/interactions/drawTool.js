@@ -5,7 +5,7 @@ import { LineString, Polygon, Point } from "ol/geom.js";
 import { Vector as VectorSource } from "ol/source.js";
 import { Vector as VectorLayer } from "ol/layer.js";
 import Feature from "ol/Feature.js";
-import { activeDrawStyle } from "../styles.js";
+import { activeDrawStyle } from "../mapStyles.js";
 import { getSelectedLayer } from "../../ui/layerList.js";
 import { insertFeatureWFST } from "../../api/geoserver.js";
 import { showToast } from "../../utils/toast.js";
@@ -14,7 +14,6 @@ import { mapManager } from "../mapManager.js";
 export function createDrawTool(map) {
   const editSideBar = document.querySelector(".editing-side-menu");
 
-  // Source y layer para features dibujadas (persistentes)
   const source = new VectorSource();
   const vectorLayer = new VectorLayer({
     source: source,
@@ -30,7 +29,6 @@ export function createDrawTool(map) {
   let sketch;
   let helpTooltipElement, helpTooltip;
 
-  // Array para almacenar features dibujadas pendientes de guardar
   const drawnFeatures = [];
 
   const continuePointMessage = "Click para colocar un punto";
@@ -107,23 +105,20 @@ export function createDrawTool(map) {
       const feature = event.feature;
       const selectedLayer = getSelectedLayer();
 
-      // Verificar que haya una capa seleccionada al terminar de dibujar
       if (!selectedLayer) {
         console.warn(
           "No hay capa seleccionada, feature no tendrá información de capa"
         );
       }
 
-      // Agregar metadata al feature
       feature.setProperties({
         layerName: selectedLayer?.name || "unknown",
         workspace: selectedLayer?.workspace || "TPI_GIS",
         drawType: activeType,
         timestamp: new Date().toISOString(),
-        saved: false, // Marca como no guardado en BD
+        saved: false,
       });
 
-      // Agregar a la lista de features pendientes
       drawnFeatures.push(feature);
 
       console.log(
@@ -132,8 +127,6 @@ export function createDrawTool(map) {
 
       sketch = undefined;
       helpMessage = startDrawingMessage;
-
-      // NO limpiamos el source, las features permanecen visibles
     });
 
     map.addInteraction(activeDraw);
@@ -170,11 +163,9 @@ export function createDrawTool(map) {
 
     btnClose.onclick = () => {
       modal.classList.remove("active");
-      // No hacer nada, solo cerrar el modal y continuar editando
     };
   }
 
-  // Función para guardar TODAS las features pendientes en la BD
   async function saveAllFeatures() {
     if (drawnFeatures.length === 0) {
       showToast("No hay features para guardar", "info");
@@ -193,7 +184,6 @@ export function createDrawTool(map) {
     for (const feature of drawnFeatures) {
       if (feature.get("saved")) continue;
 
-      // Usar la capa que se guardó EN el feature cuando se dibujó
       const featureLayerName = feature.get("layerName");
       const featureWorkspace = feature.get("workspace");
 
@@ -226,7 +216,6 @@ export function createDrawTool(map) {
     }
 
     if (successCount > 0) {
-      // Limpiar features temporales
       clearSavedFeatures();
 
       showToast(
@@ -255,7 +244,6 @@ export function createDrawTool(map) {
     };
   }
 
-  // Función para limpiar SOLO los features guardados
   function clearSavedFeatures() {
     const unsavedFeatures = drawnFeatures.filter((f) => !f.get("saved"));
 
@@ -280,17 +268,14 @@ export function createDrawTool(map) {
     showToast(`Se han eliminado todos los cambios`, "success", 6000);
   }
 
-  // Función para deshacer el último dibujo (UNDO)
   function undoLast() {
     if (drawnFeatures.length === 0) {
       console.log("No hay dibujos para deshacer");
       return { success: false, message: "No hay dibujos" };
     }
 
-    // Obtener el último feature
     const lastFeature = drawnFeatures[drawnFeatures.length - 1];
 
-    // Verificar que no esté guardado
     if (lastFeature.get("saved")) {
       console.log("El último feature ya fue guardado, no se puede deshacer");
       return {
@@ -299,10 +284,8 @@ export function createDrawTool(map) {
       };
     }
 
-    // Remover del array
     drawnFeatures.pop();
 
-    // Remover del source visual
     source.removeFeature(lastFeature);
 
     console.log(`Feature eliminado. Pendientes: ${drawnFeatures.length}`);
@@ -312,7 +295,6 @@ export function createDrawTool(map) {
     };
   }
 
-  // Configurar event listeners para los botones del panel de edición
   function setupEditingButtons(onCancelCallback) {
     const saveBtn = document.querySelector("#save-edit");
     const undoBtn = document.querySelector("#go-back-action");
@@ -349,7 +331,6 @@ export function createDrawTool(map) {
 
     if (cancelBtn) {
       cancelBtn.addEventListener("click", () => {
-        // Llamar al callback para desactivar la herramienta desde toolbar
         if (onCancelCallback) {
           onCancelCallback();
         }
@@ -407,7 +388,6 @@ export function createDrawTool(map) {
     getDrawnFeatures: () => drawnFeatures,
     getPendingCount: () => drawnFeatures.filter((f) => !f.get("saved")).length,
 
-    // Método para configurar el callback de cancelación
     setCancelCallback: (callback) => {
       cancelCallback = callback;
       setupEditingButtons(callback);

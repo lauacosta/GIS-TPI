@@ -1,6 +1,5 @@
 import { setEmoji } from "../utils/setEmoji";
 
-// Variable para mantener la capa seleccionada
 export let selectedLayer = null;
 
 export function initLayerList(map, wfsLayers, layersData) {
@@ -8,13 +7,11 @@ export function initLayerList(map, wfsLayers, layersData) {
   const searchInput = document.querySelector("#layer-search");
   const cleanButton = document.querySelector(".clean-selection");
 
-  // Verificar que los elementos existan
   if (!ulLayers || !searchInput) {
     console.error("No se encontraron los elementos del DOM necesarios");
     return;
   }
 
-  // Validar que layersData sea un array
   if (!Array.isArray(layersData)) {
     console.error("layersData no es un array:", layersData);
     return;
@@ -61,7 +58,6 @@ export function initLayerList(map, wfsLayers, layersData) {
   function renderList(list) {
     ulLayers.innerHTML = "";
 
-    // Validar que list sea un array
     if (!Array.isArray(list)) {
       console.error("renderList: list no es un array", list);
       return;
@@ -72,7 +68,7 @@ export function initLayerList(map, wfsLayers, layersData) {
         (l) => l.get("layerName") === layerName
       );
 
-      if (!targetLayer) continue; // Saltar si no se encuentra la capa
+      if (!targetLayer) continue;
 
       ulLayers.insertAdjacentHTML(
         "beforeend",

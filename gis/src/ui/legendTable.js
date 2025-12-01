@@ -4,7 +4,7 @@ import { Vector as VectorSource } from "ol/source";
 import { Feature } from "ol";
 import { Point } from "ol/geom";
 import { Style, Fill, Stroke, Text, RegularShape, Icon } from "ol/style";
-import { getLayerStyle } from "../map/icon_registry";
+import { getLayerStyle } from "../map/layerIcons";
 
 const styles = {
   font: "'Noto Sans JP', sans-serif",
