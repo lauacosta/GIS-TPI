@@ -20,7 +20,7 @@ export function createQueryTool(map, layersWFS) {
   let helpTooltip;
   let pointerMoveKey;
 
-  const startMessage = "Mantené Ctrl + Arrastrá para seleccionar";
+  const startMessage = "Click para seleccionar | Ctrl + Arrastrá para selección múltiple";
   const dragMessage = "Suelta el mouse para terminar";
 
   let helpMessage = startMessage;
@@ -52,6 +52,8 @@ export function createQueryTool(map, layersWFS) {
   };
 
   const selectInteraction = new Select({
+    // Agregar hit tolerance para mejorar la selección de puntos
+    hitTolerance: 10, // Píxeles de tolerancia alrededor del feature
     style: function (feature) {
       const geom = feature && feature.getGeometry && feature.getGeometry();
       const type = geom && geom.getType && geom.getType();
@@ -76,7 +78,25 @@ export function createQueryTool(map, layersWFS) {
   }
 
   // Actualizar visibilidad del botón cuando cambia la selección
-  selectInteraction.on("select", () => {
+  selectInteraction.on("select", (e) => {
+    // Si hay features seleccionadas, actualizar las tablas
+    const selectedFeatures = selectInteraction.getFeatures().getArray();
+    if (selectedFeatures.length > 0) {
+      updateTabs(selectedFeatures);
+      
+      // Abrir automáticamente el panel de tablas si se selecciona algo
+      const tablesBtn = document.querySelector('[data-target="tables"]');
+      if (tablesBtn) tablesBtn.click();
+
+      const layersList = document.getElementById("selected-layers");
+      if (layersList) {
+        const firstLayerBtn = layersList.querySelector(".layer-btn");
+        if (firstLayerBtn) {
+          firstLayerBtn.click();
+        }
+      }
+    }
+    
     updateDeleteButton();
   });
 
