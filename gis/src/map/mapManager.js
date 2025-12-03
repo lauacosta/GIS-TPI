@@ -2,7 +2,7 @@ import OSM from "ol/source/OSM";
 import { Map, View } from "ol";
 import { defaults as defaultControls } from "ol/control/defaults.js";
 import TileLayer from "ol/layer/Tile.js";
-import { scaleControl } from "./defaultControls"; // Asegúrate de que la ruta sea correcta
+import { scaleControl } from "./defaultControls";
 import { CORRIENTES_TIENE_PAYE, workspace } from "../config/mapConst";
 import { fetchLayersFromGeoServer } from "../api/geoserver";
 import { createWFSLayer } from "./layerFactory";

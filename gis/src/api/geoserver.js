@@ -42,15 +42,8 @@ export const getWFSUrl = (workspace, layerName, extent, epsg) => {
   );
 };
 
-// ...existing code...
 
-/**
- * Inserta una feature en GeoServer usando WFS-T (Web Feature Service - Transactional)
- * @param {string} workspace - Nombre del workspace en GeoServer
- * @param {string} layerName - Nombre de la capa
- * @param {ol.geom.Geometry} geometry - Geometría de OpenLayers
- * @returns {Promise<{success: boolean, error?: string}>}
- */
+
 export async function insertFeatureWFST(workspace, layerName, geometry, attributes = {}) {
   try {
     // Obtener información del namespace y campos desde DescribeFeatureType
@@ -228,10 +221,7 @@ export async function getFeatureTypeInfo(workspace, layerName) {
   }
 }
 
-/**
- * Convierte una geometría de OpenLayers a formato GML 3.1.1
- * IMPORTANTE: La geometría YA debe estar en EPSG:4326 antes de llamar esta función
- */
+
 function geometryToGML(geometry, geometryFieldName = "geom") {
   const type = geometry.getType();
   const coords = geometry.getCoordinates();
@@ -246,7 +236,7 @@ function geometryToGML(geometry, geometryFieldName = "geom") {
       </${geometryFieldName}>`;
 
     case "LineString":
-      // Coordenadas como lon lat lon lat...
+
       const lineCoords = coords.map((c) => `${c[0]} ${c[1]}`).join(" ");
       return `<${geometryFieldName}>
         <gml:LineString srsName="EPSG:4326">
@@ -255,7 +245,6 @@ function geometryToGML(geometry, geometryFieldName = "geom") {
       </${geometryFieldName}>`;
 
     case "Polygon":
-      // Anillo exterior con coordenadas lon lat lon lat...
       const exteriorRing = coords[0].map((c) => `${c[0]} ${c[1]}`).join(" ");
       return `<${geometryFieldName}>
         <gml:Polygon srsName="EPSG:4326">
@@ -272,13 +261,7 @@ function geometryToGML(geometry, geometryFieldName = "geom") {
   }
 }
 
-/**
- * Elimina una feature de GeoServer usando WFS-T (Delete)
- * @param {string} workspace - Nombre del workspace en GeoServer
- * @param {string} layerName - Nombre de la capa
- * @param {string} featureId - ID de la feature a eliminar (ej: "isla.1")
- * @returns {Promise<{success: boolean, error?: string}>}
- */
+
 export async function deleteFeatureWFST(workspace, layerName, featureId) {
   try {
     const namespaceInfo = await getFeatureTypeInfo(workspace, layerName);

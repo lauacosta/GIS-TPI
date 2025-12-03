@@ -159,9 +159,6 @@ export function createDrawTool(map) {
       btnSave.disabled = false;
       btnSave.textContent = originalText;
 
-      // ELIMINADO: selected.classList.remove("selected");
-      // ¿Por qué? Porque drawTool.disable() YA LO HIZO antes de abrir este modal.
-      // Si intentamos hacerlo aquí, podríamos romper el estilo de la NUEVA herramienta activa.
     };
 
     // --- BOTÓN CANCELAR ---
@@ -177,11 +174,7 @@ export function createDrawTool(map) {
     if (btnClose) {
       btnClose.onclick = () => {
         modal.classList.remove("active");
-        // Decisión de diseño: ¿Si cierra la X, borramos o mantenemos?
-        // Generalmente es mejor mantener (no llamar a clearAllDrawings)
-        // pero ten en cuenta que los dibujos quedarán visibles sobre la nueva herramienta.
-
-        // Mi recomendación: Tratar la X igual que cancelar para evitar confusión visual.
+       
         clearAllDrawings();
       };
     }
@@ -245,9 +238,7 @@ export function createDrawTool(map) {
         6000
       );
 
-      console.log(
-        `✅ ${successCount} feature(s) guardado(s) en la base de datos`
-      );
+      
       mapManager.refreshAllLayers();
     } else {
       showToast(
